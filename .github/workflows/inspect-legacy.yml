@@ -1,0 +1,76 @@
+name: Inspect legacy SourirePlus assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/inspect-legacy.yml
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check SFTP settings
+        shell: bash
+        env:
+          SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          for name in SFTP_SERVER SFTP_USERNAME SFTP_PASSWORD SFTP_PORT; do
+            if [ -z "${!name:-}" ]; then
+              echo "Missing required secret: $name" >&2
+              exit 1
+            fi
+          done
+
+      - name: Install SFTP inventory client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Build a public-assets-only inventory
+        shell: bash
+        env:
+          SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          mkdir -p legacy-inventory
+          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_SERVER" <<'LFTP' > legacy-inventory/raw-tree.txt
+          set sftp:auto-confirm yes
+          set net:max-retries 2
+          set net:timeout 20
+          cls -la
+          cls -la sourireplus.bak
+          find sourireplus.bak
+          bye
+          LFTP
+
+          {
+            echo "Inventaire documentaire de sourireplus.bak"
+            echo
+            echo "Fichiers publics potentiellement réutilisables :"
+            grep -Ei '\.(avif|css|gif|html?|ico|jpe?g|js|json|pdf|png|svg|webp|woff2?|ttf|otf)$' legacy-inventory/raw-tree.txt               | grep -Evi '(^|/)(wp-config|\.env|error[_-]?log|debug[_-]?log|backup|dump|cache|session|private|secret|credential)'               | sed -n '1,20000p' || true
+          } > legacy-inventory/public-files.txt
+
+          {
+            echo "Racine SFTP et dossier historique :"
+            sed -n '1,200p' legacy-inventory/raw-tree.txt
+          } > legacy-inventory/top-level.txt
+
+          rm -f legacy-inventory/raw-tree.txt
+
+      - name: Upload sanitized inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: sourireplus-legacy-inventory
+          path: legacy-inventory
+          if-no-files-found: error
+          retention-days: 3
