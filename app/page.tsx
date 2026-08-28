@@ -194,7 +194,7 @@ export default function Home() {
       <header className="site-header">
         <Brand />
         <nav className="desktop-nav" aria-label="Navigation principale">
-          <a href="#histoire">18 ans</a>
+          <a href="#histoire">18 ans d’existence</a>
           <a href="#approche">Notre approche</a>
           <a href="#soins">Nos soins</a>
           <a href="#equipe">L’équipe</a>
@@ -206,7 +206,7 @@ export default function Home() {
           <details className="mobile-menu">
             <summary aria-label="Ouvrir le menu"><Menu aria-hidden="true" /></summary>
             <nav aria-label="Navigation mobile">
-              <a href="#histoire">18 ans</a>
+              <a href="#histoire">18 ans d’existence</a>
               <a href="#approche">Notre approche</a>
               <a href="#soins">Nos soins</a>
               <a href="#equipe">L’équipe</a>
@@ -219,17 +219,17 @@ export default function Home() {
 
       <section className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow"><span>18 ans à Neuchâtel</span> · Depuis 2008</p>
+          <p className="eyebrow"><span>Fondée en 2008</span> · 18 ans d’existence</p>
           <h1 id="hero-title">Votre sourire mérite une <em>vision à long terme.</em></h1>
           <p className="hero-lead">
-            Une équipe de praticiens fidèle, des protocoles affinés au fil des années et une technologie utile pour choisir aujourd’hui ce qui protégera votre bouche demain.
+            Une clinique solidement installée à Neuchâtel depuis 18 ans, portée par des praticiens qui disposent d’au moins 25 ans d’expérience et par des protocoles affinés dans la durée.
           </p>
           <div className="hero-actions">
             <AppointmentDialog />
             <a className="secondary-cta" href="#approche">Découvrir notre approche <ArrowRight aria-hidden="true" /></a>
           </div>
           <div className="hero-proof" aria-label="Points forts">
-            <span><Check aria-hidden="true" /> Continuité des praticiens</span>
+            <span><Check aria-hidden="true" /> 18 ans d’existence à Neuchâtel</span>
             <span><Check aria-hidden="true" /> Organisation et protocoles éprouvés</span>
           </div>
         </div>
@@ -240,7 +240,7 @@ export default function Home() {
             <span><strong>Votre bouche en 3D</strong><small>Voir, comprendre, décider</small></span>
           </div>
           <div className="hero-card hero-card-bottom">
-            <strong>18</strong><span>ans de continuité<br />à Neuchâtel</span>
+            <strong>18</strong><span>ans d’existence<br />depuis 2008</span>
           </div>
         </div>
       </section>
@@ -256,28 +256,33 @@ export default function Home() {
       <section className="legacy section-shell" id="histoire">
         <div className="legacy-number" aria-hidden="true">
           <strong>18</strong>
-          <span>années<br />d’expérience</span>
+          <span>ans<br />d’existence</span>
         </div>
         <div className="legacy-copy">
-          <p className="eyebrow">Notre différence depuis 2008</p>
-          <h2>La stabilité qui rassure.<br /><em>L’expérience qui fait gagner du temps.</em></h2>
+          <p className="eyebrow">Une clinique créée il y a 18 ans</p>
+          <h2>La longévité comme preuve.<br /><em>Le sérieux dans la durée.</em></h2>
           <p>
-            À Neuchâtel, SourirePlus s’inscrit dans la durée. La continuité de ses praticiens permet de connaître les patients, de suivre leur bouche sur plusieurs années et de prendre des décisions avec le recul que la dentisterie exige.
+            Fondée en 2008, SourirePlus accompagne les patients de Neuchâtel depuis 18 ans. Cette longévité témoigne d’une clinique stable, fiable et capable d’assumer ses traitements dans le temps. Elle s’appuie sur des praticiens qui possèdent au minimum 25 ans d’expérience, selon leur parcours.
           </p>
         </div>
         <div className="legacy-principles">
           <article>
             <span>01</span>
-            <h3>Une équipe qui se connaît</h3>
-            <p>Les compétences se coordonnent naturellement, avec une information qui circule sans rupture.</p>
+            <h3>18 ans d’existence</h3>
+            <p>Une clinique implantée durablement, qui suit ses patients et assume ses soins sur le long terme.</p>
           </article>
           <article>
             <span>02</span>
+            <h3>25 ans d’expérience au moins</h3>
+            <p>Des praticiens expérimentés, avec des parcours différents mais tous construits sur plusieurs décennies.</p>
+          </article>
+          <article>
+            <span>03</span>
             <h3>Une organisation sans faille</h3>
             <p>Chaque étape est préparée pour rendre le parcours plus fluide, plus ponctuel et plus efficace.</p>
           </article>
           <article>
-            <span>03</span>
+            <span>04</span>
             <h3>Des protocoles éprouvés</h3>
             <p>Les méthodes de soins ont été affinées année après année pour gagner en précision et en sérénité.</p>
           </article>
@@ -306,7 +311,7 @@ export default function Home() {
             <span className="step-number">02</span>
             <Activity aria-hidden="true" />
             <h3>Mesurer son âge</h3>
-            <p>Gencives, dents, usure, fonction et esthétique sont situées sur des courbes lisibles.</p>
+            <p>Alignement, gencives, caries, restaurations, fonction et esthétique sont analysés sur six courbes distinctes.</p>
           </article>
           <article>
             <span className="step-number">03</span>
@@ -352,7 +357,7 @@ export default function Home() {
           </p>
           <ul>
             <li><Check aria-hidden="true" /><span><strong>Empreinte numérique</strong> plus confortable et immédiatement visible</span></li>
-            <li><Check aria-hidden="true" /><span><strong>Courbes personnalisées</strong> pour situer les forces et les fragilités de votre bouche</span></li>
+            <li><Check aria-hidden="true" /><span><strong>Six courbes personnalisées</strong> pour situer les forces et les fragilités de votre bouche</span></li>
             <li><Check aria-hidden="true" /><span><strong>Suivi dans le temps</strong> pour visualiser l’effet des soins et de la maintenance</span></li>
           </ul>
           <a className="inline-link" href="/methode/">Comprendre les courbes <ArrowRight aria-hidden="true" /></a>

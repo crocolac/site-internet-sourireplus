@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "L’âge de votre bouche | Méthode SourirePlus",
   description:
-    "Découvrez la méthode SourirePlus : courbes de santé bucco-dentaire, âge de la bouche, jumeau numérique et trajectoire personnalisée.",
+    "Découvrez les six courbes de la méthode SourirePlus : alignement, gencives, caries, restaurations, fonction et esthétique, intégrées au jumeau numérique.",
 };
 
 const stages = [
@@ -22,6 +22,15 @@ const stages = [
   { age: "40", title: "Préserver", text: "Détecter les évolutions avant qu’elles ne deviennent des problèmes." },
   { age: "50", title: "Préparer", text: "Renforcer ce qui doit l’être pour aborder la suite sereinement." },
   { age: "70", title: "Profiter", text: "Conserver une bouche confortable, fonctionnelle et facile à entretenir." },
+];
+
+const curveDomains = [
+  { number: "01", title: "Alignement", text: "Le positionnement des dents, leur stabilité et leur évolution dans le temps." },
+  { number: "02", title: "Gencives", text: "Le soutien des dents, la santé des tissus et leur stabilité à long terme." },
+  { number: "03", title: "Caries", text: "La santé dentaire, les périodes de fragilité et les signes de dégradation." },
+  { number: "04", title: "Restaurations", text: "La durabilité des soins existants, leur surveillance et leur remplacement éventuel." },
+  { number: "05", title: "Fonction", text: "La mastication, les douleurs, l’équilibre de la bouche et les phénomènes d’usure excessive." },
+  { number: "06", title: "Esthétique", text: "L’adéquation du sourire avec le visage, l’âge et les attentes personnelles." },
 ];
 
 export default function MethodePage() {
@@ -57,7 +66,7 @@ export default function MethodePage() {
           <p className="eyebrow">La méthode SourirePlus</p>
           <h1>Quel âge a vraiment <em>votre bouche&nbsp;?</em></h1>
           <p className="method-lead">
-            L’âge civil ne dit pas tout. Certaines bouches sont en avance, d’autres ont été remarquablement préservées. Notre méthode transforme l’examen, les images et votre jumeau numérique en trajectoires compréhensibles.
+            L’âge civil ne dit pas tout. Certaines bouches sont en avance, d’autres ont été remarquablement préservées. Notre méthode transforme l’examen, les images et votre jumeau numérique en six trajectoires compréhensibles.
           </p>
           <div className="method-hero-points">
             <span><Check aria-hidden="true" /> Comprendre où vous en êtes</span>
@@ -67,43 +76,51 @@ export default function MethodePage() {
         <div className="curve-panel" aria-labelledby="curve-title">
           <div className="curve-panel-head">
             <span>Exemple de lecture</span>
-            <strong id="curve-title">Quatre dimensions, une trajectoire</strong>
+            <strong id="curve-title">Six courbes, une vision complète</strong>
           </div>
-          <svg viewBox="0 0 560 310" role="img" aria-labelledby="curve-svg-title curve-svg-desc">
+          <svg viewBox="0 0 560 350" role="img" aria-labelledby="curve-svg-title curve-svg-desc">
             <title id="curve-svg-title">Illustration des courbes de la méthode SourirePlus</title>
-            <desc id="curve-svg-desc">Quatre courbes illustratives représentent les gencives, les dents, la fonction et l’esthétique entre 20 et 70 ans.</desc>
+            <desc id="curve-svg-desc">Six courbes illustratives représentent l’alignement, les gencives, les caries, les restaurations, la fonction et l’esthétique entre 20 et 70 ans.</desc>
             <g className="curve-grid">
-              <line x1="58" y1="52" x2="530" y2="52" />
-              <line x1="58" y1="112" x2="530" y2="112" />
-              <line x1="58" y1="172" x2="530" y2="172" />
-              <line x1="58" y1="232" x2="530" y2="232" />
-              <line x1="58" y1="270" x2="530" y2="270" />
+              <line x1="58" y1="40" x2="530" y2="40" />
+              <line x1="58" y1="85" x2="530" y2="85" />
+              <line x1="58" y1="130" x2="530" y2="130" />
+              <line x1="58" y1="175" x2="530" y2="175" />
+              <line x1="58" y1="220" x2="530" y2="220" />
+              <line x1="58" y1="265" x2="530" y2="265" />
+              <line x1="58" y1="310" x2="530" y2="310" />
             </g>
-            <path className="curve-line curve-one" d="M58 72 C150 64, 205 88, 292 78 S440 70, 530 94" />
-            <path className="curve-line curve-two" d="M58 115 C145 95, 214 118, 292 121 S433 103, 530 130" />
-            <path className="curve-line curve-three" d="M58 165 C145 180, 215 149, 292 160 S438 190, 530 173" />
-            <path className="curve-line curve-four" d="M58 224 C150 204, 208 220, 292 205 S430 215, 530 190" />
+            <path className="curve-line curve-one" d="M58 57 C145 44, 214 68, 292 58 S438 46, 530 66" />
+            <path className="curve-line curve-two" d="M58 101 C145 86, 214 109, 292 103 S438 91, 530 111" />
+            <path className="curve-line curve-three" d="M58 143 C145 158, 214 132, 292 145 S438 157, 530 139" />
+            <path className="curve-line curve-four" d="M58 191 C145 176, 214 198, 292 189 S438 176, 530 202" />
+            <path className="curve-line curve-five" d="M58 232 C145 245, 214 223, 292 235 S438 248, 530 228" />
+            <path className="curve-line curve-six" d="M58 281 C145 262, 214 284, 292 274 S438 268, 530 286" />
             <g className="curve-now">
-              <line x1="330" y1="35" x2="330" y2="270" />
-              <circle cx="330" cy="75" r="6" />
-              <circle cx="330" cy="117" r="6" />
-              <circle cx="330" cy="169" r="6" />
-              <circle cx="330" cy="199" r="6" />
-              <text x="330" y="292" textAnchor="middle">aujourd’hui</text>
+              <line x1="330" y1="28" x2="330" y2="310" />
+              <circle cx="330" cy="55" r="5" />
+              <circle cx="330" cy="99" r="5" />
+              <circle cx="330" cy="148" r="5" />
+              <circle cx="330" cy="185" r="5" />
+              <circle cx="330" cy="239" r="5" />
+              <circle cx="330" cy="272" r="5" />
+              <text x="330" y="336" textAnchor="middle">aujourd’hui</text>
             </g>
             <g className="curve-ages">
-              <text x="58" y="292">20</text>
-              <text x="176" y="292">30</text>
-              <text x="294" y="292">40</text>
-              <text x="412" y="292">50</text>
-              <text x="520" y="292">70</text>
+              <text x="58" y="336">20</text>
+              <text x="176" y="336">30</text>
+              <text x="294" y="336">40</text>
+              <text x="412" y="336">50</text>
+              <text x="520" y="336">70</text>
             </g>
           </svg>
           <div className="curve-legend">
-            <span><i className="legend-one" /> Gencives</span>
-            <span><i className="legend-two" /> Dents</span>
-            <span><i className="legend-three" /> Fonction</span>
-            <span><i className="legend-four" /> Esthétique</span>
+            <span><i className="legend-one" /> Alignement</span>
+            <span><i className="legend-two" /> Gencives</span>
+            <span><i className="legend-three" /> Caries</span>
+            <span><i className="legend-four" /> Restaurations</span>
+            <span><i className="legend-five" /> Fonction</span>
+            <span><i className="legend-six" /> Esthétique</span>
           </div>
           <small>Visualisation pédagogique — chaque bilan est individuel.</small>
         </div>
@@ -140,7 +157,24 @@ export default function MethodePage() {
         </div>
       </section>
 
-      <section className="life-curves section-shell" id="courbes">
+      <section className="curve-domains section-shell" id="courbes">
+        <div className="method-section-title dark-title">
+          <p className="eyebrow">La réalité derrière le score</p>
+          <h2>Six courbes.<br /><em>Six histoires différentes.</em></h2>
+          <p>Une bouche ne vieillit pas d’un seul bloc. Chaque dimension évolue à son rythme et peut appeler une stratégie différente.</p>
+        </div>
+        <div className="curve-domain-grid">
+          {curveDomains.map((domain) => (
+            <article key={domain.title}>
+              <span>{domain.number}</span>
+              <h3>{domain.title}</h3>
+              <p>{domain.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="life-curves section-shell">
         <div className="method-section-title dark-title">
           <p className="eyebrow">Les âges de la bouche</p>
           <h2>À chaque période,<br /><em>un objectif différent.</em></h2>
