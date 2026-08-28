@@ -1,0 +1,53 @@
+name: Fetch legacy SourirePlus brand assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-brand-assets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install SFTP client
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: Download explicitly allow-listed public brand files
+        env:
+          SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          set -euo pipefail
+          mkdir -p legacy-brand
+          lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_SERVER" <<'LFTP'
+          set sftp:auto-confirm yes
+          set cmd:fail-exit yes
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/logo.png" -o "legacy-brand/logo.png"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/logo-small.png" -o "legacy-brand/logo-small.png"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/logo-footer.png" -o "legacy-brand/logo-footer.png"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/favicon.png" -o "legacy-brand/favicon.png"
+          get "sourireplus.bak/wp-content/themes/sourireplus/style.css" -o "legacy-brand/legacy-style.css"
+          bye
+          LFTP
+
+      - name: Verify allow-list
+        run: |
+          set -euo pipefail
+          test -s legacy-brand/logo.png
+          test -s legacy-brand/logo-small.png
+          test -s legacy-brand/logo-footer.png
+          test -s legacy-brand/favicon.png
+          test -s legacy-brand/legacy-style.css
+          find legacy-brand -maxdepth 1 -type f -printf '%f\n' | sort
+
+      - name: Upload temporary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sourireplus-legacy-brand
+          path: legacy-brand/
+          retention-days: 3
+          if-no-files-found: error
