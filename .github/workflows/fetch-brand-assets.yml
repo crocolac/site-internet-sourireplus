@@ -2,6 +2,10 @@ name: Fetch legacy SourirePlus brand assets
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/fetch-brand-assets.yml"
 
 permissions:
   contents: read
