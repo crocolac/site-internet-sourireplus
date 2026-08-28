@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Activity,
   ArrowRight,
   CalendarDays,
   Check,
@@ -12,7 +13,6 @@ import {
   ScanLine,
   ShieldCheck,
   Sparkles,
-  Stethoscope,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -194,6 +194,7 @@ export default function Home() {
       <header className="site-header">
         <Brand />
         <nav className="desktop-nav" aria-label="Navigation principale">
+          <a href="#histoire">18 ans</a>
           <a href="#approche">Notre approche</a>
           <a href="#soins">Nos soins</a>
           <a href="#equipe">L’équipe</a>
@@ -205,6 +206,7 @@ export default function Home() {
           <details className="mobile-menu">
             <summary aria-label="Ouvrir le menu"><Menu aria-hidden="true" /></summary>
             <nav aria-label="Navigation mobile">
+              <a href="#histoire">18 ans</a>
               <a href="#approche">Notre approche</a>
               <a href="#soins">Nos soins</a>
               <a href="#equipe">L’équipe</a>
@@ -217,18 +219,18 @@ export default function Home() {
 
       <section className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow"><span>Depuis 2008</span> · Clinique pluridisciplinaire</p>
+          <p className="eyebrow"><span>18 ans à Neuchâtel</span> · Depuis 2008</p>
           <h1 id="hero-title">Votre sourire mérite une <em>vision à long terme.</em></h1>
           <p className="hero-lead">
-            Des soins précis, une technologie utile et des explications claires pour choisir aujourd’hui ce qui protégera votre bouche demain.
+            Une équipe de praticiens fidèle, des protocoles affinés au fil des années et une technologie utile pour choisir aujourd’hui ce qui protégera votre bouche demain.
           </p>
           <div className="hero-actions">
             <AppointmentDialog />
             <a className="secondary-cta" href="#approche">Découvrir notre approche <ArrowRight aria-hidden="true" /></a>
           </div>
           <div className="hero-proof" aria-label="Points forts">
-            <span><Check aria-hidden="true" /> Plan de traitement lisible</span>
-            <span><Check aria-hidden="true" /> Équipe multidisciplinaire</span>
+            <span><Check aria-hidden="true" /> Continuité des praticiens</span>
+            <span><Check aria-hidden="true" /> Organisation et protocoles éprouvés</span>
           </div>
         </div>
         <div className="hero-visual" role="img" aria-label="Patiente souriante dans une clinique dentaire lumineuse">
@@ -238,7 +240,7 @@ export default function Home() {
             <span><strong>Votre bouche en 3D</strong><small>Voir, comprendre, décider</small></span>
           </div>
           <div className="hero-card hero-card-bottom">
-            <strong>8</strong><span>salles de soins<br />au même endroit</span>
+            <strong>18</strong><span>ans de continuité<br />à Neuchâtel</span>
           </div>
         </div>
       </section>
@@ -251,6 +253,37 @@ export default function Home() {
         <span>Implantologie</span><i />
       </div>
 
+      <section className="legacy section-shell" id="histoire">
+        <div className="legacy-number" aria-hidden="true">
+          <strong>18</strong>
+          <span>années<br />d’expérience</span>
+        </div>
+        <div className="legacy-copy">
+          <p className="eyebrow">Notre différence depuis 2008</p>
+          <h2>La stabilité qui rassure.<br /><em>L’expérience qui fait gagner du temps.</em></h2>
+          <p>
+            À Neuchâtel, SourirePlus s’inscrit dans la durée. La continuité de ses praticiens permet de connaître les patients, de suivre leur bouche sur plusieurs années et de prendre des décisions avec le recul que la dentisterie exige.
+          </p>
+        </div>
+        <div className="legacy-principles">
+          <article>
+            <span>01</span>
+            <h3>Une équipe qui se connaît</h3>
+            <p>Les compétences se coordonnent naturellement, avec une information qui circule sans rupture.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Une organisation sans faille</h3>
+            <p>Chaque étape est préparée pour rendre le parcours plus fluide, plus ponctuel et plus efficace.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Des protocoles éprouvés</h3>
+            <p>Les méthodes de soins ont été affinées année après année pour gagner en précision et en sérénité.</p>
+          </article>
+        </div>
+      </section>
+
       <section className="approach section-shell" id="approche">
         <div className="section-intro">
           <p className="eyebrow">Une autre façon de soigner</p>
@@ -258,28 +291,28 @@ export default function Home() {
         </div>
         <div className="approach-copy">
           <p className="large-copy">
-            Une décision dentaire se juge rarement sur six mois. Nous regardons avec vous ce qu’elle change pour les dix ou vingt prochaines années.
+            Notre méthode situe l’âge de votre bouche, mesure ses écarts et dessine sa trajectoire. Une décision dentaire se juge rarement sur six mois&nbsp;: nous regardons avec vous ce qu’elle change pour les dix ou vingt prochaines années.
           </p>
-          <a className="inline-link" href="#soins">Explorer nos compétences <ArrowRight aria-hidden="true" /></a>
+          <a className="inline-link" href="/methode/">Découvrir la méthode SourirePlus <ArrowRight aria-hidden="true" /></a>
         </div>
         <div className="journey-grid">
           <article>
             <span className="step-number">01</span>
             <ScanLine aria-hidden="true" />
-            <h3>Voir clairement</h3>
-            <p>Images, scan 3D et examen clinique réunis dans un diagnostic compréhensible.</p>
+            <h3>Créer le jumeau numérique</h3>
+            <p>Images, scan 3D et examen clinique réunissent les données utiles de votre bouche.</p>
           </article>
           <article>
             <span className="step-number">02</span>
-            <Stethoscope aria-hidden="true" />
-            <h3>Choisir sereinement</h3>
-            <p>Les options, leurs bénéfices et leurs limites sont comparés sans pression.</p>
+            <Activity aria-hidden="true" />
+            <h3>Mesurer son âge</h3>
+            <p>Gencives, dents, usure, fonction et esthétique sont situées sur des courbes lisibles.</p>
           </article>
           <article>
             <span className="step-number">03</span>
             <ShieldCheck aria-hidden="true" />
-            <h3>Préserver longtemps</h3>
-            <p>Le suivi et la maintenance protègent le résultat bien après le traitement.</p>
+            <h3>Choisir une trajectoire</h3>
+            <p>Les soins et la maintenance visent un objectif concret pour les années à venir.</p>
           </article>
         </div>
       </section>
@@ -312,16 +345,17 @@ export default function Home() {
           <span className="image-caption">Le numérique, pour mieux expliquer — pas pour compliquer.</span>
         </div>
         <div className="technology-copy">
-          <p className="eyebrow">Précision numérique</p>
-          <h2>Vous voyez ce que nous voyons.</h2>
+          <p className="eyebrow">La nouvelle dentisterie</p>
+          <h2>Votre jumeau numérique donne vie à la courbe.</h2>
           <p>
-            Le scan intra-oral transforme votre bouche en modèle 3D. Vous comprenez la situation, suivez son évolution et participez réellement aux décisions.
+            Le scan intra-oral transforme votre bouche en modèle 3D. Intégré à la méthode SourirePlus, ce jumeau numérique permet de comparer, d’expliquer et de suivre votre trajectoire au lieu de regarder chaque soin isolément.
           </p>
           <ul>
             <li><Check aria-hidden="true" /><span><strong>Empreinte numérique</strong> plus confortable et immédiatement visible</span></li>
-            <li><Check aria-hidden="true" /><span><strong>Suivi dans le temps</strong> pour repérer les changements subtils</span></li>
-            <li><Check aria-hidden="true" /><span><strong>Projet partagé</strong> avec des objectifs et des étapes compréhensibles</span></li>
+            <li><Check aria-hidden="true" /><span><strong>Courbes personnalisées</strong> pour situer les forces et les fragilités de votre bouche</span></li>
+            <li><Check aria-hidden="true" /><span><strong>Suivi dans le temps</strong> pour visualiser l’effet des soins et de la maintenance</span></li>
           </ul>
+          <a className="inline-link" href="/methode/">Comprendre les courbes <ArrowRight aria-hidden="true" /></a>
         </div>
       </section>
 
@@ -340,9 +374,9 @@ export default function Home() {
             <p>Médecin-dentiste</p>
           </article>
           <article>
-            <div className="portrait-placeholder alt"><span>DL</span></div>
-            <h3>Dr Denis Liquière</h3>
-            <p>Médecin-dentiste</p>
+            <div className="portrait-placeholder alt"><span>PE</span></div>
+            <h3>Dr Philippe Elalouf</h3>
+            <p>Médecin-dentiste · Implantologie</p>
           </article>
           <article>
             <div className="portrait-placeholder gold"><span>GG</span></div>
@@ -417,6 +451,7 @@ export default function Home() {
           <div>
             <h3>Accès rapide</h3>
             <a href="#soins">Nos soins</a>
+            <a href="/methode/">La méthode SourirePlus</a>
             <a href="#equipe">L’équipe</a>
             <a href="#journal">Le journal</a>
             <a href="https://www.mydentalpass.ch/borne/">Mon rendez-vous</a>

@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
   description:
-    "Clinique dentaire pluridisciplinaire à Neuchâtel : maintenance, esthétique, endodontie, orthodontie, implantologie et soins numériques.",
+    "Depuis 18 ans à Neuchâtel, SourirePlus réunit une équipe stable, des protocoles éprouvés et une méthode fondée sur l’âge de la bouche et le jumeau numérique.",
   icons: {
     icon: "/favicon.png",
     shortcut: "/favicon.png",
