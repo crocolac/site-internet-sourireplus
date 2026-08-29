@@ -18,7 +18,7 @@ export function JournalArticlePage({ article }: { article: JournalArticle }) {
         <p><span /> Clinique Dentaire SourirePlus · Depuis 2008</p>
         <div>
           <a href="tel:+41327244020"><Phone aria-hidden="true" /> 032 724 40 20</a>
-          <Link href="/#contact">Neuchâtel, près de la gare</Link>
+          <Link href="/acces/">Neuchâtel, à 2 minutes de la gare</Link>
         </div>
       </div>
 
@@ -125,6 +125,11 @@ export function JournalArticlePage({ article }: { article: JournalArticle }) {
             <span className="brand-copy"><strong>SourirePlus</strong><small>Clinique dentaire · Neuchâtel</small></span>
           </Link>
           <p>Rue du Crêt-Taconnet 8a · 2000 Neuchâtel · 032 724 40 20</p>
+          <nav className="method-footer-links" aria-label="Informations pratiques">
+            <Link href="/acces/">Accès</Link>
+            <Link href="/mentions-legales/">Mentions légales</Link>
+            <Link href="/protection-des-donnees/">Protection des données</Link>
+          </nav>
         </div>
       </footer>
     </main>
