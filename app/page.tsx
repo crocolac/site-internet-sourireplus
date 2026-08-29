@@ -5,17 +5,22 @@ import {
   ArrowRight,
   CalendarDays,
   Check,
+  CircleCheck,
   ChevronRight,
   HeartPulse,
+  Loader2,
   MapPin,
   Menu,
   Phone,
+  RotateCcw,
   ScanLine,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Dialog,
   DialogContent,
@@ -97,11 +102,68 @@ function Brand() {
   );
 }
 
+const APPOINTMENT_API = "https://mydentalpass.ch/borne/site-api.php";
+
 function AppointmentDialog({ compact = false }: { compact?: boolean }) {
-  const [mode, setMode] = useState<"choice" | "request">("choice");
+  const [mode, setMode] = useState<"choice" | "request" | "manage" | "success">("choice");
+  const [phone, setPhone] = useState("");
+  const [existingPatient, setExistingPatient] = useState("yes");
+  const [need, setNeed] = useState("bilan");
+  const [code, setCode] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const requestId = useRef<string | null>(null);
+
+  const reset = () => {
+    setMode("choice");
+    setPhone("");
+    setExistingPatient("yes");
+    setNeed("bilan");
+    setCode("");
+    setPending(false);
+    setError("");
+    setSuccessMessage("");
+    requestId.current = null;
+  };
+
+  const submit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPending(true);
+    setError("");
+    try {
+      const isRequest = mode === "request";
+      if (isRequest && requestId.current === null) {
+        requestId.current = crypto.randomUUID();
+      }
+      const response = await fetch(APPOINTMENT_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(isRequest
+          ? {
+              action: "create_request",
+              request_id: requestId.current,
+              phone,
+              need,
+              existing_patient: existingPatient === "yes",
+            }
+          : { action: "manage_link", phone, code: code.trim() }),
+      });
+      const result = await response.json() as { ok?: boolean; message?: string; error?: string };
+      if (!response.ok || result.ok !== true) {
+        throw new Error(result.error || "Le service est momentanément indisponible.");
+      }
+      setSuccessMessage(result.message || "Le lien a été envoyé par SMS.");
+      setMode("success");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Le service est momentanément indisponible.");
+    } finally {
+      setPending(false);
+    }
+  };
 
   return (
-    <Dialog onOpenChange={(open) => !open && setMode("choice")}>
+    <Dialog onOpenChange={(open) => !open && reset()}>
       <DialogTrigger asChild>
         <Button className={compact ? "nav-appointment" : "primary-cta"}>
           <CalendarDays aria-hidden="true" /> Prendre rendez-vous
@@ -112,7 +174,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
           <p className="eyebrow">Votre rendez-vous</p>
           <DialogTitle>Comment pouvons-nous vous aider&nbsp;?</DialogTitle>
           <DialogDescription>
-            Choisissez votre situation pour être orienté sans perdre de temps.
+            Une demande simple, puis votre lien personnel directement par SMS.
           </DialogDescription>
         </DialogHeader>
 
@@ -120,60 +182,86 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
           <div className="appointment-choices">
             <button className="appointment-choice" onClick={() => setMode("request")}>
               <span><Sparkles aria-hidden="true" /></span>
-              <strong>Nouveau patient</strong>
-              <small>Premier bilan, douleur ou projet de sourire.</small>
+              <strong>Demander un rendez-vous</strong>
+              <small>Urgence de 15 minutes ou bilan de 30 minutes.</small>
               <ChevronRight aria-hidden="true" />
             </button>
-            <a className="appointment-choice" href="https://www.mydentalpass.ch/borne/">
-              <span><CalendarDays aria-hidden="true" /></span>
-              <strong>J’ai déjà mon code</strong>
-              <small>Choisir ou modifier un rendez-vous avec la borne.</small>
+            <button className="appointment-choice" onClick={() => setMode("manage")}>
+              <span><RotateCcw aria-hidden="true" /></span>
+              <strong>Retrouver ou modifier mon rendez-vous</strong>
+              <small>Recevoir à nouveau votre lien personnel.</small>
               <ChevronRight aria-hidden="true" />
-            </a>
+            </button>
             <a className="appointment-choice" href="tel:+41327244020">
               <span><HeartPulse aria-hidden="true" /></span>
-              <strong>J’ai une urgence</strong>
-              <small>Appelez-nous directement au 032 724 40 20.</small>
+              <strong>Besoin d’aide immédiate ?</strong>
+              <small>La clinique reste joignable au 032 724 40 20.</small>
               <ChevronRight aria-hidden="true" />
             </a>
           </div>
-        ) : (
-          <form
-            className="appointment-form"
-            action="https://www.onedoc.ch/fr/cabinet-dentaire/neuchatel/et86/clinique-dentaire-sourire-plus"
-            method="get"
-          >
-            <div className="field-grid">
-              <label>
-                Votre besoin
-                <select name="motif" defaultValue="bilan">
-                  <option value="bilan">Premier bilan</option>
-                  <option value="douleur">Douleur ou urgence</option>
-                  <option value="esthetique">Projet esthétique</option>
-                  <option value="orthodontie">Orthodontie</option>
-                  <option value="implantologie">Implantologie</option>
-                </select>
-              </label>
-              <label>
-                Moment préféré
-                <select name="periode" defaultValue="indifferent">
-                  <option value="indifferent">Peu importe</option>
-                  <option value="matin">Le matin</option>
-                  <option value="apres-midi">L’après-midi</option>
-                </select>
-              </label>
-            </div>
-            <p className="form-note">
-              La réservation des nouveaux patients est temporairement finalisée sur OneDoc.
-              La prochaine étape branchera directement ce formulaire à la borne SourirePlus.
-            </p>
+        ) : mode === "request" ? (
+          <form className="appointment-form" onSubmit={submit}>
+            <label>
+              Votre numéro de téléphone
+              <Input value={phone} onChange={(event) => setPhone(event.target.value)} required inputMode="tel" autoComplete="tel" placeholder="+41 79 123 45 67" />
+            </label>
+            <fieldset className="appointment-fieldset">
+              <legend>Êtes-vous déjà patient chez nous ?</legend>
+              <RadioGroup className="choice-pills" value={existingPatient} onValueChange={setExistingPatient}>
+                <label><RadioGroupItem value="yes" /> Oui</label>
+                <label><RadioGroupItem value="no" /> Non</label>
+              </RadioGroup>
+            </fieldset>
+            <fieldset className="appointment-fieldset">
+              <legend>Quel rendez-vous souhaitez-vous ?</legend>
+              <RadioGroup className="need-options" value={need} onValueChange={setNeed}>
+                <label>
+                  <RadioGroupItem value="urgence" />
+                  <span><strong>Urgence</strong><small>15 minutes</small></span>
+                </label>
+                <label>
+                  <RadioGroupItem value="bilan" />
+                  <span><strong>Bilan</strong><small>30 minutes</small></span>
+                </label>
+              </RadioGroup>
+            </fieldset>
+            <p className="form-note">La borne crée la demande selon le type configuré par la clinique. Vous recevez ensuite le lien pour choisir votre créneau.</p>
+            {error && <p className="form-error" role="alert">{error}</p>}
             <div className="dialog-actions">
-              <button className="text-button" type="button" onClick={() => setMode("choice")}>Retour</button>
-              <Button className="primary-cta" type="submit">
-                Voir les rendez-vous <ArrowRight aria-hidden="true" />
+              <button className="text-button" type="button" onClick={() => { setMode("choice"); setError(""); }}>Retour</button>
+              <Button className="primary-cta" type="submit" disabled={pending}>
+                {pending ? <Loader2 className="spin" aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
+                Recevoir mon lien
               </Button>
             </div>
           </form>
+        ) : mode === "manage" ? (
+          <form className="appointment-form" onSubmit={submit}>
+            <label>
+              Votre numéro de téléphone
+              <Input value={phone} onChange={(event) => setPhone(event.target.value)} required inputMode="tel" autoComplete="tel" placeholder="+41 79 123 45 67" />
+            </label>
+            <label>
+              Code à 5 caractères <span className="optional">facultatif</span>
+              <Input value={code} onChange={(event) => setCode(event.target.value)} maxLength={5} autoCapitalize="none" autoCorrect="off" spellCheck={false} placeholder="Seulement si aucun téléphone n’était enregistré" />
+            </label>
+            <p className="form-note">Si votre téléphone avait déjà été enregistré, laissez le code vide : le même lien vous sera renvoyé. Sinon, indiquez votre code et votre téléphone pour créer votre accès personnel.</p>
+            {error && <p className="form-error" role="alert">{error}</p>}
+            <div className="dialog-actions">
+              <button className="text-button" type="button" onClick={() => { setMode("choice"); setError(""); }}>Retour</button>
+              <Button className="primary-cta" type="submit" disabled={pending}>
+                {pending ? <Loader2 className="spin" aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
+                Renvoyer mon lien
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="appointment-success" role="status">
+            <CircleCheck aria-hidden="true" />
+            <h3>C’est enregistré</h3>
+            <p>{successMessage}</p>
+            <p className="form-note">Aucune vérification par SMS n’est nécessaire : ouvrez simplement le lien reçu pour gérer votre rendez-vous.</p>
+          </div>
         )}
       </DialogContent>
     </Dialog>
