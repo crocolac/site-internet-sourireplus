@@ -75,18 +75,21 @@ const articles = [
     title: "Le café jaunit-il vraiment les dents ?",
     text: "La réponse courte : oui, mais ce n’est pas une raison pour renoncer à votre espresso.",
     tone: "cream",
+    href: "/journal/cafe-et-dents/",
   },
   {
     category: "Mode d’emploi",
     title: "Brosse électrique : meilleure, vraiment ?",
     text: "Le bon outil aide. La bonne méthode fait presque tout le reste.",
     tone: "navy",
+    href: "/journal/brosse-electrique/",
   },
   {
     category: "Les dents ont leur logique",
     title: "Pourquoi ça casse toujours le week-end",
     text: "Ce n’est pas une conspiration. Mais il existe quelques signaux à ne pas ignorer.",
     tone: "gold",
+    href: "/journal/casse-du-week-end/",
   },
 ];
 
@@ -501,7 +504,7 @@ export default function Home() {
                   <p>{article.category}</p>
                   <h3>{article.title}</h3>
                   <span>{article.text}</span>
-                  <a href="#rendez-vous">Lire bientôt <ArrowRight aria-hidden="true" /></a>
+                  <a href={article.href}>Lire l’article <ArrowRight aria-hidden="true" /></a>
                 </div>
               </article>
             ))}
