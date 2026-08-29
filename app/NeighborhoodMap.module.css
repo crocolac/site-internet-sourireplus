@@ -1,0 +1,163 @@
+.neighborhoodMap { width: 100%; }
+.stage { padding: 28px 16px 36px; }
+.frame {
+  aspect-ratio: 16 / 9;
+  background: #afc7b2;
+  border: 1px solid rgba(8,37,60,.16);
+  border-radius: 26px;
+  box-shadow: 0 30px 54px rgba(8,37,60,.22), 0 7px 0 rgba(8,37,60,.1);
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+}
+.aerialImage { height: 100%; inset: 0; object-fit: cover; position: absolute; width: 100%; }
+.aerialShade {
+  background: linear-gradient(135deg, rgba(255,255,255,.08), transparent 44%, rgba(8,37,60,.12));
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+.routes { height: 100%; inset: 0; overflow: visible; pointer-events: none; position: absolute; width: 100%; z-index: 2; }
+.routeShadow, .route { fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.routeShadow { stroke: rgba(8,37,60,.76); stroke-width: 8; }
+.route { animation: routeFlow 12s linear infinite; stroke-dasharray: 3 15; stroke-width: 5; }
+.routeStation { stroke: #fff; }
+.routeParking { stroke: var(--gold-light); }
+@keyframes routeFlow { to { stroke-dashoffset: -180; } }
+.landmark {
+  align-items: center;
+  backdrop-filter: blur(11px);
+  background: rgba(255,255,255,.94);
+  border: 1px solid rgba(255,255,255,.88);
+  border-radius: 12px;
+  box-shadow: 0 13px 25px rgba(8,37,60,.27), 0 4px 0 rgba(8,37,60,.14);
+  display: flex;
+  gap: 9px;
+  padding: 10px 12px;
+  position: absolute;
+  transform: translate(-50%, -100%);
+  z-index: 4;
+}
+.landmark::after {
+  background: rgba(255,255,255,.95);
+  bottom: -6px;
+  box-shadow: 3px 3px 4px rgba(8,37,60,.09);
+  content: "";
+  height: 13px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%) rotate(45deg);
+  width: 13px;
+}
+.landmarkIcon {
+  align-items: center;
+  background: var(--navy);
+  border-radius: 8px;
+  box-shadow: inset 0 1px rgba(255,255,255,.25), 4px 5px 0 rgba(5,24,39,.2), 0 9px 13px rgba(8,37,60,.2);
+  color: var(--gold-light);
+  display: flex;
+  flex: 0 0 auto;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+.landmarkIcon svg { height: 17px; width: 17px; }
+.landmark > span:last-child { display: flex; flex-direction: column; gap: 3px; white-space: nowrap; }
+.landmark strong { color: var(--navy); font-size: 9px; letter-spacing: .01em; }
+.landmark small { color: var(--muted); font-size: 7px; }
+.station { left: 31.9%; top: 56.1%; }
+.ofs { left: 51.5%; top: 43%; }
+.ofs .landmarkIcon { background: #4b7181; }
+.parking { left: 80.5%; top: 36%; }
+.parking .landmarkIcon { background: var(--gold); color: white; }
+.clinicPin {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  left: 64.7%;
+  position: absolute;
+  top: 48.7%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+.clinicLogo {
+  align-items: center;
+  background: white;
+  border: 5px solid white;
+  border-radius: 50%;
+  box-shadow: 0 14px 30px rgba(8,37,60,.35), 0 5px 0 rgba(8,37,60,.14);
+  display: flex;
+  height: 74px;
+  justify-content: center;
+  position: relative;
+  width: 74px;
+}
+.clinicLogo::after {
+  background: white;
+  bottom: -8px;
+  content: "";
+  height: 20px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%) rotate(45deg);
+  width: 20px;
+  z-index: -1;
+}
+.clinicLogo img { height: 59px; object-fit: contain; width: 59px; }
+.clinicLabel {
+  align-items: center;
+  background: var(--navy);
+  border: 1px solid rgba(255,255,255,.17);
+  border-radius: 11px;
+  box-shadow: 0 9px 20px rgba(8,37,60,.25), 0 3px 0 rgba(5,24,39,.22);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 13px;
+  padding: 8px 13px 7px;
+  white-space: nowrap;
+}
+.clinicLabel strong { font-family: Georgia, serif; font-size: 13px; font-weight: 400; }
+.clinicLabel small { color: rgba(255,255,255,.65); font-size: 7px; }
+.attribution {
+  background: rgba(255,255,255,.88);
+  bottom: 7px;
+  color: #344b52;
+  font-size: 7px;
+  padding: 3px 6px;
+  position: absolute;
+  right: 7px;
+  z-index: 6;
+}
+.actions { align-items: center; display: flex; gap: 18px; justify-content: space-between; padding-inline: 18px; }
+.actions a { align-items: center; color: var(--navy); display: inline-flex; font-size: 10px; font-weight: 700; gap: 7px; }
+.actions a:last-child { color: var(--gold); }
+.actions svg { height: 13px; width: 13px; }
+
+@media (max-width: 760px) {
+  .stage { margin-inline: -8px; padding: 23px 8px 31px; }
+  .frame { border-radius: 18px; }
+  .landmark { border-radius: 8px; gap: 5px; padding: 5px 6px; }
+  .landmarkIcon { border-radius: 6px; height: 23px; width: 23px; }
+  .landmarkIcon svg { height: 13px; width: 13px; }
+  .landmark strong { font-size: 6px; }
+  .landmark small { display: none; }
+  .station { left: 27%; top: 59%; }
+  .ofs { left: 49%; top: 38%; }
+  .parking { left: 78%; top: 30%; }
+  .clinicLogo { border-width: 3px; height: 47px; width: 47px; }
+  .clinicLogo img { height: 38px; width: 38px; }
+  .clinicLogo::after { bottom: -5px; height: 14px; width: 14px; }
+  .clinicLabel { border-radius: 7px; margin-top: 8px; padding: 5px 8px; }
+  .clinicLabel strong { font-size: 8px; }
+  .clinicLabel small { display: none; }
+  .routeShadow { stroke-width: 6; }
+  .route { stroke-dasharray: 2 10; stroke-width: 3; }
+  .attribution { bottom: 4px; font-size: 5px; padding: 2px 4px; right: 4px; }
+  .actions { align-items: flex-start; flex-direction: column; gap: 12px; padding-inline: 6px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route { animation: none; }
+}

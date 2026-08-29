@@ -63,7 +63,7 @@ export default function AccessPage() {
             <p className="eyebrow">Plan du quartier</p>
             <h2 id="map-title">SourirePlus, juste au-dessus de la gare.</h2>
           </div>
-          <p>Le plan est volontairement présenté comme une carte en relief. Le bouton d’itinéraire ouvre ensuite la navigation détaillée.</p>
+          <p>Repérez la tour vitrée de l’OFS, puis suivez les pointillés depuis la gare ou depuis notre parking patients jusqu’au numéro 8a.</p>
         </div>
         <NeighborhoodMap />
       </section>
@@ -102,4 +102,3 @@ export default function AccessPage() {
     </InfoPageShell>
   );
 }
-
