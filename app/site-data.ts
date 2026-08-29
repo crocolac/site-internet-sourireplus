@@ -19,6 +19,7 @@ export const CLINIC_GEO = {
   north: 1205202.91,
 };
 
-export const SWISS_MAP_EMBED_URL =
-  `https://map.geo.admin.ch/#/embed?lang=fr&center=${CLINIC_GEO.east},${CLINIC_GEO.north}&z=11&topic=ech&bgLayer=ch.swisstopo.pixelkarte-grau&layers=&crosshair=marker`;
-
+// Vue aérienne couleur cadrée sur la gare, la clinique et le parking patients.
+// Le cadrage fixe permet de conserver l'alignement des repères et des parcours.
+export const SWISS_AERIAL_IMAGE_URL =
+  "https://wms.geo.admin.ch/?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=ch.swisstopo.swissimage&STYLES=default&CRS=EPSG:2056&BBOX=2561650,1205070,2562110,1205329&WIDTH=1600&HEIGHT=900&FORMAT=image/jpeg";
