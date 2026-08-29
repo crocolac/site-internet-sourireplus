@@ -183,7 +183,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
             <button className="appointment-choice" onClick={() => setMode("request")}>
               <span><Sparkles aria-hidden="true" /></span>
               <strong>Demander un rendez-vous</strong>
-              <small>Urgence de 15 minutes ou bilan de 30 minutes.</small>
+              <small>Urgence de 30 minutes ou bilan de 45 minutes, installation comprise.</small>
               <ChevronRight aria-hidden="true" />
             </button>
             <button className="appointment-choice" onClick={() => setMode("manage")}>
@@ -217,21 +217,21 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
               <RadioGroup className="need-options" value={need} onValueChange={setNeed}>
                 <label>
                   <RadioGroupItem value="urgence" />
-                  <span><strong>Urgence</strong><small>15 minutes</small></span>
+                  <span><strong>Urgence</strong><small>30 minutes</small></span>
                 </label>
                 <label>
                   <RadioGroupItem value="bilan" />
-                  <span><strong>Bilan</strong><small>30 minutes</small></span>
+                  <span><strong>Bilan</strong><small>45 minutes</small></span>
                 </label>
               </RadioGroup>
             </fieldset>
-            <p className="form-note">La borne crée la demande selon le type configuré par la clinique. Vous recevez ensuite le lien pour choisir votre créneau.</p>
+            <p className="form-note">Notre système de prise de RDV va vous permettre de choisir votre rendez-vous via votre téléphone.</p>
             {error && <p className="form-error" role="alert">{error}</p>}
             <div className="dialog-actions">
               <button className="text-button" type="button" onClick={() => { setMode("choice"); setError(""); }}>Retour</button>
               <Button className="primary-cta" type="submit" disabled={pending}>
                 {pending ? <Loader2 className="spin" aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
-                Recevoir mon lien
+                Prendre mon RDV
               </Button>
             </div>
           </form>
