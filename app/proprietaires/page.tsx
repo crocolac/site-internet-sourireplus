@@ -10,6 +10,7 @@ import {
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Topline } from "../Topline";
 
 export const metadata: Metadata = {
   title: "Les propriétaires | Clinique Dentaire SourirePlus",
@@ -39,13 +40,7 @@ function Brand() {
 export default function ProprietairesPage() {
   return (
     <main className="owners-page">
-      <div className="topline">
-        <p><span /> Nouveaux patients bienvenus</p>
-        <div>
-          <a href="tel:+41327244020">032 724 40 20</a>
-          <Link href="/acces/">Neuchâtel, à 2 minutes de la gare</Link>
-        </div>
-      </div>
+      <Topline message="Nouveaux patients bienvenus" />
 
       <header className="site-header method-header owners-header">
         <Brand />
