@@ -27,10 +27,17 @@ jobs:
           node-version: 22
       - run: npm install --no-audit --no-fund
       - run: npm run build
-      - name: Verify exported routes
+      - name: Verify exported routes and SEO files
         run: |
           test -f out/index.html
+          test -f out/acces/index.html
           test -f out/methode/index.html
+          test -f out/mentions-legales/index.html
+          test -f out/protection-des-donnees/index.html
+          test -f out/robots.txt
+          test -f out/sitemap.xml
+          test -f out/manifest.webmanifest
+          test -f out/.htaccess
       - name: Install SFTP client
         run: sudo apt-get update && sudo apt-get install -y lftp
       - name: Publish without deleting the legacy backup
