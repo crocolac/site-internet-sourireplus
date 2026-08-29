@@ -9,9 +9,7 @@ import {
   ChevronRight,
   HeartPulse,
   Loader2,
-  MapPin,
   Menu,
-  Phone,
   RotateCcw,
   ScanLine,
   ShieldCheck,
@@ -30,6 +28,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { NeighborhoodMap } from "./NeighborhoodMap";
+import { Topline } from "./Topline";
 
 const services = [
   {
@@ -275,13 +274,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
 export default function Home() {
   return (
     <main id="accueil">
-      <div className="topline">
-        <p><span /> Nouveaux patients bienvenus</p>
-        <div>
-          <a href="tel:+41327244020"><Phone aria-hidden="true" /> 032 724 40 20</a>
-          <a href="/acces/"><MapPin aria-hidden="true" /> À 2 minutes de la gare</a>
-        </div>
-      </div>
+      <Topline message="Nouveaux patients bienvenus" />
 
       <header className="site-header">
         <Brand />
