@@ -91,10 +91,18 @@ h1 em, h2 em { color: var(--gold); font-weight: 400; }
   padding-inline: 14px;
   white-space: nowrap;
 }
-.google-rating-badge strong { color: white; font-weight: 600; letter-spacing: 0; }
 .google-rating-badge b { color: white; font-weight: 700; letter-spacing: 0; }
+.google-maps-attribution {
+  color: white;
+  font-family: Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
 .google-stars {
-  background: linear-gradient(90deg, #fbbc04 0 86%, rgba(255,255,255,.24) 86% 100%);
+  background: linear-gradient(90deg, #fbbc04 0 var(--google-rating-fill, 86%), rgba(255,255,255,.24) var(--google-rating-fill, 86%) 100%);
   background-clip: text;
   color: transparent;
   font-size: 13px;
