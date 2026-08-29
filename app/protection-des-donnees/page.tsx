@@ -102,6 +102,7 @@ export default function PrivacyPage() {
             <h2>Cookies, mesure d’audience et carte</h2>
             <p>SourirePlus n’installe actuellement aucun outil publicitaire ni outil de mesure d’audience sur ce site. Aucun bandeau de consentement n’est donc nécessaire pour le fonctionnement actuel.</p>
             <p>La page Accès charge une carte du géoportail fédéral suisse. Lors de ce chargement, le service cartographique peut recevoir des informations techniques usuelles, notamment votre adresse IP et les caractéristiques de votre navigateur. Les liens vers Google Maps ou Facebook ne transmettent des données à ces services que lorsque vous les ouvrez.</p>
+            <p>La note et le nombre d’avis affichés dans le bandeau proviennent de Google Maps Platform. La demande est effectuée par le serveur de SourirePlus&nbsp;: votre navigateur ne communique directement à Google ni votre adresse IP ni une donnée de rendez-vous pour cette fonction. Ces données ne sont pas mises en cache par SourirePlus. L’utilisation de Google Maps Platform est soumise aux <a href="https://cloud.google.com/maps-platform/terms" target="_blank" rel="noreferrer">conditions de Google Maps Platform</a> et aux <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">règles de confidentialité de Google</a>.</p>
           </div>
         </section>
 
@@ -136,4 +137,3 @@ export default function PrivacyPage() {
     </InfoPageShell>
   );
 }
-
