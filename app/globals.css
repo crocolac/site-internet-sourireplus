@@ -260,7 +260,7 @@ h1 em, h2 em { color: var(--gold); font-weight: 400; }
 .portrait-placeholder::after { background: linear-gradient(to top, rgba(8,37,60,.16), transparent); content: ""; inset: 0; position: absolute; }
 .portrait-placeholder.alt { background: linear-gradient(145deg, #e9dfd1, #cbbda8); }
 .portrait-placeholder.gold { background: linear-gradient(145deg, #d8d2c3, #bda06f); }
-.portrait-placeholder.portrait-raphael { background: #cbd5dc url('/images/raphael-lacoste-portrait-2026.webp') center 22% / cover no-repeat; }
+.portrait-placeholder.portrait-raphael { background: #cbd5dc url('/images/raphael-lacoste-medical-2026.webp') center 22% / cover no-repeat; }
 .portrait-placeholder span { color: rgba(255,255,255,.8); font-family: Georgia, serif; font-size: 50px; }
 .team-list h3 { color: var(--navy); font-family: Georgia, serif; font-size: 18px; font-weight: 400; margin-top: 18px; }
 .team-list p { color: var(--muted); font-size: 10px; margin-top: 6px; text-transform: uppercase; letter-spacing: .1em; }
