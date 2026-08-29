@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import { Topline } from "../Topline";
 
 export const metadata: Metadata = {
   title: "L’âge de votre bouche | Méthode SourirePlus",
@@ -286,13 +287,7 @@ function CurveChart({
 export default function MethodePage() {
   return (
     <main className="method-page">
-      <div className="topline">
-        <p><span /> Clinique Dentaire SourirePlus · Depuis 2008</p>
-        <div>
-          <a href="tel:+41327244020">032 724 40 20</a>
-          <Link href="/acces/">Neuchâtel, à 2 minutes de la gare</Link>
-        </div>
-      </div>
+      <Topline />
 
       <header className="site-header method-header">
         <Link className="brand" href="/" aria-label="SourirePlus — accueil">

@@ -4,23 +4,17 @@ import {
   CalendarDays,
   Check,
   Clock3,
-  Phone,
 } from "lucide-react";
 import Link from "next/link";
 import type { JournalArticle } from "./articles";
+import { Topline } from "../Topline";
 
 export function JournalArticlePage({ article }: { article: JournalArticle }) {
   const Icon = article.icon;
 
   return (
     <main className={`journal-page journal-theme-${article.theme}`}>
-      <div className="topline">
-        <p><span /> Clinique Dentaire SourirePlus · Depuis 2008</p>
-        <div>
-          <a href="tel:+41327244020"><Phone aria-hidden="true" /> 032 724 40 20</a>
-          <Link href="/acces/">Neuchâtel, à 2 minutes de la gare</Link>
-        </div>
-      </div>
+      <Topline />
 
       <header className="site-header journal-header">
         <Link className="brand" href="/" aria-label="SourirePlus — accueil">

@@ -1,13 +1,8 @@
-import { CalendarDays, MapPin, Phone } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import {
-  ADDRESS_LINE,
-  EMAIL,
-  PHONE_DISPLAY,
-  PHONE_INTERNATIONAL,
-  POSTAL_LOCALITY,
-} from "./site-data";
+import { ADDRESS_LINE, EMAIL, PHONE_DISPLAY, PHONE_INTERNATIONAL, POSTAL_LOCALITY } from "./site-data";
+import { Topline } from "./Topline";
 
 function Brand() {
   return (
@@ -24,13 +19,7 @@ function Brand() {
 export function InfoPageShell({ children }: { children: ReactNode }) {
   return (
     <main className="info-page">
-      <div className="topline">
-        <p><span /> Clinique Dentaire SourirePlus · Depuis 2008</p>
-        <div>
-          <a href={`tel:${PHONE_INTERNATIONAL}`}><Phone aria-hidden="true" /> {PHONE_DISPLAY}</a>
-          <Link href="/acces/"><MapPin aria-hidden="true" /> À 2 minutes de la gare</Link>
-        </div>
-      </div>
+      <Topline />
       <header className="site-header info-header">
         <Brand />
         <nav className="desktop-nav" aria-label="Navigation principale">
@@ -69,4 +58,3 @@ export function InfoPageShell({ children }: { children: ReactNode }) {
     </main>
   );
 }
-

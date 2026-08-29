@@ -77,10 +77,30 @@ h1 em, h2 em { color: var(--gold); font-weight: 400; }
 .topline p, .topline div, .topline a { align-items: center; display: flex; }
 .topline p { gap: 9px; text-transform: uppercase; }
 .topline p span { background: #82c49c; border-radius: 50%; box-shadow: 0 0 0 3px rgba(130,196,156,.14); height: 6px; width: 6px; }
-.topline div { gap: 26px; }
+.topline .topline-actions { gap: 22px; }
 .topline a { gap: 7px; transition: color .2s ease; }
 .topline a:hover { color: white; }
 .topline svg { height: 13px; width: 13px; }
+.google-rating-badge {
+  align-items: center;
+  background: rgba(255,255,255,.08);
+  border-inline: 1px solid rgba(255,255,255,.12);
+  display: flex;
+  gap: 7px;
+  min-height: 36px;
+  padding-inline: 14px;
+  white-space: nowrap;
+}
+.google-rating-badge strong { color: white; font-weight: 600; letter-spacing: 0; }
+.google-rating-badge b { color: white; font-weight: 700; letter-spacing: 0; }
+.google-stars {
+  background: linear-gradient(90deg, #fbbc04 0 86%, rgba(255,255,255,.24) 86% 100%);
+  background-clip: text;
+  color: transparent;
+  font-size: 13px;
+  letter-spacing: 1px;
+  line-height: 1;
+}
 
 .site-header {
   align-items: center;
@@ -805,8 +825,10 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 
 @media (max-width: 760px) {
   .section-shell { width: min(100% - 32px, 1200px); }
-  .topline { justify-content: center; min-height: 32px; padding-inline: 16px; }
-  .topline > div { display: none; }
+  .topline { justify-content: center; min-height: 36px; padding-inline: 0; }
+  .topline > p, .topline-contact { display: none !important; }
+  .topline .topline-actions { display: flex; gap: 0; }
+  .google-rating-badge { border: 0; min-height: 36px; padding-inline: 16px; }
   .site-header { height: 72px; padding-inline: 16px; }
   .brand-emblem { height: 40px; width: 52px; }
   .brand-copy strong { font-size: 17px; }
