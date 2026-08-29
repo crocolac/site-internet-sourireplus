@@ -15,6 +15,13 @@ export const metadata: Metadata = {
   title: "Les propriétaires | Clinique Dentaire SourirePlus",
   description:
     "Découvrez les deux propriétaires de SourirePlus : le Dr Raphaël Lacoste, en endodontie et esthétique, et le Dr Guillaume Guilbert, orthodontiste.",
+  alternates: { canonical: "/proprietaires/" },
+  openGraph: {
+    title: "Raphaël Lacoste et Guillaume Guilbert | SourirePlus",
+    description: "Deux propriétaires, des compétences distinctes et une même responsabilité envers la continuité de la clinique.",
+    url: "/proprietaires/",
+    type: "profile",
+  },
 };
 
 function Brand() {
@@ -36,7 +43,7 @@ export default function ProprietairesPage() {
         <p><span /> Nouveaux patients bienvenus</p>
         <div>
           <a href="tel:+41327244020">032 724 40 20</a>
-          <Link href="/#contact">Neuchâtel, près de la gare</Link>
+          <Link href="/acces/">Neuchâtel, à 2 minutes de la gare</Link>
         </div>
       </div>
 
@@ -198,6 +205,11 @@ export default function ProprietairesPage() {
         <div className="section-shell">
           <Brand />
           <p>Rue du Crêt-Taconnet 8a · 2000 Neuchâtel · 032 724 40 20</p>
+          <nav className="method-footer-links" aria-label="Informations pratiques">
+            <Link href="/acces/">Accès</Link>
+            <Link href="/mentions-legales/">Mentions légales</Link>
+            <Link href="/protection-des-donnees/">Protection des données</Link>
+          </nav>
         </div>
       </footer>
     </main>
