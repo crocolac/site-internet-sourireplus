@@ -26,7 +26,7 @@ jobs:
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: |
           set -euo pipefail
-          mkdir -p legacy-brand
+          mkdir -p legacy-brand legacy-human
           lftp -u "$SFTP_USERNAME","$SFTP_PASSWORD" -p "$SFTP_PORT" "sftp://$SFTP_SERVER" <<'LFTP'
           set sftp:auto-confirm yes
           set cmd:fail-exit yes
@@ -35,6 +35,21 @@ jobs:
           get "sourireplus.bak/wp-content/themes/sourireplus/img/logo-footer.png" -o "legacy-brand/logo-footer.png"
           get "sourireplus.bak/wp-content/themes/sourireplus/img/favicon.png" -o "legacy-brand/favicon.png"
           get "sourireplus.bak/wp-content/themes/sourireplus/style.css" -o "legacy-brand/legacy-style.css"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/photo-01.jpg" -o "legacy-human/photo-01.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/photo-02.jpg" -o "legacy-human/photo-02.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/photo-03.jpg" -o "legacy-human/photo-03.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/photo-04.jpg" -o "legacy-human/photo-04.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/raphael-action.jpg" -o "legacy-human/raphael-action.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/guillaume-action.jpg" -o "legacy-human/guillaume-action.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/medecin-dentiste-raphael-lacoste.jpg" -o "legacy-human/raphael-portrait-2015.jpg"
+          get "sourireplus.bak/wp-content/themes/sourireplus/img/medecin-dentiste-guillaume-guilbert.jpg" -o "legacy-human/guillaume-portrait-2015.jpg"
+          get "sourireplus.bak/wp-content/uploads/2015/10/PHOTO-NEWS-SP1.jpg" -o "legacy-human/photo-news-sp1.jpg"
+          get "sourireplus.bak/wp-content/uploads/2015/10/RAPHAELOKDEF.jpg" -o "legacy-human/raphael-studio-2015.jpg"
+          get "sourireplus.bak/wp-content/uploads/2015/10/GUILLAUMEOKDEF.jpg" -o "legacy-human/guillaume-studio-2015.jpg"
+          get "sourireplus.bak/wp-content/uploads/2018/12/raph.png" -o "legacy-human/raphael-clinic-2018.png"
+          get "sourireplus.bak/wp-content/uploads/2018/12/raphael.png" -o "legacy-human/raphael-cutout-2018.png"
+          get "sourireplus.bak/wp-content/uploads/2018/12/guillaume.png" -o "legacy-human/guillaume-clinic-2018.png"
+          get "sourireplus.bak/wp-content/uploads/2018/12/guillaume-1.png" -o "legacy-human/guillaume-cutout-2018.png"
           bye
           LFTP
 
@@ -46,12 +61,22 @@ jobs:
           test -s legacy-brand/logo-footer.png
           test -s legacy-brand/favicon.png
           test -s legacy-brand/legacy-style.css
-          find legacy-brand -maxdepth 1 -type f -printf '%f\n' | sort
+          test -s legacy-human/raphael-portrait-2015.jpg
+          test -s legacy-human/guillaume-portrait-2015.jpg
+          find legacy-brand legacy-human -maxdepth 1 -type f -printf '%p\n' | sort
 
-      - name: Upload temporary artifact
+      - name: Upload temporary brand artifact
         uses: actions/upload-artifact@v4
         with:
           name: sourireplus-legacy-brand
           path: legacy-brand/
+          retention-days: 3
+          if-no-files-found: error
+
+      - name: Upload temporary human photos artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sourireplus-legacy-human
+          path: legacy-human/
           retention-days: 3
           if-no-files-found: error
