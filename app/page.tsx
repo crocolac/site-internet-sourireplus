@@ -288,7 +288,7 @@ export default function Home() {
           <a href="#histoire">18 ans d’existence</a>
           <a href="#approche">Notre approche</a>
           <a href="#soins">Nos soins</a>
-          <a href="#equipe">L’équipe</a>
+          <a href="/proprietaires/">Les propriétaires</a>
           <a href="#journal">Le journal</a>
           <a href="#contact">Contact</a>
         </nav>
@@ -300,7 +300,7 @@ export default function Home() {
               <a href="#histoire">18 ans d’existence</a>
               <a href="#approche">Notre approche</a>
               <a href="#soins">Nos soins</a>
-              <a href="#equipe">L’équipe</a>
+              <a href="/proprietaires/">Les propriétaires</a>
               <a href="#journal">Le journal</a>
               <a href="#contact">Contact</a>
             </nav>
@@ -461,13 +461,16 @@ export default function Home() {
             <p className="eyebrow">L’équipe</p>
             <h2>Plusieurs regards.<br /><em>Une seule direction.</em></h2>
           </div>
-          <p>Les traitements sont coordonnés entre praticiens pour que chaque compétence arrive au bon moment.</p>
+          <div className="team-heading-aside">
+            <p>Les traitements sont coordonnés entre praticiens pour que chaque compétence arrive au bon moment.</p>
+            <a className="inline-link" href="/proprietaires/">Découvrir les deux propriétaires <ArrowRight aria-hidden="true" /></a>
+          </div>
         </div>
         <div className="team-list">
           <article>
-            <div className="portrait-placeholder"><span>RL</span></div>
+            <div className="portrait-placeholder portrait-raphael" role="img" aria-label="Portrait du Dr Raphaël Lacoste" />
             <h3>Dr Raphaël Lacoste</h3>
-            <p>Médecin-dentiste</p>
+            <p>Endodontie · Esthétique</p>
           </article>
           <article>
             <div className="portrait-placeholder alt"><span>PE</span></div>
@@ -548,7 +551,7 @@ export default function Home() {
             <h3>Accès rapide</h3>
             <a href="#soins">Nos soins</a>
             <a href="/methode/">La méthode SourirePlus</a>
-            <a href="#equipe">L’équipe</a>
+            <a href="/proprietaires/">Les propriétaires</a>
             <a href="#journal">Le journal</a>
             <a href="https://www.mydentalpass.ch/borne/">Mon rendez-vous</a>
           </div>
