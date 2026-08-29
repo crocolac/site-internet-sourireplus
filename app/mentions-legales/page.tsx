@@ -73,6 +73,7 @@ export default function LegalNoticesPage() {
           <div>
             <h2>Liens externes et disponibilité</h2>
             <p>Le site peut renvoyer vers des services externes, notamment la cartographie, Facebook ou des sources médicales. La clinique ne contrôle pas en permanence leur contenu, leur disponibilité ni leurs pratiques de confidentialité.</p>
+            <p>La note moyenne et le nombre d’avis sont fournis par Google Maps Platform et affichés avec son attribution. Leur utilisation est soumise aux <a href="https://cloud.google.com/maps-platform/terms" target="_blank" rel="noreferrer">conditions de Google Maps Platform</a>.</p>
             <p>Nous faisons notre possible pour maintenir des informations exactes et un service disponible, sans pouvoir garantir l’absence totale d’interruption ou d’erreur technique.</p>
           </div>
         </section>
@@ -89,4 +90,3 @@ export default function LegalNoticesPage() {
     </InfoPageShell>
   );
 }
-

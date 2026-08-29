@@ -10,11 +10,10 @@ export const FACEBOOK_URL =
   "https://www.facebook.com/SourirePlus.CliniqueDentaire.Neuchatel.Suisse/";
 export const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=Rue+du+Cr%C3%AAt-Taconnet+8a+2000+Neuch%C3%A2tel";
-export const GOOGLE_MAPS_PROFILE_URL =
-  "https://www.google.com/maps/place/Clinique+dentaire+Neuch%C3%A2tel,+Sourire+Plus/@46.9967509,6.9383457,17z/data=!4m6!3m5!1s0x478e0a18614b4509:0x82fba73334619866!8m2!3d46.9967509!4d6.9383457!16s%2Fg%2F1tfb5gtb";
 
-// Valeurs vérifiées sur la fiche Google officielle le 29 août 2026.
-export const GOOGLE_RATING = "4,3";
+// Valeurs de repli vérifiées sur la fiche Google officielle le 29 août 2026.
+// En production, le bandeau les remplace par les données actuelles de Places API.
+export const GOOGLE_RATING = 4.3;
 export const GOOGLE_REVIEW_COUNT = 120;
 
 // Coordonnées officielles de l'adresse selon le répertoire fédéral des bâtiments.
