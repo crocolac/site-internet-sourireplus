@@ -363,6 +363,16 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 .legend-five { background: #4f8f86; }
 .legend-six { background: #9b6b9e; }
 .curve-panel > small { color: rgba(104,115,124,.7); display: block; font-size: 8px; margin-top: 18px; }
+.method-curve-chart { display: block; overflow: visible; width: 100%; }
+.method-chart-grid line { stroke: rgba(8,37,60,.1); stroke-width: 1; }
+.method-chart-axis line { stroke: rgba(8,37,60,.24); stroke-width: 1; }
+.method-chart-axis text { fill: var(--muted); font-family: Arial, sans-serif; font-size: 9px; text-anchor: middle; }
+.method-chart-axis .method-chart-age-label { font-size: 8px; letter-spacing: .08em; text-anchor: end; text-transform: uppercase; }
+.method-chart-line { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4; }
+.method-chart-area { pointer-events: none; }
+.method-chart-point circle:first-child { fill: white; stroke-width: 2; }
+.method-chart-point circle:last-child { stroke: none; }
+.method-curve-chart.compact .method-chart-line { stroke-width: 3.25; }
 
 .method-principle { background: var(--navy); color: white; padding-block: 112px 118px; }
 .method-section-title h2 { color: white; font-size: clamp(42px, 4.4vw, 63px); line-height: 1.06; margin-top: 17px; }
@@ -374,11 +384,40 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 .method-steps p { color: rgba(255,255,255,.58); font-size: 12px; line-height: 1.75; margin-top: 15px; }
 
 .curve-domains { padding-block: 125px 105px; }
-.curve-domain-grid { border-left: 1px solid var(--line); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3,1fr); margin-top: 58px; }
-.curve-domain-grid article { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 240px; padding: 31px 32px; }
-.curve-domain-grid span { color: var(--gold); font-size: 9px; letter-spacing: .15em; }
-.curve-domain-grid h3 { color: var(--navy); font-family: Georgia, serif; font-size: 23px; font-weight: 400; margin-top: 35px; }
-.curve-domain-grid p { color: var(--muted); font-size: 12px; line-height: 1.75; margin-top: 15px; max-width: 300px; }
+.curve-story-list { margin-top: 68px; }
+.curve-story { align-items: center; border-top: 1px solid var(--line); display: grid; gap: clamp(55px, 7vw, 105px); grid-template-columns: 1.08fr .92fr; padding-block: 76px; }
+.curve-story:nth-child(even) { grid-template-columns: .92fr 1.08fr; }
+.curve-story:nth-child(even) .curve-story-chart { order: 2; }
+.curve-chart-card { background: white; border-top: 3px solid var(--curve-color); box-shadow: 0 19px 58px rgba(8,37,60,.09); padding: 28px 28px 25px; }
+.curve-chart-heading { align-items: flex-start; display: flex; justify-content: space-between; }
+.curve-chart-heading span { color: var(--navy); font-size: 9px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.curve-chart-heading small { color: var(--muted); font-size: 8px; }
+.curve-chart-card .method-curve-chart { margin-top: 15px; }
+.curve-directions { border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3,1fr); margin-top: 12px; padding-top: 18px; }
+.curve-directions span { color: var(--muted); display: flex; flex-direction: column; font-size: 9px; gap: 5px; padding-right: 12px; }
+.curve-directions strong { color: var(--navy); font-size: 10px; font-weight: 700; }
+.curve-story-copy { position: relative; }
+.curve-number { font-family: Georgia, serif; font-size: 70px; font-weight: 400; left: -2px; line-height: .8; opacity: .12; position: absolute; top: -20px; }
+.curve-kicker { font-size: 9px !important; font-weight: 700; letter-spacing: .14em; margin: 0 0 13px !important; position: relative; text-transform: uppercase; }
+.curve-story-copy h3 { color: var(--navy); font-family: Georgia, serif; font-size: clamp(36px, 3.4vw, 50px); font-weight: 400; line-height: 1.05; position: relative; }
+.curve-story-copy .curve-subtitle { color: var(--gold); font-size: 11px; font-weight: 700; letter-spacing: .05em; margin-top: 12px; text-transform: uppercase; }
+.curve-story-copy > p:not(.curve-kicker, .curve-subtitle) { color: var(--muted); font-size: 12px; line-height: 1.82; margin-top: 20px; }
+.curve-story-copy > p strong { color: var(--navy); font-weight: 700; }
+.curve-question { background: rgba(255,255,255,.72); border-left: 3px solid; margin-top: 28px; padding: 18px 20px; }
+.curve-question span { color: var(--muted); display: block; font-size: 8px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.curve-question strong { color: var(--navy); display: block; font-family: Georgia, serif; font-size: 17px; font-weight: 400; line-height: 1.42; margin-top: 8px; }
+.combined-curves { align-items: center; background: var(--navy); color: white; display: grid; gap: clamp(55px, 7vw, 100px); grid-template-columns: .82fr 1.18fr; margin-top: 40px; padding: clamp(50px, 7vw, 88px); scroll-margin-top: 110px; }
+.combined-curves-copy h2 { color: white; font-size: clamp(40px, 4vw, 58px); line-height: 1.04; margin-top: 17px; }
+.combined-curves-copy > p:not(.eyebrow) { color: rgba(255,255,255,.64); font-size: 12px; line-height: 1.82; margin-top: 23px; }
+.combined-proof { align-items: center; border-top: 1px solid rgba(255,255,255,.14); display: flex; gap: 19px; margin-top: 31px; padding-top: 27px; }
+.combined-proof strong { color: var(--gold-light); font-family: Georgia, serif; font-size: 42px; font-weight: 400; line-height: 1; white-space: nowrap; }
+.combined-proof span { color: rgba(255,255,255,.72); font-size: 10px; line-height: 1.55; max-width: 210px; }
+.combined-chart-card { background: white; box-shadow: 0 25px 70px rgba(0,0,0,.19); color: var(--navy); padding: 31px 31px 26px; }
+.combined-chart-card .method-curve-chart { margin-top: 17px; }
+.combined-legend { margin-top: 12px; }
+.combined-chart-card > small { color: var(--muted); display: block; font-size: 8px; line-height: 1.5; margin-top: 18px; }
+.method-source { color: var(--muted); font-size: 9px; line-height: 1.6; margin: 28px auto 0; max-width: 840px; text-align: center; }
+.method-source a { color: var(--navy); font-weight: 700; text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 3px; }
 .life-curves { border-top: 1px solid var(--line); padding-block: 105px 130px; }
 .dark-title { display: grid; gap: 0 50px; grid-template-columns: 1.2fr .8fr; }
 .dark-title .eyebrow, .dark-title h2 { grid-column: 1; }
@@ -437,7 +476,9 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
   .legacy-principles article:nth-child(2) { border-right: 0; }
   .legacy-principles article:nth-child(-n+2) { border-bottom: 1px solid var(--line); padding-bottom: 32px; }
   .method-steps { grid-template-columns: repeat(2,1fr); }
-  .curve-domain-grid { grid-template-columns: repeat(2,1fr); }
+  .curve-story { gap: 45px; }
+  .combined-curves { grid-template-columns: 1fr; }
+  .combined-curves-copy { max-width: 680px; }
   .stage-grid { grid-template-columns: repeat(3,1fr); }
   .stage-grid article { border-bottom: 1px solid var(--line); }
 }
@@ -508,9 +549,23 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
   .method-steps { grid-template-columns: 1fr; margin-top: 43px; }
   .method-steps article { min-height: 245px; }
   .curve-domains { padding-block: 87px 72px; }
-  .curve-domain-grid { display: block; margin-top: 43px; }
-  .curve-domain-grid article { min-height: 0; padding: 27px 24px; }
-  .curve-domain-grid h3 { margin-top: 22px; }
+  .curve-story-list { margin-top: 43px; }
+  .curve-story, .curve-story:nth-child(even) { display: flex; flex-direction: column; gap: 39px; padding-block: 58px; }
+  .curve-story:nth-child(even) .curve-story-chart { order: 0; }
+  .curve-story-chart { width: 100%; }
+  .curve-chart-card { padding: 22px 12px 20px; }
+  .curve-chart-heading { padding-inline: 7px; }
+  .curve-chart-heading small { max-width: 150px; text-align: right; }
+  .curve-directions { padding-inline: 7px; }
+  .curve-directions span { font-size: 8px; }
+  .curve-story-copy h3 { font-size: 39px; }
+  .curve-question { padding: 16px 17px; }
+  .combined-curves { margin-left: -16px; margin-right: -16px; padding: 54px 16px; }
+  .combined-proof { align-items: flex-start; flex-direction: column; }
+  .combined-chart-card { padding: 23px 12px 21px; width: 100%; }
+  .combined-chart-card .curve-chart-heading { padding-inline: 7px; }
+  .combined-legend { padding-inline: 7px; }
+  .combined-chart-card > small { padding-inline: 7px; }
   .life-curves { padding-block: 87px; }
   .dark-title { display: block; }
   .dark-title > p:last-child { margin-top: 24px; }
