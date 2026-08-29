@@ -29,6 +29,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { NeighborhoodMap } from "./NeighborhoodMap";
 
 const services = [
   {
@@ -278,7 +279,7 @@ export default function Home() {
         <p><span /> Nouveaux patients bienvenus</p>
         <div>
           <a href="tel:+41327244020"><Phone aria-hidden="true" /> 032 724 40 20</a>
-          <a href="#contact"><MapPin aria-hidden="true" /> Neuchâtel, près de la gare</a>
+          <a href="/acces/"><MapPin aria-hidden="true" /> À 2 minutes de la gare</a>
         </div>
       </div>
 
@@ -290,7 +291,7 @@ export default function Home() {
           <a href="#soins">Nos soins</a>
           <a href="/proprietaires/">Les propriétaires</a>
           <a href="#journal">Le journal</a>
-          <a href="#contact">Contact</a>
+          <a href="/acces/">Accès</a>
         </nav>
         <div className="header-actions">
           <AppointmentDialog compact />
@@ -302,7 +303,7 @@ export default function Home() {
               <a href="#soins">Nos soins</a>
               <a href="/proprietaires/">Les propriétaires</a>
               <a href="#journal">Le journal</a>
-              <a href="#contact">Contact</a>
+              <a href="/acces/">Accès</a>
             </nav>
           </details>
         </div>
@@ -515,6 +516,16 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="location-preview section-shell" id="acces">
+        <div className="location-preview-copy">
+          <p className="eyebrow">Au cœur de Neuchâtel</p>
+          <h2>À deux minutes de la gare.<br /><em>Avec deux places pour vous.</em></h2>
+          <p>Retrouvez-nous rue du Crêt-Taconnet 8a. En voiture, le parking patients se trouve au niveau −2, places 91 et 92.</p>
+          <a className="inline-link" href="/acces/">Voir l’accès et le parking <ArrowRight aria-hidden="true" /></a>
+        </div>
+        <NeighborhoodMap compact />
+      </section>
+
       <section className="appointment-band" id="rendez-vous">
         <div className="section-shell">
           <div>
@@ -539,6 +550,7 @@ export default function Home() {
           <div>
             <h3>Nous trouver</h3>
             <address>Rue du Crêt-Taconnet 8a<br />2000 Neuchâtel<br />Suisse</address>
+            <p>Gare à 2 min · Parking patients −2, places 91–92</p>
             <a className="footer-link" href="https://www.google.com/maps/search/?api=1&query=Rue+du+Cr%C3%AAt-Taconnet+8a+2000+Neuch%C3%A2tel">Voir l’itinéraire <ArrowRight aria-hidden="true" /></a>
           </div>
           <div>
@@ -552,13 +564,14 @@ export default function Home() {
             <a href="#soins">Nos soins</a>
             <a href="/methode/">La méthode SourirePlus</a>
             <a href="/proprietaires/">Les propriétaires</a>
+            <a href="/acces/">Accès et parking</a>
             <a href="#journal">Le journal</a>
             <a href="https://www.mydentalpass.ch/borne/">Mon rendez-vous</a>
           </div>
         </div>
         <div className="footer-bottom section-shell">
           <span>© 2026 Clinique Dentaire SourirePlus SA</span>
-          <div><a href="#contact">Mentions légales</a><a href="#contact">Protection des données</a></div>
+          <div><a href="/mentions-legales/">Mentions légales</a><a href="/protection-des-donnees/">Protection des données</a></div>
         </div>
       </footer>
     </main>
