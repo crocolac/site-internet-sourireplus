@@ -27,6 +27,32 @@ jobs:
           node-version: 22
       - run: npm install --no-audit --no-fund
       - run: npm run build
+      - name: Create the server-only Google Places configuration
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+        run: node scripts/write-google-places-config.mjs
+      - name: Validate Google Places access
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+        run: |
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail --max-time 15 \
+            --header "X-Goog-Api-Key: $GOOGLE_PLACES_API_KEY" \
+            --header "X-Goog-FieldMask: rating,userRatingCount" \
+            "https://places.googleapis.com/v1/places/ChIJCUVLYRgKjkcRZphhNDOn-4I")"
+          RESPONSE="$response" node <<'NODE'
+          const payload = JSON.parse(process.env.RESPONSE);
+          if (
+            typeof payload.rating !== "number" ||
+            typeof payload.userRatingCount !== "number" ||
+            payload.rating < 0 ||
+            payload.rating > 5 ||
+            payload.userRatingCount < 0
+          ) {
+            throw new Error("Google Places did not return a valid rating");
+          }
+          console.log("GOOGLE_PLACES_OK");
+          NODE
       - name: Verify exported routes and SEO files
         run: |
           test -f out/index.html
@@ -38,6 +64,9 @@ jobs:
           test -f out/sitemap.xml
           test -f out/manifest.webmanifest
           test -f out/.htaccess
+          test -f out/google-rating.php
+          test -f out/config/.htaccess
+          test -s out/config/google-places.php
       - name: Install SFTP client
         run: sudo apt-get update && sudo apt-get install -y lftp
       - name: Publish without deleting the legacy backup
@@ -54,3 +83,27 @@ jobs:
           mirror --reverse --verbose --parallel=4 --only-newer out/ ./
           bye
           LFTP
+      - name: Verify the live Google rating endpoint
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            response="$(curl --silent --show-error --max-time 15 \
+              "https://sourireplus.ch/google-rating.php?build=${{ github.sha }}&attempt=$attempt" || true)"
+            if RESPONSE="$response" node <<'NODE'
+          const payload = JSON.parse(process.env.RESPONSE || "{}");
+          if (
+            typeof payload.rating !== "number" ||
+            typeof payload.reviewCount !== "number" ||
+            payload.rating < 0 ||
+            payload.rating > 5 ||
+            payload.reviewCount < 0
+          ) process.exit(1);
+          NODE
+            then
+              echo "GOOGLE_RATING_ENDPOINT_OK"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "The live Google rating endpoint did not return valid data" >&2
+          exit 1
