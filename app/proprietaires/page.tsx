@@ -107,7 +107,7 @@ export default function ProprietairesPage() {
 
       <section className="owner-profile section-shell" id="raphael">
         <figure className="owner-portrait owner-portrait-raphael">
-          <Image src="/images/raphael-lacoste-studio.webp" alt="Portrait professionnel récent du Dr Raphaël Lacoste" width={1122} height={1402} />
+          <Image src="/images/raphael-lacoste-portrait-2026.webp" alt="Portrait professionnel récent du Dr Raphaël Lacoste" width={1122} height={1402} />
           <figcaption>Dr Raphaël Lacoste · Médecin-dentiste</figcaption>
         </figure>
         <div className="owner-profile-copy">
