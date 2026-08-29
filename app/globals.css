@@ -232,7 +232,7 @@ h1 em, h2 em { color: var(--gold); font-weight: 400; }
 .portrait-placeholder::after { background: linear-gradient(to top, rgba(8,37,60,.16), transparent); content: ""; inset: 0; position: absolute; }
 .portrait-placeholder.alt { background: linear-gradient(145deg, #e9dfd1, #cbbda8); }
 .portrait-placeholder.gold { background: linear-gradient(145deg, #d8d2c3, #bda06f); }
-.portrait-placeholder.portrait-raphael { background: #cbd5dc url('/images/raphael-lacoste-studio.webp') 35% center / cover no-repeat; }
+.portrait-placeholder.portrait-raphael { background: #cbd5dc url('/images/raphael-lacoste-studio.webp') center 22% / cover no-repeat; }
 .portrait-placeholder span { color: rgba(255,255,255,.8); font-family: Georgia, serif; font-size: 50px; }
 .team-list h3 { color: var(--navy); font-family: Georgia, serif; font-size: 18px; font-weight: 400; margin-top: 18px; }
 .team-list p { color: var(--muted); font-size: 10px; margin-top: 6px; text-transform: uppercase; letter-spacing: .1em; }
@@ -551,7 +551,7 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 
 .owner-profile { align-items: center; display: grid; gap: clamp(55px, 8vw, 110px); grid-template-columns: .88fr 1.12fr; padding-block: 130px; scroll-margin-top: 100px; }
 .owner-portrait { background: #d5dee3; box-shadow: var(--shadow); margin: 0; min-height: 690px; overflow: hidden; position: relative; }
-.owner-portrait > img { display: block; height: 690px; object-fit: cover; object-position: 34% center; width: 100%; }
+.owner-portrait > img { display: block; height: 690px; object-fit: cover; object-position: center 24%; width: 100%; }
 .owner-portrait > figcaption { background: rgba(6,28,45,.91); bottom: 0; color: rgba(255,255,255,.8); font-size: 9px; left: 0; letter-spacing: .08em; padding: 18px 22px; position: absolute; right: 0; text-transform: uppercase; }
 .owner-profile-copy h2 { font-size: clamp(45px, 4.5vw, 65px); line-height: 1.04; margin-top: 17px; }
 .owner-role { color: var(--gold); font-size: 10px; font-weight: 700; letter-spacing: .15em; margin-top: 14px; text-transform: uppercase; }
