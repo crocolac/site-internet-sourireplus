@@ -15,6 +15,13 @@ export const metadata: Metadata = {
   title: "L’âge de votre bouche | Méthode SourirePlus",
   description:
     "Découvrez les six courbes de la méthode SourirePlus : alignement, gencives, caries, restaurations, fonction et esthétique, intégrées au jumeau numérique.",
+  alternates: { canonical: "/methode/" },
+  openGraph: {
+    title: "L’âge de votre bouche | Méthode SourirePlus",
+    description: "Six courbes pour comprendre les reliefs, les changements de direction et la trajectoire de votre bouche.",
+    url: "/methode/",
+    type: "article",
+  },
 };
 
 type CurvePoint = readonly [age: number, need: number];
@@ -283,7 +290,7 @@ export default function MethodePage() {
         <p><span /> Clinique Dentaire SourirePlus · Depuis 2008</p>
         <div>
           <a href="tel:+41327244020">032 724 40 20</a>
-          <Link href="/#contact">Neuchâtel, près de la gare</Link>
+          <Link href="/acces/">Neuchâtel, à 2 minutes de la gare</Link>
         </div>
       </div>
 
@@ -507,6 +514,11 @@ export default function MethodePage() {
             <span className="brand-copy"><strong>SourirePlus</strong><small>Clinique dentaire · Neuchâtel</small></span>
           </Link>
           <p>Rue du Crêt-Taconnet 8a · 2000 Neuchâtel · 032 724 40 20</p>
+          <nav className="method-footer-links" aria-label="Informations pratiques">
+            <Link href="/acces/">Accès</Link>
+            <Link href="/mentions-legales/">Mentions légales</Link>
+            <Link href="/protection-des-donnees/">Protection des données</Link>
+          </nav>
         </div>
       </footer>
     </main>
