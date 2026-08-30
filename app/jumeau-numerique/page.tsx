@@ -13,6 +13,7 @@ import {
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import { SiteHeader } from "../SiteHeader";
 import { Topline } from "../Topline";
 
 export const metadata: Metadata = {
@@ -197,18 +198,20 @@ export default function JumeauNumeriquePage() {
     <main className="twin-page">
       <Topline />
 
-      <header className="site-header twin-header">
-        <Brand />
-        <nav className="desktop-nav" aria-label="Navigation du jumeau numérique">
-          <a href="#definition">Le principe</a>
-          <a href="#technologie">Technologie et sens</a>
-          <a href="#six-axes">Les six axes</a>
-          <a href="#parcours">Le parcours</a>
-        </nav>
-        <Link className="method-appointment" href="/#rendez-vous">
-          <CalendarDays aria-hidden="true" /> Prendre rendez-vous
-        </Link>
-      </header>
+      <SiteHeader
+        action={(
+          <Link className="method-appointment" href="/#rendez-vous">
+            <CalendarDays aria-hidden="true" /> Prendre rendez-vous
+          </Link>
+        )}
+        className="twin-header"
+        secondaryLinks={[
+          { href: "#definition", label: "Le principe" },
+          { href: "#technologie", label: "Technologie et sens" },
+          { href: "#six-axes", label: "Les six axes" },
+          { href: "#parcours", label: "Le parcours" },
+        ]}
+      />
 
       <section className="twin-hero section-shell">
         <div className="twin-hero-copy">
