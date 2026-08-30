@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import type { JournalArticle } from "./articles";
+import { SiteHeader } from "../SiteHeader";
 import { Topline } from "../Topline";
 
 export function JournalArticlePage({ article }: { article: JournalArticle }) {
@@ -16,21 +17,15 @@ export function JournalArticlePage({ article }: { article: JournalArticle }) {
     <main className={`journal-page journal-theme-${article.theme}`}>
       <Topline />
 
-      <header className="site-header journal-header">
-        <Link className="brand" href="/" aria-label="SourirePlus — accueil">
-          <span className="brand-emblem" aria-hidden="true" />
-          <span className="brand-copy">
-            <strong>SourirePlus</strong>
-            <small>Clinique dentaire · Neuchâtel</small>
-          </span>
-        </Link>
-        <nav className="desktop-nav" aria-label="Navigation du journal">
-          <Link href="/methode/">La méthode</Link>
-          <Link href="/#soins">Les soins</Link>
-          <Link href="/#journal">Le journal</Link>
-        </nav>
-        <Link className="method-appointment" href="/#rendez-vous"><CalendarDays aria-hidden="true" /> Prendre rendez-vous</Link>
-      </header>
+      <SiteHeader
+        action={<Link className="method-appointment" href="/#rendez-vous"><CalendarDays aria-hidden="true" /> Prendre rendez-vous</Link>}
+        className="journal-header"
+        secondaryLinks={[
+          { href: "/journal/cafe-et-dents/", label: "Café et dents" },
+          { href: "/journal/brosse-electrique/", label: "Brosse électrique" },
+          { href: "/journal/casse-du-week-end/", label: "Urgence du week-end" },
+        ]}
+      />
 
       <section className="journal-article-hero section-shell">
         <div className="journal-hero-copy">
