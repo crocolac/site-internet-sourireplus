@@ -33,7 +33,12 @@ export const metadata: Metadata = {
 
 export default function AccessPage() {
   return (
-    <InfoPageShell>
+    <InfoPageShell secondaryLinks={[
+      { href: "#plan-quartier", label: "Plan du quartier" },
+      { href: "#depuis-gare", label: "Depuis la gare" },
+      { href: "#parking-patients", label: "Parking patients" },
+      { href: "#arrivee", label: "À votre arrivée" },
+    ]}>
       <section className="info-hero section-shell access-hero">
         <div>
           <p className="eyebrow">Venir à la clinique</p>
@@ -57,7 +62,7 @@ export default function AccessPage() {
         </div>
       </section>
 
-      <section className="section-shell access-map-section" aria-labelledby="map-title">
+      <section className="section-shell access-map-section" id="plan-quartier" aria-labelledby="map-title">
         <div className="access-map-heading">
           <div>
             <p className="eyebrow">Plan du quartier</p>
@@ -70,19 +75,19 @@ export default function AccessPage() {
 
       <section className="access-options">
         <div className="section-shell access-options-grid">
-          <article>
+          <article id="depuis-gare">
             <TrainFront aria-hidden="true" />
             <span>01</span>
             <h2>Depuis la gare</h2>
             <p>La clinique se trouve à environ deux minutes à pied de la gare de Neuchâtel, rue du Crêt-Taconnet.</p>
           </article>
-          <article>
+          <article id="parking-patients">
             <CarFront aria-hidden="true" />
             <span>02</span>
             <h2>Parking patients</h2>
             <p>Entrez dans le parking de la rue du Crêt-Taconnet, descendez au niveau −2 et utilisez les places 91 ou 92.</p>
           </article>
-          <article>
+          <article id="arrivee">
             <Building2 aria-hidden="true" />
             <span>03</span>
             <h2>À votre arrivée</h2>
