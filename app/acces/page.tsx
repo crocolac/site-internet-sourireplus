@@ -61,7 +61,7 @@ export default function AccessPage() {
         <div className="access-map-heading">
           <div>
             <p className="eyebrow">Plan du quartier</p>
-            <h2 id="map-title">SourirePlus, juste au-dessus de la gare.</h2>
+            <h2 id="map-title">SourirePlus, à proximité immédiate de la gare.</h2>
           </div>
           <p>Repérez la tour vitrée de l’OFS, puis suivez les pointillés depuis la gare ou depuis notre parking patients jusqu’au numéro 8a.</p>
         </div>
