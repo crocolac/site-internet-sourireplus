@@ -442,10 +442,10 @@ export default function Home() {
           </p>
           <ul>
             <li><Check aria-hidden="true" /><span><strong>Empreinte numérique</strong> plus confortable et immédiatement visible</span></li>
-            <li><Check aria-hidden="true" /><span><strong>Six courbes personnalisées</strong> pour situer les forces et les fragilités de votre bouche</span></li>
+            <li><Check aria-hidden="true" /><span><strong>Six axes de lecture</strong> pour relier vos observations personnelles aux courbes de population concernée</span></li>
             <li><Check aria-hidden="true" /><span><strong>Suivi dans le temps</strong> pour visualiser l’effet des soins et de la maintenance</span></li>
           </ul>
-          <a className="inline-link" href="/methode/">Comprendre les courbes <ArrowRight aria-hidden="true" /></a>
+          <a className="inline-link" href="/jumeau-numerique/">Découvrir le jumeau numérique <ArrowRight aria-hidden="true" /></a>
         </div>
       </section>
 

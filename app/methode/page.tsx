@@ -495,8 +495,11 @@ export default function MethodePage() {
             <ul>
               <li><Check aria-hidden="true" /> Une situation de départ mémorisée</li>
               <li><Check aria-hidden="true" /> Des changements mesurables dans le temps</li>
-              <li><Check aria-hidden="true" /> Une trajectoire personnelle intégrée aux six courbes</li>
+              <li><Check aria-hidden="true" /> Une lecture personnelle répartie sur les six axes</li>
             </ul>
+            <Link className="twin-section-link" href="/jumeau-numerique/">
+              Comprendre le jumeau numérique <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>
