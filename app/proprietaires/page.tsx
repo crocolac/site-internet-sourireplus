@@ -10,6 +10,7 @@ import {
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { SiteHeader } from "../SiteHeader";
 import { Topline } from "../Topline";
 
 export const metadata: Metadata = {
@@ -42,17 +43,19 @@ export default function ProprietairesPage() {
     <main className="owners-page">
       <Topline message="Nouveaux patients bienvenus" />
 
-      <header className="site-header method-header owners-header">
-        <Brand />
-        <nav className="owners-nav" aria-label="Navigation de la page">
-          <a href="#histoire">Notre histoire</a>
-          <a href="#raphael">Raphaël Lacoste</a>
-          <a href="#guillaume">Guillaume Guilbert</a>
-        </nav>
-        <Link className="method-appointment" href="/#rendez-vous">
-          <CalendarDays aria-hidden="true" /> Prendre rendez-vous
-        </Link>
-      </header>
+      <SiteHeader
+        action={(
+          <Link className="method-appointment" href="/#rendez-vous">
+            <CalendarDays aria-hidden="true" /> Prendre rendez-vous
+          </Link>
+        )}
+        className="method-header owners-header"
+        secondaryLinks={[
+          { href: "#histoire", label: "Notre histoire" },
+          { href: "#raphael", label: "Raphaël Lacoste" },
+          { href: "#guillaume", label: "Guillaume Guilbert" },
+        ]}
+      />
 
       <section className="owners-hero section-shell">
         <div className="owners-hero-copy">
