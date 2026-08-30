@@ -9,7 +9,6 @@ import {
   ChevronRight,
   HeartPulse,
   Loader2,
-  Menu,
   RotateCcw,
   ScanLine,
   ShieldCheck,
@@ -28,6 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { NeighborhoodMap } from "./NeighborhoodMap";
+import { SiteHeader } from "./SiteHeader";
 import { Topline } from "./Topline";
 
 const services = [
@@ -276,31 +276,16 @@ export default function Home() {
     <main id="accueil">
       <Topline message="Nouveaux patients bienvenus" />
 
-      <header className="site-header">
-        <Brand />
-        <nav className="desktop-nav" aria-label="Navigation principale">
-          <a href="#histoire">18 ans d’existence</a>
-          <a href="#approche">Notre approche</a>
-          <a href="#soins">Nos soins</a>
-          <a href="/proprietaires/">Les propriétaires</a>
-          <a href="#journal">Le journal</a>
-          <a href="/acces/">Accès</a>
-        </nav>
-        <div className="header-actions">
-          <AppointmentDialog compact />
-          <details className="mobile-menu">
-            <summary aria-label="Ouvrir le menu"><Menu aria-hidden="true" /></summary>
-            <nav aria-label="Navigation mobile">
-              <a href="#histoire">18 ans d’existence</a>
-              <a href="#approche">Notre approche</a>
-              <a href="#soins">Nos soins</a>
-              <a href="/proprietaires/">Les propriétaires</a>
-              <a href="#journal">Le journal</a>
-              <a href="/acces/">Accès</a>
-            </nav>
-          </details>
-        </div>
-      </header>
+      <SiteHeader
+        action={<AppointmentDialog compact />}
+        homeHref="#accueil"
+        secondaryLinks={[
+          { href: "#histoire", label: "18 ans d’existence" },
+          { href: "#approche", label: "Notre approche" },
+          { href: "#technologie", label: "Technologie 3D" },
+          { href: "#equipe", label: "L’équipe" },
+        ]}
+      />
 
       <section className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
@@ -429,7 +414,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="technology section-shell">
+      <section className="technology section-shell" id="technologie">
         <div className="technology-visual" role="img" aria-label="Scan dentaire numérique dans une salle de soins moderne">
           <div className="technology-image" />
           <span className="image-caption">Le numérique, pour mieux expliquer — pas pour compliquer.</span>
