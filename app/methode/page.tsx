@@ -15,23 +15,24 @@ import { Topline } from "../Topline";
 export const metadata: Metadata = {
   title: "L’âge de votre bouche | Méthode SourirePlus",
   description:
-    "Découvrez les six courbes de la méthode SourirePlus : alignement, gencives, caries, restaurations, fonction et esthétique, intégrées au jumeau numérique.",
+    "Découvrez les six courbes de qualité de la méthode SourirePlus : alignement, dents d’origine, support, restaurations, fonction et esthétique.",
   alternates: { canonical: "/methode/" },
   openGraph: {
     title: "L’âge de votre bouche | Méthode SourirePlus",
-    description: "Six courbes pour comprendre les reliefs, les changements de direction et la trajectoire de votre bouche.",
+    description: "Six courbes de qualité pour comprendre les forces, les fragilités et la trajectoire de votre bouche.",
     url: "/methode/",
     type: "article",
   },
 };
 
-type CurvePoint = readonly [age: number, need: number];
+type CurvePoint = readonly [age: number, quality: number];
 
 type CurveDomain = {
   number: string;
   slug: string;
   title: string;
   subtitle: string;
+  metric: string;
   color: string;
   smoothing: number;
   points: readonly CurvePoint[];
@@ -56,119 +57,125 @@ const curveDomains: readonly CurveDomain[] = [
     slug: "alignement",
     title: "Alignement",
     subtitle: "Orthodontie, récidives et migrations",
+    metric: "Degré d’alignement dentaire",
     color: "#1473e6",
     smoothing: 0.35,
-    points: [[10, 20], [13, 80], [17, 88], [25, 24], [40, 34], [58, 24], [80, 20]],
-    highlights: [17, 25, 40],
+    points: [[10, 70], [15, 50], [20, 75], [30, 95], [41, 89], [50, 75], [60, 65], [65, 60], [70, 52], [80, 40]],
+    highlights: [15, 30, 50],
     directions: [
-      { age: "10–17 ans", label: "Montée rapide" },
-      { age: "17–25 ans", label: "Retour marqué" },
-      { age: "Vers 40 ans", label: "Second relief" },
+      { age: "10–15 ans", label: "Période orthodontique" },
+      { age: "15–30 ans", label: "Alignement restauré" },
+      { age: "Après 50 ans", label: "Recul progressif" },
     ],
     shape:
-      "La courbe monte presque à la verticale pendant la croissance et la période habituelle des traitements orthodontiques. Elle redescend fortement à l’entrée dans l’âge adulte, puis dessine un relief plus discret autour de 40 ans.",
+      "La qualité de l’alignement baisse pendant la croissance et la période orthodontique, puis remonte fortement une fois les traitements réalisés. Elle reste élevée chez le jeune adulte avant de diminuer progressivement après 50 ans.",
     meaning:
-      "La baisse ne veut pas dire que les dents ne bougent plus. Les récidives, les migrations et l’encombrement tardif peuvent réapparaître longtemps après un traitement, d’où l’importance de la contention et du suivi.",
+      "Un alignement obtenu n’est jamais définitivement acquis. Les récidives, les migrations et l’encombrement tardif expliquent la pente descendante et donnent tout son sens à la contention et au suivi.",
     question: "Vos dents ont-elles bougé depuis votre traitement orthodontique ou depuis vos vingt ans ?",
   },
   {
     number: "02",
-    slug: "gencives",
-    title: "Gencives et support",
-    subtitle: "Santé parodontale, attache et os",
-    color: "#2ca640",
-    smoothing: 0.5,
-    points: [[10, 5], [25, 10], [35, 20], [45, 35], [55, 55], [68, 72], [80, 85]],
-    highlights: [35, 55, 68],
+    slug: "caries",
+    title: "Caries",
+    subtitle: "Caries actives, risque, récidives et racines",
+    metric: "Quantité de dent d’origine non détruite",
+    color: "#e3262e",
+    smoothing: 0.42,
+    points: [[10, 65], [15, 70], [20, 85], [29, 89], [39, 59], [50, 77], [60, 74], [66, 70], [73, 61], [80, 24]],
+    highlights: [29, 39, 73],
     directions: [
-      { age: "10–35 ans", label: "Pente douce" },
-      { age: "35–55 ans", label: "Accélération" },
-      { age: "Après 55 ans", label: "Vigilance accrue" },
+      { age: "10–29 ans", label: "Capital consolidé" },
+      { age: "Vers 40 ans", label: "Premier décrochage" },
+      { age: "Après 73 ans", label: "Baisse accélérée" },
     ],
     shape:
-      "D’abord basse et presque plate, la courbe s’incline progressivement. Son changement de pente devient plus net entre 35 et 55 ans, puis la montée se poursuit avec l’âge.",
+      "La quantité de dent d’origine préservée progresse jusqu’au jeune âge adulte. Un premier décrochage apparaît autour de 40 ans, suivi d’un répit, puis d’une baisse qui s’accélère nettement après 70 ans.",
     meaning:
-      "Le support d’une dent se construit dans la durée. Une inflammation discrète mais répétée peut affecter la gencive, l’attache puis l’os. Détecter l’accélération tôt permet souvent de conserver une situation stable.",
-    question: "Vos gencives saignent-elles, se rétractent-elles, ou certaines dents paraissent-elles plus longues ?",
+      "Chaque carie détruit une part de tissu qui ne repousse pas. Prévenir les récidives et intervenir de façon conservatrice protège le capital dentaire disponible pour les décennies suivantes.",
+    question: "Quelle proportion de vos dents est encore constituée de tissu d’origine intact ?",
   },
   {
     number: "03",
-    slug: "caries",
-    title: "Caries",
-    subtitle: "Risque carieux, récidives et racines",
-    color: "#e3262e",
-    smoothing: 0.55,
-    points: [[10, 35], [18, 50], [30, 40], [45, 42], [60, 55], [70, 68], [80, 78]],
-    highlights: [18, 30, 60],
+    slug: "gencives",
+    title: "Gencives et support",
+    subtitle: "Santé parodontale, attache, os et implants",
+    metric: "Qualité du support",
+    color: "#2ca640",
+    smoothing: 0.38,
+    points: [[10, 95], [15, 92], [22, 89], [29, 75], [38, 82], [50, 68], [60, 41], [66, 32], [74, 24], [80, 18]],
+    highlights: [29, 38, 60],
     directions: [
-      { age: "Vers 18 ans", label: "Premier sommet" },
-      { age: "30–45 ans", label: "Plateau relatif" },
-      { age: "Après 45 ans", label: "Remontée" },
+      { age: "10–29 ans", label: "Première érosion" },
+      { age: "Vers 38 ans", label: "Rebond possible" },
+      { age: "Après 50 ans", label: "Déclin plus rapide" },
     ],
     shape:
-      "Un premier relief apparaît chez le jeune patient. La courbe redescend ensuite vers un plateau adulte, avant de changer progressivement de direction et de remonter à partir du milieu de vie.",
+      "Le support est généralement très favorable au début de la vie. Après une première baisse, une amélioration reste possible, mais la pente devient nettement plus forte à partir de 50 ans.",
     meaning:
-      "Avec le temps, de nouveaux facteurs peuvent intervenir : racines exposées, bouche plus sèche, médicaments ou limites d’anciennes restaurations. Le risque carieux n’est donc jamais définitivement acquis ni définitivement écarté.",
-    question: "Votre bouche est-elle plus sèche, vos racines plus exposées ou les récidives plus fréquentes qu’avant ?",
+      "Une inflammation discrète mais répétée peut affecter la gencive, l’attache puis l’os. Détecter une perte de qualité tôt permet souvent de stabiliser le support des dents et des implants.",
+    question: "Vos gencives saignent-elles, se rétractent-elles, ou certaines dents paraissent-elles plus longues ?",
   },
   {
     number: "04",
     slug: "restaurations",
     title: "Restaurations",
-    subtitle: "Entretien et remplacement des soins",
+    subtitle: "Entretien, réparation, remplacement et réhabilitation",
+    metric: "Qualité des restaurations",
     color: "#f5820b",
-    smoothing: 0.45,
-    points: [[10, 2], [25, 8], [35, 20], [45, 40], [55, 60], [68, 76], [80, 82]],
-    highlights: [35, 45, 68],
+    smoothing: 0.32,
+    points: [[10, 98], [15, 95], [22, 92], [32, 89], [40, 68], [48, 72], [56, 49], [62, 33], [70, 20], [80, 12]],
+    highlights: [40, 48, 62],
     directions: [
-      { age: "Avant 35 ans", label: "Charge limitée" },
-      { age: "35–55 ans", label: "Pente plus forte" },
-      { age: "Après 68 ans", label: "Haut plateau" },
+      { age: "Avant 32 ans", label: "Qualité élevée" },
+      { age: "40–48 ans", label: "Répit après reprise" },
+      { age: "Après 50 ans", label: "Usure accélérée" },
     ],
     shape:
-      "La ligne reste très basse au début de la vie, puis se redresse après 35 ans. Entre 45 et 68 ans, sa pente devient franche avant de tendre vers un plateau élevé.",
+      "La qualité du patrimoine restauré reste élevée au début de la vie, puis connaît un premier décrochage autour de 40 ans. Après un léger rebond, la baisse devient beaucoup plus marquée à partir de la cinquantaine.",
     meaning:
-      "Chaque obturation, couronne ou implant rejoint un patrimoine à entretenir. Plus ce patrimoine s’accumule, plus les décisions doivent être coordonnées pour éviter une succession de réparations isolées.",
+      "Chaque obturation, couronne ou implant vieillit. Les contrôler, les entretenir et coordonner leur remplacement évite qu’une succession de reprises isolées n’affaiblisse l’ensemble.",
     question: "Savez-vous quel âge ont vos obturations, vos couronnes et vos implants, et comment ils évoluent ?",
   },
   {
     number: "05",
     slug: "fonction",
-    title: "Fonction, usure et bruxisme",
-    subtitle: "Contraintes, parafonctions et mastication",
+    title: "Fonction",
+    subtitle: "Croissance, occlusion, usure, bruxisme et mastication",
+    metric: "Qualité des fonctions",
     color: "#7137b9",
-    smoothing: 0.5,
-    points: [[10, 8], [25, 35], [35, 65], [45, 80], [55, 75], [65, 65], [80, 58]],
-    highlights: [25, 45, 65],
+    smoothing: 0.3,
+    points: [[10, 75], [15, 52], [20, 70], [30, 88], [40, 82], [50, 70], [60, 65], [65, 60], [70, 38], [80, 18]],
+    highlights: [15, 30, 65],
     directions: [
-      { age: "25–45 ans", label: "Forte montée" },
-      { age: "Vers 45 ans", label: "Point culminant" },
-      { age: "Après 45 ans", label: "Baisse sans retour" },
+      { age: "10–15 ans", label: "Creux de croissance" },
+      { age: "15–30 ans", label: "Fonction optimisée" },
+      { age: "Après 65 ans", label: "Baisse marquée" },
     ],
     shape:
-      "La courbe grimpe rapidement au cœur de la vie et atteint son sommet autour de 45 ans. Elle redescend ensuite, mais reste nettement au-dessus de son niveau de départ.",
+      "La qualité fonctionnelle connaît un creux pendant la croissance, puis atteint son meilleur niveau chez l’adulte jeune. Elle diminue progressivement à partir de 40 ans et plus franchement après 65 ans.",
     meaning:
-      "Le serrement ou le grincement peuvent diminuer avec l’âge, mais l’usure déjà accumulée ne s’efface pas. C’est pourquoi une pente descendante peut malgré tout correspondre à une bouche qui demande encore de l’attention.",
+      "Occlusion, mastication, usure et bruxisme s’influencent. L’objectif n’est pas seulement de soulager un symptôme, mais de conserver des fonctions efficaces malgré les contraintes accumulées.",
     question: "Serrez-vous les dents, ressentez-vous des tensions, ou trouvez-vous que vos dents se raccourcissent ?",
   },
   {
     number: "06",
     slug: "esthetique",
     title: "Esthétique",
-    subtitle: "Couleur, forme et harmonie du sourire",
+    subtitle: "Couleur, forme, harmonie et rajeunissement du sourire",
+    metric: "Qualité du visuel",
     color: "#e51a78",
-    smoothing: 0.65,
-    points: [[10, 12], [18, 60], [30, 70], [42, 52], [55, 65], [68, 52], [80, 40]],
-    highlights: [30, 42, 55],
+    smoothing: 0.4,
+    points: [[10, 90], [15, 65], [20, 48], [30, 55], [38, 75], [50, 35], [60, 35], [68, 41], [75, 52], [80, 81]],
+    highlights: [20, 38, 50],
     directions: [
-      { age: "18–30 ans", label: "Premier relief" },
-      { age: "Vers 42 ans", label: "Repli" },
-      { age: "Vers 55 ans", label: "Second relief" },
+      { age: "15–20 ans", label: "Premier décrochage" },
+      { age: "Vers 38 ans", label: "Qualité retrouvée" },
+      { age: "50–60 ans", label: "Second creux" },
     ],
     shape:
-      "La courbe dessine deux reliefs : un premier sommet chez le jeune adulte, puis une nouvelle montée autour de 55 ans après un creux au milieu de la vie.",
+      "La qualité visuelle connaît un premier creux chez le jeune adulte, remonte autour de 40 ans, puis traverse une seconde période basse entre 50 et 60 ans avant de s’améliorer de nouveau.",
     meaning:
-      "Cette trajectoire parle moins de maladie que d’identité. Les attentes évoluent avec le visage, les étapes de vie et l’image que l’on souhaite transmettre. Elles restent personnelles à tout âge.",
+      "Cette trajectoire parle moins de maladie que d’identité. Le regard porté sur le sourire, les soins déjà réalisés et l’harmonie avec le visage évoluent selon les étapes de vie.",
     question: "Votre sourire correspond-il encore à votre visage et à l’image que vous voulez donner aujourd’hui ?",
   },
 ];
@@ -183,12 +190,12 @@ function chartX(age: number) {
   return chart.left + ((age - 10) / 70) * chartWidth;
 }
 
-function chartY(need: number) {
-  return chart.bottom - (need / 100) * chartHeight;
+function chartY(quality: number) {
+  return chart.bottom - (quality / 100) * chartHeight;
 }
 
 function smoothPath(points: readonly CurvePoint[], smoothing: number) {
-  const coordinates = points.map(([age, need]) => [chartX(age), chartY(need)] as const);
+  const coordinates = points.map(([age, quality]) => [chartX(age), chartY(quality)] as const);
 
   return coordinates.reduce((path, point, index, all) => {
     if (index === 0) return `M ${point[0]} ${point[1]}`;
@@ -248,11 +255,19 @@ function CurveChart({
             <text x={chartX(age)} y="276">{age}</text>
           </g>
         ))}
+        <text
+          className="method-chart-quality-label"
+          x={-((chart.top + chart.bottom) / 2)}
+          y="12"
+          transform="rotate(-90)"
+        >
+          qualité
+        </text>
         <text className="method-chart-age-label" x={chart.right} y="296">âge</text>
         {!compact ? (
           <>
-            <text x="47" y={chartY(100) + 4} textAnchor="end">fort</text>
-            <text x="47" y={chartY(0) + 4} textAnchor="end">faible</text>
+            <text x="47" y={chartY(100) + 4} textAnchor="end">haute</text>
+            <text x="47" y={chartY(0) + 4} textAnchor="end">basse</text>
           </>
         ) : null}
       </g>
@@ -271,10 +286,10 @@ function CurveChart({
             style={{ stroke: curve.color }}
           />
           {singleCurve
-            ? curve.points.filter(([age]) => curve.highlights.includes(age)).map(([age, need]) => (
+            ? curve.points.filter(([age]) => curve.highlights.includes(age)).map(([age, quality]) => (
                 <g className="method-chart-point" key={age}>
-                  <circle cx={chartX(age)} cy={chartY(need)} r="7" style={{ stroke: curve.color }} />
-                  <circle cx={chartX(age)} cy={chartY(need)} r="2.5" style={{ fill: curve.color }} />
+                  <circle cx={chartX(age)} cy={chartY(quality)} r="7" style={{ stroke: curve.color }} />
+                  <circle cx={chartX(age)} cy={chartY(quality)} r="2.5" style={{ fill: curve.color }} />
                 </g>
               ))
             : null}
@@ -312,7 +327,7 @@ export default function MethodePage() {
           <p className="eyebrow">La méthode SourirePlus</p>
           <h1>Quel âge a vraiment <em>votre bouche&nbsp;?</em></h1>
           <p className="method-lead">
-            L’âge civil ne dit pas tout. Certaines bouches sont en avance, d’autres ont été remarquablement préservées. Notre méthode transforme l’examen, les images et votre jumeau numérique en six trajectoires compréhensibles.
+            L’âge civil ne dit pas tout. Certaines bouches sont en avance, d’autres ont été remarquablement préservées. Notre méthode mesure six formes de qualité, toujours dans le même sens&nbsp;: plus la courbe est haute, meilleure est la situation.
           </p>
           <div className="method-hero-points">
             <span><Check aria-hidden="true" /> Comprendre où vous en êtes</span>
@@ -328,14 +343,14 @@ export default function MethodePage() {
             curves={curveDomains}
             compact
             label="Aperçu des six courbes de référence SourirePlus"
-            description="Les six trajectoires de besoin relatif de surveillance ou d’intervention entre 10 et 80 ans se croisent et changent de direction à des âges différents."
+            description="Les six trajectoires de qualité entre 10 et 80 ans se croisent et changent de direction à des âges différents. Une valeur haute correspond toujours à une meilleure situation."
           />
           <div className="curve-legend">
             {curveDomains.map((curve) => (
               <span key={curve.slug}><i style={{ background: curve.color }} /> {curve.title}</span>
             ))}
           </div>
-          <small>Indice pédagogique de besoin relatif de surveillance ou d’intervention — chaque bilan est individuel.</small>
+          <small>Indice pédagogique de qualité, de 0 à 100 — plus la courbe est haute, meilleure est la situation.</small>
         </div>
       </section>
 
@@ -374,7 +389,7 @@ export default function MethodePage() {
         <div className="method-section-title dark-title">
           <p className="eyebrow">La réalité derrière le score</p>
           <h2>Six courbes.<br /><em>Six histoires différentes.</em></h2>
-          <p>Une courbe de référence n’est pas votre destin. Ses reliefs montrent les périodes où les priorités changent. Votre histoire, vos soins, vos habitudes et votre suivi déplacent votre propre trajectoire.</p>
+          <p>Chaque courbe mesure une qualité différente sur la même échelle. Une courbe de référence n’est pas votre destin&nbsp;: votre histoire, vos soins, vos habitudes et votre suivi déplacent votre propre trajectoire.</p>
         </div>
 
         <div className="curve-story-list">
@@ -383,8 +398,8 @@ export default function MethodePage() {
               <div className="curve-story-chart">
                 <div className="curve-chart-card" style={{ "--curve-color": domain.color } as CSSProperties}>
                   <div className="curve-chart-heading">
-                    <span>Besoin relatif</span>
-                    <small>Surveillance ou intervention</small>
+                    <span>Qualité</span>
+                    <small>{domain.metric}</small>
                   </div>
                   <CurveChart
                     curves={[domain]}
@@ -400,7 +415,7 @@ export default function MethodePage() {
               </div>
               <div className="curve-story-copy">
                 <span className="curve-number" style={{ color: domain.color }}>{domain.number}</span>
-                <p className="curve-kicker" style={{ color: domain.color }}>Lecture de la forme</p>
+                <p className="curve-kicker" style={{ color: domain.color }}>{domain.metric}</p>
                 <h3>{domain.title}</h3>
                 <p className="curve-subtitle">{domain.subtitle}</p>
                 <p><strong>Le relief.</strong> {domain.shape}</p>
@@ -432,24 +447,24 @@ export default function MethodePage() {
           <div className="combined-chart-card">
             <div className="curve-chart-heading">
               <span>Les six trajectoires simultanées</span>
-              <small>Besoin relatif de surveillance ou d’intervention</small>
+              <small>Qualité relative — plus haut = meilleur</small>
             </div>
             <CurveChart
               curves={curveDomains}
               label="Superposition des six courbes de référence SourirePlus"
-              description="Les courbes d’alignement, de gencives, de caries, de restaurations, de fonction et d’esthétique sont superposées entre 10 et 80 ans."
+              description="Les courbes de qualité d’alignement, de préservation des dents d’origine, du support, des restaurations, des fonctions et du visuel sont superposées entre 10 et 80 ans."
             />
             <div className="curve-legend combined-legend">
               {curveDomains.map((curve) => (
                 <span key={curve.slug}><i style={{ background: curve.color }} /> {curve.title}</span>
               ))}
             </div>
-            <small>Courbes de référence : elles donnent un repère pédagogique, jamais un diagnostic individuel.</small>
+            <small>Courbes de référence&nbsp;: une valeur haute est favorable. Elles donnent un repère pédagogique, jamais un diagnostic individuel.</small>
           </div>
         </div>
 
         <p className="method-source">
-          Modèle de référence 10–80 ans issu de l’outil <a href="https://mydentalpass.ch/courbes/" target="_blank" rel="noreferrer">MyDentalPass — Courbes</a>. L’indice est normalisé&nbsp;: il n’exprime ni une prévalence ni une probabilité individuelle.
+          Modèle de référence 10–80 ans, actualisé le 30 août 2026 à partir de l’outil <a href="https://mydentalpass.ch/courbes/" target="_blank" rel="noreferrer">MyDentalPass — Courbes</a>. L’indice de qualité est normalisé&nbsp;: 100 représente la situation la plus favorable et 0 la moins favorable. Il n’exprime ni une prévalence ni une probabilité individuelle.
         </p>
       </section>
 
