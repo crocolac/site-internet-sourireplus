@@ -454,6 +454,7 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 .method-chart-grid line { stroke: rgba(8,37,60,.1); stroke-width: 1; }
 .method-chart-axis line { stroke: rgba(8,37,60,.24); stroke-width: 1; }
 .method-chart-axis text { fill: var(--muted); font-family: Arial, sans-serif; font-size: 9px; text-anchor: middle; }
+.method-chart-axis .method-chart-quality-label { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .method-chart-axis .method-chart-age-label { font-size: 8px; letter-spacing: .08em; text-anchor: end; text-transform: uppercase; }
 .method-chart-line { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 4; }
 .method-chart-area { pointer-events: none; }
