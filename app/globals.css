@@ -536,6 +536,9 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 .digital-twin ul { display: grid; gap: 13px; list-style: none; margin: 30px 0 0; padding: 0; }
 .digital-twin li { align-items: center; color: rgba(255,255,255,.78); display: flex; font-size: 11px; gap: 10px; }
 .digital-twin li svg { color: var(--gold); height: 15px; width: 15px; }
+.twin-section-link { align-items: center; color: var(--gold-light); display: inline-flex; font-size: 10px; font-weight: 700; gap: 9px; letter-spacing: .04em; margin-top: 29px; text-transform: uppercase; }
+.twin-section-link svg { height: 14px; transition: transform .2s ease; width: 14px; }
+.twin-section-link:hover svg { transform: translateX(5px); }
 
 .method-cta { align-items: center; display: flex; gap: 60px; justify-content: space-between; padding-block: 105px; }
 .method-cta h2 { font-size: clamp(39px, 4vw, 57px); line-height: 1.07; margin-top: 16px; max-width: 800px; }
@@ -547,6 +550,110 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
 .method-footer-links { display: flex; flex-wrap: wrap; gap: 9px 18px; justify-content: flex-end; }
 .method-footer-links a { font-size: 9px; transition: color .2s ease; }
 .method-footer-links a:hover { color: white; }
+
+/* Jumeau numérique SourirePlus */
+.twin-page { background: var(--ivory); }
+.twin-header { top: 0; }
+.twin-hero { align-items: center; display: grid; gap: clamp(55px, 7vw, 105px); grid-template-columns: .92fr 1.08fr; min-height: 735px; padding-block: 74px 96px; }
+.twin-hero h1 { font-size: clamp(53px, 5.1vw, 75px); line-height: .98; margin-top: 22px; }
+.twin-hero h1 em { display: block; }
+.twin-lead { color: #52616c; font-size: 15px; line-height: 1.82; margin-top: 29px; max-width: 620px; }
+.twin-hero-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 28px; margin-top: 34px; }
+.twin-hero-actions .primary-cta svg { height: 16px; width: 16px; }
+.twin-hero-visual { min-height: 570px; position: relative; }
+.twin-scanner-image { background-color: #dfe8eb; background-image: linear-gradient(135deg, rgba(8,37,60,.06), rgba(189,152,96,.08)), url('/images/scanner-technology.webp'); background-position: center; background-size: cover; height: 570px; }
+.twin-hero-visual::before { border: 1px solid rgba(189,152,96,.42); content: ""; inset: 23px -22px -23px 22px; pointer-events: none; position: absolute; }
+.twin-hero-visual figcaption { background: white; bottom: 30px; box-shadow: var(--shadow); display: grid; gap: 4px 13px; grid-template-columns: 36px 1fr; left: -38px; max-width: 315px; padding: 22px 24px; position: absolute; }
+.twin-hero-visual figcaption > span { color: var(--gold); font-family: Georgia, serif; font-size: 26px; grid-row: 1 / 3; }
+.twin-hero-visual figcaption strong { color: var(--navy); font-family: Georgia, serif; font-size: 16px; font-weight: 400; }
+.twin-hero-visual figcaption small { color: var(--muted); font-size: 9px; line-height: 1.5; }
+.twin-hero-signal { align-items: center; background: var(--navy); border: 7px solid var(--ivory); border-radius: 50%; color: white; display: flex; flex-direction: column; height: 94px; justify-content: center; position: absolute; right: -25px; top: 32px; width: 94px; }
+.twin-hero-signal svg { color: var(--gold-light); height: 28px; width: 28px; }
+.twin-hero-signal span { font-size: 8px; font-weight: 700; letter-spacing: .15em; margin-top: 4px; }
+
+.twin-bridge { background: var(--navy); color: white; }
+.twin-bridge .section-shell { display: grid; grid-template-columns: 1fr 1fr; min-height: 154px; }
+.twin-bridge p { align-items: center; color: rgba(255,255,255,.58); display: flex; font-family: Georgia, serif; font-size: clamp(20px, 2.1vw, 28px); line-height: 1.35; padding-right: 45px; }
+.twin-bridge p + p { border-left: 1px solid rgba(255,255,255,.14); padding-left: 58px; padding-right: 0; }
+.twin-bridge strong { color: var(--gold-light); font-weight: 400; margin-left: .3em; }
+
+.twin-definition { padding-block: 125px 132px; scroll-margin-top: 105px; }
+.twin-section-heading { max-width: 790px; }
+.twin-section-heading h2 { font-size: clamp(43px, 4.5vw, 64px); line-height: 1.05; margin-top: 17px; }
+.twin-section-heading > p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.82; margin-top: 25px; max-width: 690px; }
+.twin-definition-grid { align-items: start; display: grid; gap: clamp(55px, 7vw, 95px); grid-template-columns: .82fr 1.18fr; margin-top: 70px; }
+.twin-definition-copy .large-copy { color: var(--navy); font-family: Georgia, serif; font-size: 22px; line-height: 1.55; }
+.twin-definition-copy > p:not(.large-copy) { color: var(--muted); font-size: 12px; line-height: 1.82; margin-top: 25px; }
+.twin-definition-copy aside { align-items: flex-start; background: white; border-left: 3px solid var(--gold); display: flex; gap: 16px; margin-top: 30px; padding: 22px; }
+.twin-definition-copy aside svg { color: var(--gold); flex: 0 0 auto; height: 23px; width: 23px; }
+.twin-definition-copy aside span { color: var(--muted); font-size: 10px; line-height: 1.65; }
+.twin-definition-copy aside strong { color: var(--navy); display: block; font-size: 10px; letter-spacing: .05em; margin-bottom: 5px; text-transform: uppercase; }
+.twin-comparison-card { background: white; box-shadow: 0 20px 60px rgba(8,37,60,.1); padding: 29px 31px 25px; }
+.twin-card-heading { align-items: flex-start; display: flex; gap: 20px; justify-content: space-between; }
+.twin-card-heading span { color: var(--navy); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.twin-card-heading small { color: var(--muted); font-size: 8px; max-width: 210px; text-align: right; }
+.twin-comparison-diagram { display: block; margin-top: 20px; overflow: visible; width: 100%; }
+.twin-diagram-labels text { fill: var(--navy); font-family: Arial, sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-anchor: middle; }
+.twin-diagram-notes text { fill: var(--muted); font-family: Arial, sans-serif; font-size: 9px; text-anchor: middle; }
+.twin-diagram-arrows path { fill: none; stroke: var(--gold); stroke-linecap: round; stroke-width: 1.5; }
+.twin-diagram-legend text { fill: var(--muted); font-family: Arial, sans-serif; font-size: 8px; }
+.twin-comparison-note { border-top: 1px solid var(--line); color: var(--muted); font-size: 8px; line-height: 1.55; margin-top: 3px; padding-top: 15px; text-align: center; }
+
+.twin-dx { background: #0d304b; color: white; padding-block: 120px 125px; scroll-margin-top: 105px; }
+.light-heading h2 { color: white; }
+.light-heading > p:not(.eyebrow) { color: rgba(255,255,255,.59); }
+.dx-levels { border-left: 1px solid rgba(255,255,255,.14); border-top: 1px solid rgba(255,255,255,.14); display: grid; grid-template-columns: 1fr 1fr; margin-top: 62px; }
+.dx-levels article { border-bottom: 1px solid rgba(255,255,255,.14); border-right: 1px solid rgba(255,255,255,.14); min-height: 460px; padding: 42px 45px 38px; position: relative; }
+.dx-levels article.dx-plus-card { background: rgba(255,255,255,.045); }
+.dx-level-title { align-items: center; display: flex; gap: 11px; }
+.dx-level-title svg { color: var(--gold-light); height: 22px; width: 22px; }
+.dx-level-title span { color: var(--gold-light); font-size: 8px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.dx-levels h3 { color: white; font-family: Georgia, serif; font-size: clamp(34px, 3.2vw, 46px); font-weight: 400; margin-top: 40px; }
+.dx-levels article > p { color: rgba(255,255,255,.62); font-size: 12px; line-height: 1.82; margin-top: 19px; max-width: 470px; }
+.dx-levels ul { display: grid; gap: 13px; list-style: none; margin: 28px 0 0; padding: 0; }
+.dx-levels li { align-items: center; color: rgba(255,255,255,.79); display: flex; font-size: 10px; gap: 10px; }
+.dx-levels li svg { color: var(--gold); height: 14px; width: 14px; }
+.dx-levels article > small { bottom: 35px; color: rgba(255,255,255,.39); display: block; font-size: 8px; left: 45px; line-height: 1.55; max-width: 430px; position: absolute; right: 45px; }
+.dx-responsibility { align-items: flex-start; background: var(--gold); color: var(--navy); display: flex; gap: 20px; padding: 26px 31px; }
+.dx-responsibility svg { flex: 0 0 auto; height: 25px; margin-top: 2px; width: 25px; }
+.dx-responsibility p { font-size: 11px; line-height: 1.75; }
+
+.twin-axes { padding-block: 126px 132px; scroll-margin-top: 105px; }
+.twin-axis-grid { border-left: 1px solid var(--line); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(2,1fr); margin-top: 67px; }
+.twin-axis-grid article { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 430px; padding: 34px 38px 37px; position: relative; }
+.twin-axis-grid article::before { background: var(--axis-color); content: ""; height: 3px; left: 0; position: absolute; top: 0; width: 29%; }
+.twin-axis-head { align-items: center; display: flex; justify-content: space-between; }
+.twin-axis-head span { color: var(--axis-color); font-family: Georgia, serif; font-size: 30px; }
+.twin-axis-head i { background: var(--axis-color); border-radius: 50%; height: 10px; width: 10px; }
+.twin-axis-grid h3 { color: var(--navy); font-family: Georgia, serif; font-size: 30px; font-weight: 400; margin-top: 26px; }
+.twin-axis-grid dl { display: grid; gap: 20px; margin: 26px 0 0; }
+.twin-axis-grid dt { color: var(--axis-color); font-size: 8px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
+.twin-axis-grid dd { color: var(--muted); font-size: 10px; line-height: 1.68; margin: 7px 0 0; }
+.twin-axis-limit { border-top: 1px solid var(--line); padding-top: 18px; }
+.twin-axis-limit dt { color: var(--navy); }
+
+.twin-journey { background: var(--navy); color: white; padding-block: 120px 128px; scroll-margin-top: 105px; }
+.twin-journey-list { border-top: 1px solid rgba(255,255,255,.14); list-style: none; margin: 62px 0 0; padding: 0; }
+.twin-journey-list li { align-items: start; border-bottom: 1px solid rgba(255,255,255,.14); display: grid; gap: 42px; grid-template-columns: 64px 1fr; padding: 31px 5px; }
+.twin-journey-list li > span { color: var(--gold); font-family: Georgia, serif; font-size: 30px; }
+.twin-journey-list li > div { align-items: baseline; display: grid; gap: 45px; grid-template-columns: .52fr 1.48fr; }
+.twin-journey-list h3 { color: white; font-family: Georgia, serif; font-size: 25px; font-weight: 400; }
+.twin-journey-list p { color: rgba(255,255,255,.59); font-size: 11px; line-height: 1.78; max-width: 660px; }
+
+.twin-result { align-items: center; display: grid; gap: clamp(55px, 8vw, 115px); grid-template-columns: 1fr 1fr; padding-block: 125px; }
+.twin-result-copy h2 { font-size: clamp(40px, 4vw, 57px); line-height: 1.07; margin-top: 17px; }
+.twin-result-copy > p:not(.eyebrow) { color: var(--muted); font-size: 12px; line-height: 1.82; margin-top: 25px; }
+.twin-result-list { border-top: 1px solid var(--line); }
+.twin-result-list > p { align-items: flex-start; border-bottom: 1px solid var(--line); display: flex; gap: 18px; padding-block: 23px; }
+.twin-result-list svg { color: var(--gold); flex: 0 0 auto; height: 24px; width: 24px; }
+.twin-result-list span { color: var(--muted); font-size: 10px; line-height: 1.65; }
+.twin-result-list strong { color: var(--navy); display: block; font-family: Georgia, serif; font-size: 18px; font-weight: 400; margin-bottom: 5px; }
+
+.twin-sources { border-top: 1px solid var(--line); padding-block: 50px 75px; }
+.twin-sources h2 { color: var(--navy); font-size: 18px; }
+.twin-sources > p { color: var(--muted); font-size: 9px; line-height: 1.7; margin-top: 15px; max-width: 940px; }
+.twin-sources nav { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 21px; }
+.twin-sources a { color: var(--navy); font-size: 9px; font-weight: 700; text-decoration: underline; text-decoration-color: var(--gold); text-underline-offset: 4px; }
 
 /* Propriétaires SourirePlus */
 .owners-page { background: var(--ivory); }
@@ -830,6 +937,12 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
   .neighborhood-map-frame { height: 410px; }
   .access-options article { padding-right: 35px; }
   .access-options article + article { padding-left: 35px; }
+  .twin-hero { gap: 48px; grid-template-columns: 1fr 1fr; }
+  .twin-definition-grid { grid-template-columns: 1fr; }
+  .twin-definition-copy { max-width: 720px; }
+  .dx-levels article { padding-inline: 34px; }
+  .dx-levels article > small { left: 34px; right: 34px; }
+  .twin-axis-grid article { padding-inline: 30px; }
 }
 
 @media (max-width: 760px) {
@@ -952,6 +1065,51 @@ footer .brand-copy small { color: rgba(255,255,255,.45); }
   .method-cta { align-items: flex-start; flex-direction: column; padding-block: 83px; }
   .method-cta .primary-cta { justify-content: center; width: 100%; }
   .method-footer .section-shell { align-items: flex-start; flex-direction: column; gap: 25px; justify-content: center; padding-block: 34px; }
+  .twin-header .method-appointment { font-size: 0; height: 42px; justify-content: center; padding: 0; width: 42px; }
+  .twin-header .method-appointment svg { height: 17px; width: 17px; }
+  .twin-hero { display: flex; flex-direction: column; min-height: 0; padding-block: 48px 82px; }
+  .twin-hero-copy, .twin-hero-visual { width: 100%; }
+  .twin-hero h1 { font-size: 47px; }
+  .twin-hero-actions { align-items: stretch; flex-direction: column; gap: 20px; }
+  .twin-hero-actions .primary-cta { justify-content: center; width: 100%; }
+  .twin-hero-actions .inline-link { justify-content: center; }
+  .twin-hero-visual { min-height: 485px; }
+  .twin-scanner-image { height: 485px; }
+  .twin-hero-visual::before { display: none; }
+  .twin-hero-visual figcaption { bottom: 18px; left: 12px; right: 12px; }
+  .twin-hero-signal { border-width: 5px; height: 78px; right: -8px; top: 17px; width: 78px; }
+  .twin-hero-signal svg { height: 23px; width: 23px; }
+  .twin-bridge .section-shell { display: block; padding-block: 28px; }
+  .twin-bridge p { display: block; font-size: 20px; padding: 15px 0; }
+  .twin-bridge p + p { border-left: 0; border-top: 1px solid rgba(255,255,255,.14); padding-left: 0; }
+  .twin-bridge strong { display: block; margin: 4px 0 0; }
+  .twin-definition { padding-block: 87px 92px; }
+  .twin-section-heading h2 { font-size: 42px; }
+  .twin-definition-grid { margin-top: 45px; }
+  .twin-definition-copy .large-copy { font-size: 19px; }
+  .twin-comparison-card { margin-inline: -8px; overflow: hidden; padding: 22px 10px 15px; }
+  .twin-card-heading { padding-inline: 8px; }
+  .twin-card-heading small { display: none; }
+  .twin-comparison-diagram { margin-left: -62%; width: 225%; }
+  .twin-dx { padding-block: 87px 92px; }
+  .dx-levels { display: block; margin-top: 45px; }
+  .dx-levels article { min-height: 0; padding: 32px 23px 34px; }
+  .dx-levels article > small { margin-top: 28px; max-width: none; position: static; }
+  .dx-responsibility { padding: 23px 20px; }
+  .twin-axes { padding-block: 88px 92px; }
+  .twin-axis-grid { display: block; margin-top: 45px; }
+  .twin-axis-grid article { min-height: 0; padding: 30px 22px 34px; }
+  .twin-axis-grid h3 { font-size: 27px; margin-top: 19px; }
+  .twin-journey { padding-block: 87px 92px; }
+  .twin-journey-list { margin-top: 45px; }
+  .twin-journey-list li { gap: 20px; grid-template-columns: 42px 1fr; padding: 26px 0; }
+  .twin-journey-list li > div { display: block; }
+  .twin-journey-list h3 { font-size: 22px; }
+  .twin-journey-list p { margin-top: 12px; }
+  .twin-result { display: block; padding-block: 87px; }
+  .twin-result-list { margin-top: 44px; }
+  .twin-sources { padding-block: 41px 61px; }
+  .twin-sources nav { display: grid; }
   .owners-header .method-appointment { font-size: 0; height: 42px; justify-content: center; padding: 0; width: 42px; }
   .owners-header .method-appointment svg { height: 17px; width: 17px; }
   .owners-hero { display: flex; flex-direction: column; min-height: 0; padding-block: 48px 78px; }
