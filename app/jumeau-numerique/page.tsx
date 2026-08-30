@@ -18,7 +18,7 @@ import { Topline } from "../Topline";
 export const metadata: Metadata = {
   title: "Jumeau numérique dentaire | Méthode SourirePlus",
   description:
-    "Découvrez comment le scan TRIOS 6, 3Shape Dx et les six axes SourirePlus rendent l’évolution de votre bouche visible, comparable et compréhensible.",
+    "Découvrez comment le scan 3D et les six axes SourirePlus rendent l’évolution de votre bouche visible, comparable et compréhensible.",
   alternates: { canonical: "/jumeau-numerique/" },
   openGraph: {
     title: "Le jumeau numérique SourirePlus",
@@ -42,9 +42,9 @@ const axes = [
     number: "02",
     title: "Caries",
     color: "#e3262e",
-    observed: "Aide visuelle Dx Plus pour les caries de surface et visualisation des zones proximales selon les données disponibles.",
+    observed: "Aides visuelles pour repérer certaines zones de surface et visualisation des zones proximales selon les données disponibles.",
     interpreted: "Le praticien confronte ces indices à l’examen, aux radiographies utiles et au risque carieux personnel.",
-    limit: "La visualisation des caries proximales n’est pas présentée par 3Shape comme une détection par IA.",
+    limit: "La visualisation des caries proximales ne doit pas être confondue avec une détection automatique certaine.",
   },
   {
     number: "03",
@@ -60,7 +60,7 @@ const axes = [
     color: "#f5820b",
     observed: "Mémoire datée des formes, surfaces et volumes autour des obturations, couronnes ou implants visibles au scan.",
     interpreted: "Le suivi aide à documenter une évolution et à choisir entre surveiller, réparer ou remplacer.",
-    limit: "Dx n’attribue pas automatiquement une note de qualité ou de durée de vie à une restauration.",
+    limit: "Aucun logiciel n’attribue automatiquement une note fiable de qualité ou de durée de vie à une restauration.",
   },
   {
     number: "05",
@@ -84,12 +84,12 @@ const journey = [
   {
     number: "01",
     title: "Enregistrer",
-    text: "Le scan intra-oral crée un modèle 3D daté. Avec TRIOS 6, l’acquisition peut réunir couleur, lumière de fluorescence et imagerie proche infrarouge dans le même parcours de scan.",
+    text: "Un scanner intra-oral de dernière génération crée un modèle 3D daté et réunit plusieurs informations visuelles dans un même parcours d’acquisition.",
   },
   {
     number: "02",
-    title: "Inspecter",
-    text: "Dx organise le modèle pour l’examen. Dx Plus peut ajouter des aides visuelles assistées par IA sur certains signes : usure, récession gingivale, caries de surface et plaque.",
+    title: "Analyser",
+    text: "Les outils numériques aident à inspecter le modèle, mesurer certaines variations et attirer l’attention sur des zones qui devront être confrontées à l’examen clinique.",
   },
   {
     number: "03",
@@ -201,7 +201,7 @@ export default function JumeauNumeriquePage() {
         <Brand />
         <nav className="desktop-nav" aria-label="Navigation du jumeau numérique">
           <a href="#definition">Le principe</a>
-          <a href="#dx">Dx Standard et Plus</a>
+          <a href="#technologie">Technologie et sens</a>
           <a href="#six-axes">Les six axes</a>
           <a href="#parcours">Le parcours</a>
         </nav>
@@ -272,40 +272,40 @@ export default function JumeauNumeriquePage() {
         </div>
       </section>
 
-      <section className="twin-dx" id="dx">
+      <section className="twin-dx" id="technologie">
         <div className="section-shell">
           <div className="twin-section-heading light-heading">
-            <p className="eyebrow light">La couche technologique</p>
-            <h2>TRIOS 6 capte. Dx organise. <em>SourirePlus donne du sens.</em></h2>
-            <p>Les appellations Dx Standard et Dx Plus désignent deux niveaux d’outils 3Shape. Leur rôle doit rester distinct de la méthode clinique SourirePlus.</p>
+            <p className="eyebrow light">La différence SourirePlus</p>
+            <h2>La technologie révèle. La méthode relie. <em>Le praticien donne du sens.</em></h2>
+            <p>Nous utilisons des technologies dentaires de dernière génération. Leur valeur ne réside pas dans la quantité d’images produites, mais dans notre capacité à les relire avec le patient, son histoire dentaire et ses objectifs.</p>
           </div>
           <div className="dx-levels">
             <article>
-              <div className="dx-level-title"><Layers aria-hidden="true" /><span>Le socle</span></div>
-              <h3>Dx Standard</h3>
-              <p>La continuité du suivi numérique TRIOS&nbsp;: revoir les scans, comparer deux dates, mesurer des écarts et présenter les changements au patient.</p>
+              <div className="dx-level-title"><Layers aria-hidden="true" /><span>La précision numérique</span></div>
+              <h3>Observer avec précision</h3>
+              <p>Le scan 3D et les outils de comparaison rendent visibles des détails difficiles à mémoriser d’un rendez-vous à l’autre.</p>
               <ul>
-                <li><Check aria-hidden="true" /> Comparaison chronologique des scans</li>
-                <li><Check aria-hidden="true" /> Cartes de différences et superpositions</li>
-                <li><Check aria-hidden="true" /> Mesures, coupes et outils de présentation</li>
+                <li><Check aria-hidden="true" /> Une situation de départ datée</li>
+                <li><Check aria-hidden="true" /> Des superpositions et mesures comparables</li>
+                <li><Check aria-hidden="true" /> Des aides visuelles pour mieux observer</li>
               </ul>
-              <small>Ces fonctions de suivi sont accessibles avec les scans TRIOS compatibles, selon la configuration logicielle.</small>
+              <small>La technologie montre des formes, des écarts et des signaux. Elle ne connaît pas encore leur importance dans votre vie.</small>
             </article>
             <article className="dx-plus-card">
-              <div className="dx-level-title"><Sparkles aria-hidden="true" /><span>L’assistance avancée</span></div>
-              <h3>Dx Plus</h3>
-              <p>Une couche d’assistance par intelligence artificielle, réservée aux scans TRIOS&nbsp;6, pour attirer l’attention sur certains signes cliniques.</p>
+              <div className="dx-level-title"><Sparkles aria-hidden="true" /><span>L’intelligence clinique</span></div>
+              <h3>Comprendre la trajectoire</h3>
+              <p>La méthode SourirePlus replace chaque observation dans une histoire complète, au lieu de laisser un logiciel transformer un signal isolé en conclusion.</p>
               <ul>
-                <li><Check aria-hidden="true" /> Usure dentaire et exposition dentinaire</li>
-                <li><Check aria-hidden="true" /> Récession gingivale et niveau de sévérité</li>
-                <li><Check aria-hidden="true" /> Caries de surface et plaque</li>
+                <li><Check aria-hidden="true" /> Vos soins et événements dentaires antérieurs</li>
+                <li><Check aria-hidden="true" /> Une lecture coordonnée selon six axes</li>
+                <li><Check aria-hidden="true" /> Vos priorités, symptômes et projets de vie</li>
               </ul>
-              <small>Dx Plus nécessite l’offre correspondante. Les fonctions et leur disponibilité peuvent varier selon les autorisations régionales.</small>
+              <small>Deux images identiques peuvent appeler des décisions différentes selon l’âge, les antécédents, le risque et les attentes du patient.</small>
             </article>
           </div>
           <div className="dx-responsibility">
             <Eye aria-hidden="true" />
-            <p><strong>L’IA signale une zone d’attention, pas une vérité automatique.</strong> 3Shape précise que ses résultats peuvent comporter des faux positifs ou manquer un signe. Le professionnel de santé confirme toujours l’interprétation.</p>
+            <p><strong>Une image devient utile quand elle ouvre une conversation.</strong> Nous la comparons à votre situation antérieure, nous vous montrons ce qui a changé, puis nous décidons ensemble si cela mérite une surveillance, une prévention ou un soin.</p>
           </div>
         </div>
       </section>
@@ -314,7 +314,7 @@ export default function JumeauNumeriquePage() {
         <div className="twin-section-heading">
           <p className="eyebrow">L’intégration SourirePlus</p>
           <h2>Une seule mémoire 3D.<br /><em>Six angles de lecture.</em></h2>
-          <p>Les outils Dx ne fabriquent pas les courbes SourirePlus. Ils apportent des observations personnelles que l’équipe classe et interprète selon les six axes. Les courbes restent, elles, des repères de population concernée par âge.</p>
+          <p>Les outils numériques ne fabriquent pas les courbes SourirePlus. Ils apportent des observations personnelles que l’équipe classe et interprète selon les six axes. Les courbes restent, elles, des repères de population concernée par âge.</p>
         </div>
         <div className="twin-axis-grid">
           {axes.map((axis) => (
@@ -362,16 +362,15 @@ export default function JumeauNumeriquePage() {
       </section>
 
       <section className="twin-sources section-shell">
-        <h2>Technologie et transparence</h2>
+        <h2>La technologie au service de votre histoire</h2>
         <p>
-          Cette page présente l’usage clinique envisagé par SourirePlus à partir des informations publiques 3Shape consultées en août&nbsp;2026. «&nbsp;Jumeau numérique SourirePlus&nbsp;» est notre manière d’expliquer un suivi longitudinal fondé sur des scans datés&nbsp;; ce n’est pas le nom d’un produit 3Shape. TRIOS, Dx et 3Shape sont des marques de 3Shape. La disponibilité des fonctions dépend de l’équipement, de l’abonnement et des autorisations applicables.
+          Notre jumeau numérique n’est ni une marque, ni une démonstration de logiciel. C’est la continuité entre ce que nous observons aujourd’hui, ce que votre bouche a déjà vécu et ce que vous souhaitez préserver demain. La méthode SourirePlus transforme ainsi une succession de données techniques en une histoire dentaire compréhensible et en décisions partagées.
         </p>
-        <nav aria-label="Sources technologiques officielles">
-          <a href="https://www.3shape.com/en/software/trios-patient-monitoring" target="_blank" rel="noreferrer">Suivi numérique TRIOS / Dx Standard</a>
-          <a href="https://support.3shape.com/getting-started/navigating-the-main-functions-in-dx-diagnose-analyze-and-present-" target="_blank" rel="noreferrer">Fonctions Diagnose, Analyze et Present</a>
-          <a href="https://www.3shape.com/en-gb/software/dx/plus" target="_blank" rel="noreferrer">Présentation officielle de Dx Plus</a>
-          <a href="https://learn.3shape.com/en/support/all-products/trios-scanner--accessories/trios-6/frequently-asked-questions-trios-6-trios-dx-and-dentalhealth-app" target="_blank" rel="noreferrer">FAQ TRIOS 6 et limites de l’IA</a>
-        </nav>
+        <ul className="twin-commitment-list">
+          <li><strong>Vous montrer</strong> ce qui est réellement visible et comparable.</li>
+          <li><strong>Vous écouter</strong> pour relier l’image à vos sensations et à votre vécu.</li>
+          <li><strong>Vous guider</strong> vers une trajectoire cohérente, sans surinterpréter la technologie.</li>
+        </ul>
       </section>
 
       <section className="method-cta section-shell">
