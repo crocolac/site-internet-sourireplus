@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
+import { SiteHeader } from "../SiteHeader";
 import { Topline } from "../Topline";
 
 export const metadata: Metadata = {
@@ -297,22 +298,16 @@ export default function MethodePage() {
     <main className="method-page">
       <Topline />
 
-      <header className="site-header method-header">
-        <Link className="brand" href="/" aria-label="SourirePlus — accueil">
-          <span className="brand-emblem" aria-hidden="true" />
-          <span className="brand-copy">
-            <strong>SourirePlus</strong>
-            <small>Clinique dentaire · Neuchâtel</small>
-          </span>
-        </Link>
-        <nav className="desktop-nav" aria-label="Navigation de la méthode">
-          <a href="#principe">Le principe</a>
-          <a href="#courbes">Les six courbes</a>
-          <a href="#ensemble">La vision d’ensemble</a>
-          <a href="#jumeau">Le jumeau numérique</a>
-        </nav>
-        <Link className="method-appointment" href="/#rendez-vous"><CalendarDays aria-hidden="true" /> Prendre rendez-vous</Link>
-      </header>
+      <SiteHeader
+        action={<Link className="method-appointment" href="/#rendez-vous"><CalendarDays aria-hidden="true" /> Prendre rendez-vous</Link>}
+        className="method-header"
+        secondaryLinks={[
+          { href: "#principe", label: "Le principe" },
+          { href: "#courbes", label: "Les six courbes" },
+          { href: "#ensemble", label: "La vision d’ensemble" },
+          { href: "#jumeau", label: "Le jumeau numérique" },
+        ]}
+      />
 
       <section className="method-hero section-shell">
         <div>
