@@ -2,6 +2,7 @@ import { CalendarDays } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ADDRESS_LINE, EMAIL, PHONE_DISPLAY, PHONE_INTERNATIONAL, POSTAL_LOCALITY } from "./site-data";
+import { SiteHeader, type HeaderLink } from "./SiteHeader";
 import { Topline } from "./Topline";
 
 function Brand() {
@@ -16,22 +17,19 @@ function Brand() {
   );
 }
 
-export function InfoPageShell({ children }: { children: ReactNode }) {
+export function InfoPageShell({ children, secondaryLinks = [] }: { children: ReactNode; secondaryLinks?: readonly HeaderLink[] }) {
   return (
     <main className="info-page">
       <Topline />
-      <header className="site-header info-header">
-        <Brand />
-        <nav className="desktop-nav" aria-label="Navigation principale">
-          <Link href="/methode/">La méthode</Link>
-          <Link href="/#soins">Les soins</Link>
-          <Link href="/proprietaires/">Les propriétaires</Link>
-          <Link href="/acces/">Accès</Link>
-        </nav>
-        <Link className="method-appointment" href="/#rendez-vous">
-          <CalendarDays aria-hidden="true" /> Prendre rendez-vous
-        </Link>
-      </header>
+      <SiteHeader
+        action={(
+          <Link className="method-appointment" href="/#rendez-vous">
+            <CalendarDays aria-hidden="true" /> Prendre rendez-vous
+          </Link>
+        )}
+        className="info-header"
+        secondaryLinks={secondaryLinks}
+      />
       {children}
       <footer className="info-footer">
         <div className="section-shell info-footer-main">
