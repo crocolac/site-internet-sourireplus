@@ -5,7 +5,7 @@ import sharp from "sharp";
 
 const sourceRef = "refs/remotes/origin/philippe-portrait-source";
 const sourcePath = "app/layout.tsx";
-const outputPath = resolve("public/images/philippe-elalouf-medical-2026.png");
+const outputPath = resolve("public/images/philippe-elalouf-medical-2026.jpg");
 
 function hasSourceRef() {
   try {
@@ -47,5 +47,7 @@ if (metadata.format !== "jpeg" || !metadata.width || !metadata.height) {
 }
 
 mkdirSync(dirname(outputPath), { recursive: true });
-await image.png({ compressionLevel: 9 }).toFile(outputPath);
-console.log(`Portrait de Philippe normalisé en PNG (${metadata.width}x${metadata.height}).`);
+await image
+  .jpeg({ quality: 92, progressive: false, mozjpeg: false, chromaSubsampling: "4:4:4" })
+  .toFile(outputPath);
+console.log(`Portrait de Philippe validé et réencodé en JPEG standard (${metadata.width}x${metadata.height}).`);
