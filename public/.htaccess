@@ -4,6 +4,11 @@ RewriteEngine On
 RewriteCond %{HTTP_HOST} ^www\.sourireplus\.ch$ [NC]
 RewriteRule ^ https://sourireplus.ch%{REQUEST_URI} [R=301,L]
 
+# Sécurité de repli : si le JPEG ou le WebP de Philippe manque,
+# utiliser directement le PNG sain placé dans le dossier images sur OVH.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^images/philippe-elalouf-medical-2026\.(jpg|jpeg|webp)$ images/philippe-elalouf-medical-2026.png [NC,L]
+
 Options -Indexes
 AddDefaultCharset UTF-8
 
