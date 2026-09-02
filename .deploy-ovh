@@ -15,3 +15,4 @@ Deploy PR #26 — publish the two-level global and contextual navigation on 2026
 Deploy PR #27 — publish the portrait of Dr Philippe Elalouf on 2026-09-02 UTC.
 Fix PR #27 deployment: replace the embedded data URI with a real WebP image asset for Philippe Elalouf on 2026-09-02 UTC.
 Redeploy after the real Philippe Elalouf WebP asset and corrected CSS were committed on 2026-09-02 UTC.
+Adjust Philippe Elalouf portrait zoom to coordinate its framing with Raphaël Lacoste on 2026-09-02 UTC.
