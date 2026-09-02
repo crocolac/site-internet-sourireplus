@@ -1,44 +1,20 @@
-import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import sharp from "sharp";
 
-const sourceRef = "refs/remotes/origin/philippe-portrait-source";
-const sourcePath = "app/layout.tsx";
+const sourcePath = resolve("public/images/philippe-elalouf-medical-2026.webp");
 const outputPath = resolve("public/images/philippe-elalouf-medical-2026.jpg");
 
-function hasSourceRef() {
-  try {
-    execFileSync("git", ["show-ref", "--verify", "--quiet", sourceRef]);
-    return true;
-  } catch {
-    return false;
-  }
+const source = sharp(sourcePath, { failOn: "error" });
+const metadata = await source.metadata();
+
+if (metadata.format !== "webp" || !metadata.width || !metadata.height) {
+  throw new Error("Le portrait source de Philippe n'est pas un WebP valide.");
 }
 
-if (!hasSourceRef()) {
-  execFileSync(
-    "git",
-    ["fetch", "--no-tags", "--depth=1", "origin", `pull/27/head:${sourceRef}`],
-    { stdio: "inherit" },
-  );
-}
+await mkdir(dirname(outputPath), { recursive: true });
+await sharp(sourcePath, { failOn: "error" })
+  .jpeg({ quality: 88, progressive: false, chromaSubsampling: "4:4:4" })
+  .toFile(outputPath);
 
-const historicalLayout = execFileSync(
-  "git",
-  ["show", `${sourceRef}:${sourcePath}`],
-  { encoding: "utf8", maxBuffer: 5 * 1024 * 1024 },
-);
-
-const match = historicalLayout.match(/const philippePortrait = "([A-Za-z0-9+/=]+)";/);
-if (!match) {
-  throw new Error("Impossible de retrouver le portrait JPEG valide de Philippe dans la PR #27.");
-}
-
-const jpeg = Buffer.from(match[1], "base64");
-if (jpeg.length < 1000 || jpeg[0] !== 0xff || jpeg[1] !== 0xd8 || jpeg.at(-2) !== 0xff || jpeg.at(-1) !== 0xd9) {
-  throw new Error("Le portrait historique de Philippe n'est pas un JPEG valide.");
-}
-
-mkdirSync(dirname(outputPath), { recursive: true });
-writeFileSync(outputPath, jpeg);
-console.log(`Portrait de Philippe restauré (${jpeg.length} octets).`);
+console.log(`Portrait de Philippe généré depuis la source studio saine (${metadata.width}x${metadata.height}).`);
