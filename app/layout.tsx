@@ -129,7 +129,11 @@ export default function RootLayout({
       <body>
         <style>{`
           .team-list article:nth-child(2) .portrait-placeholder.alt {
-            background: #d9e0e4 url('/images/philippe-elalouf-medical-2026.webp') center 18% / cover no-repeat;
+            background-color: #d9e0e4;
+            background-image: url('/images/philippe-elalouf-medical-2026.webp');
+            background-position: center 18%;
+            background-repeat: no-repeat;
+            background-size: 86% auto;
           }
           .team-list article:nth-child(2) .portrait-placeholder.alt > span {
             display: none;
