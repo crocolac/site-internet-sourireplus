@@ -447,17 +447,23 @@ export default function Home() {
         </div>
         <div className="team-list">
           <article>
-            <div className="portrait-placeholder portrait-raphael" role="img" aria-label="Portrait du Dr Raphaël Lacoste" />
+            <div className="portrait-placeholder team-portrait-frame">
+              <img className="team-portrait-raphael" src="/images/raphael-lacoste-medical-2026.webp?v=20260902-1426" alt="Portrait du Dr Raphaël Lacoste" loading="lazy" decoding="async" />
+            </div>
             <h3>Dr Raphaël Lacoste</h3>
             <p>Endodontie · Esthétique</p>
           </article>
           <article>
-            <div className="portrait-placeholder alt"><span>PE</span></div>
+            <div className="portrait-placeholder team-portrait-frame">
+              <img className="team-portrait-philippe" src="/images/philippe-elalouf-medical-2026.jpg?v=20260902-1426" alt="Portrait du Dr Philippe Elalouf" loading="lazy" decoding="async" />
+            </div>
             <h3>Dr Philippe Elalouf</h3>
             <p>Médecin-dentiste · Implantologie</p>
           </article>
           <article>
-            <div className="portrait-placeholder gold"><span>GG</span></div>
+            <div className="portrait-placeholder team-portrait-frame">
+              <img className="team-portrait-guillaume" src="/images/guillaume-guilbert-medical-2026.webp?v=20260902-1426" alt="Portrait du Dr Guillaume Guilbert" loading="lazy" decoding="async" />
+            </div>
             <h3>Dr Guillaume Guilbert</h3>
             <p>Orthodontiste</p>
           </article>

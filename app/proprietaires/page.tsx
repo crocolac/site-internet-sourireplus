@@ -165,12 +165,9 @@ export default function ProprietairesPage() {
               Son regard complète celui de Raphaël Lacoste&nbsp;: deux propriétaires, des compétences distinctes et une même responsabilité envers la continuité de la clinique.
             </p>
           </div>
-          <figure className="owner-portrait owner-portrait-pending">
-            <div aria-hidden="true"><span>GG</span><i /></div>
-            <figcaption>
-              <strong>Nouveau portrait à venir</strong>
-              <span>Dr Guillaume Guilbert · Orthodontiste</span>
-            </figcaption>
+          <figure className="owner-portrait owner-portrait-guillaume">
+            <Image src="/images/guillaume-guilbert-medical-2026.webp" alt="Portrait studio du Dr Guillaume Guilbert en blouse médicale bleu nuit" width={700} height={700} />
+            <figcaption>Dr Guillaume Guilbert · Orthodontiste</figcaption>
           </figure>
         </div>
       </section>

@@ -128,21 +128,25 @@ export default function RootLayout({
     <html lang="fr">
       <body>
         <style>{`
-          .portrait-placeholder.alt {
-            background: #d9e0e4 url('/images/philippe-elalouf-medical-2026.jpg?v=20260902-1322') center 18% / 86% auto no-repeat !important;
+          .team-list .portrait-placeholder.team-portrait-frame {
+            background: #d9e0e4 !important;
+            display: block;
           }
-          .portrait-placeholder.alt > span {
-            display: none !important;
+          .team-list .team-portrait-frame > img {
+            display: block;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            width: 100%;
           }
-          .team-list article:nth-child(3) .portrait-placeholder.gold {
-            background-color: #d9e0e4;
-            background-image: url('/images/guillaume-guilbert-medical-2026.webp');
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
+          .team-list .team-portrait-frame > img.team-portrait-raphael {
+            object-position: center 22%;
           }
-          .team-list article:nth-child(3) .portrait-placeholder.gold > span {
-            display: none;
+          .team-list .team-portrait-frame > img.team-portrait-philippe {
+            object-position: center 18%;
+          }
+          .team-list .team-portrait-frame > img.team-portrait-guillaume {
+            object-position: center center;
           }
         `}</style>
         {children}
