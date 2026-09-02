@@ -12,4 +12,5 @@ Deploy PR #23 — enlarge the three smallest font sizes site-wide on 2026-08-30 
 Deploy PR #24 — correct the actual reading scale, dark-section contrast and digital-twin card overlap on 2026-08-30 UTC.
 Deploy PR #25 — replace the station-location wording on the Access page on 2026-08-30 UTC.
 Deploy PR #26 — publish the two-level global and contextual navigation on 2026-08-30 UTC.
-Deploy PR #27 — publish the new professional portrait of Dr Philippe Elalouf on 2026-09-02 UTC.
+Deploy PR #27 — publish the portrait of Dr Philippe Elalouf on 2026-09-02 UTC.
+Fix PR #27 deployment: replace the embedded data URI with a real WebP image asset for Philippe Elalouf on 2026-09-02 UTC.
