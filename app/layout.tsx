@@ -138,6 +138,16 @@ export default function RootLayout({
           .team-list article:nth-child(2) .portrait-placeholder.alt > span {
             display: none;
           }
+          .team-list article:nth-child(3) .portrait-placeholder.gold {
+            background-color: #d9e0e4;
+            background-image: url('/images/guillaume-guilbert-medical-2026.webp');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+          }
+          .team-list article:nth-child(3) .portrait-placeholder.gold > span {
+            display: none;
+          }
         `}</style>
         {children}
         <script
