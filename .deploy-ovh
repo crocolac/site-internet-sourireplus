@@ -22,3 +22,4 @@ Deploy PR #28 — restore the valid JPEG portrait of Dr Philippe Elalouf and pub
 Deploy PR #29 — force Philippe Elalouf portrait display with dedicated selector and cache-busted JPEG on 2026-09-02 UTC.
 Deploy PR #30 — unify the three team portraits as HTML images and add Guillaume Guilbert to the owners page on 2026-09-02 UTC.
 Deploy PR #32 — publish Philippe Elalouf’s validated studio portrait source and generated standard JPEG on OVH on 2026-09-02 UTC.
+Deploy the PNG placed directly on OVH as Philippe Elalouf’s canonical source, regenerate fresh JPEG and WebP files, and publish them with cache busting on 2026-09-02 UTC.
