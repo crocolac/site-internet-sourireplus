@@ -1,20 +1,47 @@
-import { mkdir } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import sharp from "sharp";
 
-const sourcePath = resolve("public/images/philippe-elalouf-medical-2026.webp");
+const parts = [
+  "assets/philippe-portrait/part-01.b64",
+  "assets/philippe-portrait/part-02.b64",
+  "assets/philippe-portrait/part-03.b64",
+  "assets/philippe-portrait/part-04.b64",
+  "assets/philippe-portrait/part-05.b64",
+];
+
+const expectedBase64Length = 22408;
+const expectedByteLength = 16804;
+const expectedSha256 = "a62b06d7d4fc497c8da2205edd8890149ae8cbfd121bcaea11f5b9691b684925";
 const outputPath = resolve("public/images/philippe-elalouf-medical-2026.jpg");
 
-const source = sharp(sourcePath, { failOn: "error" });
-const metadata = await source.metadata();
+const encoded = (
+  await Promise.all(parts.map((part) => readFile(resolve(part), "utf8")))
+)
+  .map((part) => part.trim())
+  .join("");
 
-if (metadata.format !== "webp" || !metadata.width || !metadata.height) {
-  throw new Error("Le portrait source de Philippe n'est pas un WebP valide.");
+if (encoded.length !== expectedBase64Length) {
+  throw new Error(`Source de Philippe incomplète : ${encoded.length} caractères au lieu de ${expectedBase64Length}.`);
+}
+
+const jpeg = Buffer.from(encoded, "base64");
+if (
+  jpeg.length !== expectedByteLength ||
+  jpeg[0] !== 0xff ||
+  jpeg[1] !== 0xd8 ||
+  jpeg.at(-2) !== 0xff ||
+  jpeg.at(-1) !== 0xd9
+) {
+  throw new Error("Le portrait reconstruit de Philippe n'est pas un JPEG complet.");
+}
+
+const sha256 = createHash("sha256").update(jpeg).digest("hex");
+if (sha256 !== expectedSha256) {
+  throw new Error(`Empreinte du portrait de Philippe invalide : ${sha256}.`);
 }
 
 await mkdir(dirname(outputPath), { recursive: true });
-await sharp(sourcePath, { failOn: "error" })
-  .jpeg({ quality: 88, progressive: false, chromaSubsampling: "4:4:4" })
-  .toFile(outputPath);
+await writeFile(outputPath, jpeg);
 
-console.log(`Portrait de Philippe généré depuis la source studio saine (${metadata.width}x${metadata.height}).`);
+console.log(`Portrait de Philippe restauré depuis la source studio saine (400x461, ${jpeg.length} octets).`);
