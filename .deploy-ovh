@@ -16,3 +16,4 @@ Deploy PR #27 — publish the portrait of Dr Philippe Elalouf on 2026-09-02 UTC.
 Fix PR #27 deployment: replace the embedded data URI with a real WebP image asset for Philippe Elalouf on 2026-09-02 UTC.
 Redeploy after the real Philippe Elalouf WebP asset and corrected CSS were committed on 2026-09-02 UTC.
 Adjust Philippe Elalouf portrait zoom to coordinate its framing with Raphaël Lacoste on 2026-09-02 UTC.
+Deploy the final coordinated Philippe Elalouf portrait, full-frame like Raphaël Lacoste, on 2026-09-02 UTC.
