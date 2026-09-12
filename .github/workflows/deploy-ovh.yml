@@ -58,6 +58,7 @@ jobs:
           test -f out/index.html
           test -f out/acces/index.html
           test -f out/methode/index.html
+          test -f out/methode/visite/index.html
           test -f out/mentions-legales/index.html
           test -f out/protection-des-donnees/index.html
           test -f out/robots.txt
