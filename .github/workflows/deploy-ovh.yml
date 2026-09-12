@@ -68,6 +68,8 @@ jobs:
           test -f out/google-rating.php
           test -f out/config/.htaccess
           test -s out/config/google-places.php
+          grep -q 'function patientReportGap' out/methode/visite/index.html
+          grep -q 'function patientReportEffect' out/methode/visite/index.html
       - name: Install SFTP client
         run: sudo apt-get update && sudo apt-get install -y lftp
       - name: Publish without deleting the legacy backup
@@ -84,6 +86,21 @@ jobs:
           mirror --reverse --verbose --parallel=4 --only-newer out/ ./
           bye
           LFTP
+      - name: Verify the live patient report matches the build
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            if curl --silent --show-error --fail --location --max-time 20 \
+              "https://sourireplus.ch/methode/visite/?build=${{ github.sha }}&attempt=$attempt" \
+              --output "$RUNNER_TEMP/patient-report-live.html" \
+              && cmp -s out/methode/visite/index.html "$RUNNER_TEMP/patient-report-live.html"; then
+              echo "PATIENT_REPORT_PASTEL_LIVE_OK"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "The live patient report does not match this build" >&2
+          exit 1
       - name: Verify the live Google rating endpoint
         run: |
           set -euo pipefail
