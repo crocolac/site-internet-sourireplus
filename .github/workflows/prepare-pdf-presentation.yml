@@ -1,0 +1,142 @@
+name: Prepare and verify patient PDF presentation
+on:
+  push:
+    branches: [codex/pdf-lecture-douce-20260912]
+    paths:
+      - .github/workflows/prepare-pdf-presentation.yml
+      - public/methode/visite/pdf-presentation.js
+permissions:
+  contents: write
+concurrency:
+  group: pdf-presentation-20260912
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Integrate only the PDF rendering functions
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import subprocess, hashlib, re
+          path = Path('public/methode/visite/index.html')
+          original = subprocess.check_output(['git', 'show', '5e9fd78e7339303c98a87fc9f08e9c5c69eb1863']).decode('utf-8')
+          start = original.index('    function drawReportTrack(')
+          end = original.index('    function createSummaryReportPage()', start)
+          replacement = '    // Les pages PDF 1 à 3 sont dessinées dans pdf-presentation.js.\n\n'
+          updated = original[:start] + replacement + original[end:]
+          assert updated.count('</body>') == 1
+          updated = updated.replace('</body>', '  <script src="./pdf-presentation.js?v=20260912-1"></script>\n</body>')
+          current = path.read_text()
+          assert current in (original, updated), 'Unexpected source changes; refusing to overwrite.'
+          assert original[original.index('    function createSummaryReportPage()'):] == updated[updated.index('    function createSummaryReportPage()'):].replace('  <script src="./pdf-presentation.js?v=20260912-1"></script>\n', '')
+          path.write_text(updated)
+          root = Path('.pdf-qa')
+          for name, html in [('before', original), ('after', updated)]:
+              folder = root / name
+              folder.mkdir(parents=True, exist_ok=True)
+              (folder / 'index.html').write_text(html)
+              (folder / 'pdf-presentation.js').write_text(Path('public/methode/visite/pdf-presentation.js').read_text())
+              for index, script in enumerate(re.findall(r'<script>(.*?)</script>', html, re.S)):
+                  check = folder / ('inline-' + str(index) + '.js')
+                  check.write_text(script)
+                  subprocess.run(['node', '--check', str(check)], check=True)
+          subprocess.run(['node', '--check', 'public/methode/visite/pdf-presentation.js'], check=True)
+          print('Scope verified: HTML outside the PDF rendering block is unchanged; page 4 is unchanged.')
+          PY
+      - name: Install browser for PDF regression tests
+        run: |
+          pip install playwright==1.55.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Test fictional cases, unchanged UI and unchanged final page
+        run: |
+          python <<'PY'
+          from pathlib import Path
+          import base64, json, io
+          from PIL import Image
+          from playwright.sync_api import sync_playwright
+          root = Path('.pdf-qa').resolve()
+          ids = ['alignement','caries','gencives','restaurations','fonction','esthetique']
+          def data(age=45, patient=None, clinical=None, objective=None):
+              return {'age':age, 'patient':dict(zip(ids, patient or [8,7,4,'unknown',2,6])), 'clinician':dict(zip(ids, clinical or [7,3,8,6,2,4])), 'objective':dict(zip(ids, objective or [9,8,9,6,5,8]))}
+          cases = [data()]
+          for age in [10,80,81,100]: cases.append(data(age=age))
+          for count in range(7): cases.append(data(objective=[min(10,v+1) if i<count else v for i,v in enumerate([7,3,8,6,2,4])]))
+          cases += [data(patient=['unknown']*6), data(patient=[0]*6,clinical=[0]*6,objective=[10]*6), data(patient=[10]*6,clinical=[10]*6,objective=[0]*6)]
+          with sync_playwright() as p:
+              browser = p.chromium.launch()
+              old = browser.new_page(viewport={'width':1280,'height':900})
+              new = browser.new_page(viewport={'width':1280,'height':900})
+              errors = []
+              new.on('pageerror', lambda error: errors.append(str(error)))
+              for page, name in [(old,'before'),(new,'after')]:
+                  page.goto((root / name / 'index.html').as_uri())
+                  page.evaluate('document.fonts.ready')
+              assert old.locator('#app').inner_html() == new.locator('#app').inner_html(), 'Intro UI changed'
+              result = new.evaluate('''() => {
+                for (let p=0;p<=10;p++) for(let c=0;c<=10;c++) {
+                  const gap=Math.abs(p-c), expected=gap<=1?'#eaf5ee':gap<=3?'#fff3df':'#fbeae8';
+                  if(reportGapStyle(p,c).fill!==expected) throw Error('Gap threshold');
+                }
+                if(reportGapStyle('unknown',5).fill!=='#f0f2f4') throw Error('Unknown classified');
+                if(reportGainStyle(5,5).label!=='À préserver') throw Error('Maintenance');
+                if(reportGainStyle(5,2).fill!=='#fff3df') throw Error('Negative gain shown as improvement');
+                return true;
+              }''')
+              for index, sample in enumerate(cases):
+                  for page in [old,new]: page.evaluate('(sample) => Object.assign(state,sample)',sample)
+                  before_state = new.evaluate('JSON.stringify(state)')
+                  old_final = old.evaluate("createSummaryReportPage().toDataURL('image/png')")
+                  new_final = new.evaluate("createSummaryReportPage().toDataURL('image/png')")
+                  assert old_final == new_final, 'Final page changed for case '+str(index)
+                  imgs = new.evaluate("[createComparisonReportPage(),createPopulationReportPage(),createTreatmentReportPage(),createSummaryReportPage()].map(c=>c.toDataURL('image/png'))")
+                  assert before_state == new.evaluate('JSON.stringify(state)'), 'Rendering mutated patient data'
+                  if index == 0 or index in [3,4,5,11,12,14]:
+                      for n,img in enumerate(imgs):
+                          (root / ('case-'+str(index)+'-page-'+str(n+1)+'.png')).write_bytes(base64.b64decode(img.split(',')[1]))
+                  if index == 0:
+                      old_imgs = old.evaluate("[createComparisonReportPage(),createPopulationReportPage(),createTreatmentReportPage(),createSummaryReportPage()].map(c=>c.toDataURL('image/png'))")
+                      for n,(a,b) in enumerate(zip(old_imgs,imgs)):
+                          aa=Image.open(io.BytesIO(base64.b64decode(a.split(',')[1])))
+                          bb=Image.open(io.BytesIO(base64.b64decode(b.split(',')[1])))
+                          assert aa.crop((0,0,1600,320)).tobytes()==bb.crop((0,0,1600,320)).tobytes(), 'Page header changed'
+                          (root / ('before-page-'+str(n+1)+'.png')).write_bytes(base64.b64decode(a.split(',')[1]))
+                      for page,name in [(old,'before'),(new,'after')]:
+                          pdf=page.evaluate('''() => {const pages=[createComparisonReportPage(),createPopulationReportPage(),createTreatmentReportPage(),createSummaryReportPage()]; return Array.from(assemblePdfFromJpegs(pages.map(c=>c.toDataURL('image/jpeg',.94)),1600,1131));}''')
+                          (root / ('exemple-fictif-'+name+'.pdf')).write_bytes(bytes(pdf))
+              for page in [old,new]: page.evaluate('(sample) => Object.assign(state,sample,{phase:"results"})',cases[0])
+              for view in ['comparison','population','treatment','summary']:
+                  for page in [old,new]: page.evaluate('(view)=>{state.resultView=view;renderResults();}',view)
+                  assert old.locator('#app').inner_html()==new.locator('#app').inner_html(), 'Consultation UI changed: '+view
+              with new.expect_download() as download:
+                  new.locator('#generateReportBtn').click()
+              download.value.save_as(str(root / 'rapport-sourireplus-exemple-fictif.pdf'))
+              assert not errors, errors
+              browser.close()
+          result={'fictional_cases':len(cases),'gap_combinations':121,'summary_pixel_identical':True,'all_four_headers_pixel_identical':True,'consultation_ui_unchanged':True,'data_unchanged':True,'download_button_passed':True}
+          (root/'verification.json').write_text(json.dumps(result,indent=2))
+          print(json.dumps(result,indent=2))
+          PY
+      - name: Upload PDF previews and verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: sourireplus-pdf-presentation-qa
+          path: .pdf-qa/
+          include-hidden-files: true
+          retention-days: 7
+      - name: Commit the verified integration to the feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/methode/visite/index.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'Intègre le rendu PDF allégé sans changer les écrans ni la synthèse'
+            git push origin HEAD:codex/pdf-lecture-douce-20260912
+          fi
