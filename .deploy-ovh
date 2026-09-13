@@ -25,3 +25,4 @@ Deploy PR #32 — publish Philippe Elalouf’s validated studio portrait source 
 Deploy the PNG placed directly on OVH as Philippe Elalouf’s canonical source, regenerate fresh JPEG and WebP files, and publish them with cache busting on 2026-09-02 UTC.
 Deploy the SourirePlus patient visit tool with clarified four-step wording and PDF report on 2026-09-12 UTC.
 Deploy the airy pastel PDF report requested by Raphaël Lacoste on 2026-09-12 UTC: text-only clinic logo and maxim, discreet tracks, discrepancy and treatment-effect backgrounds, synthetic reference chart, unchanged three-note summary.
+Deploy the original clinic logo with the maxim “Votre ressenti face à la réalité, notre expertise pour votre tranquillité.” in /methode/visite/ and all four PDF headers, as requested by Raphaël Lacoste on 2026-09-13 UTC. Preserve the pastel report, questionnaire, reference curves and three-note summary.

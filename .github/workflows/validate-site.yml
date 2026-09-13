@@ -23,3 +23,13 @@ jobs:
         run: |
           test -s out/index.html
           test -s out/methode/visite/index.html
+          grep -q 'id="visitClinicLogo"' out/methode/visite/index.html
+          grep -q 'await reportLogo.decode()' out/methode/visite/index.html
+          grep -q 'function patientReportGap' out/methode/visite/index.html
+          grep -q 'function patientReportEffect' out/methode/visite/index.html
+      - name: Save the standalone visit for visual and PDF checks
+        uses: actions/upload-artifact@v4
+        with:
+          name: patient-visit-preview
+          path: out/methode/visite/index.html
+          retention-days: 3
