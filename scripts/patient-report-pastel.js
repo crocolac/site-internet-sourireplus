@@ -121,7 +121,7 @@
       return page.canvas;
     }
 
-        function drawPopulationReportChart(ctx, x0, y0, width, height, visibleCriteria) {
+            function drawPopulationReportChart(ctx, x0, y0, width, height, visibleCriteria) {
       reportRoundRect(ctx, x0, y0, width, height, 20, '#fafcfe');
       const margin = {left:66, right:32, top:86, bottom:65};
       const innerW = width - margin.left - margin.right;
@@ -164,28 +164,48 @@
       ctx.font = '400 17px Arial, sans-serif';
       ctx.fillText('Population concernée (%) · repères du modèle', x0 + 27, y0 + 34);
     
+      const bands = [
+        {name:'Mise en place', start:10, end:20},
+        {name:'Séduire', start:20, end:35},
+        {name:'Préserver', start:35, end:45},
+        {name:'Préparer', start:45, end:70},
+        {name:'Profiter', start:70, end:xMax}
+      ];
+      const fills = ['#f6f7f8','#e9ecef'];
+      bands.forEach((band,index) => {
+        const startAge=Math.max(10,band.start);
+        const endAge=Math.min(xMax,band.end);
+        if(endAge<=startAge) return;
+        const bx=x(startAge), bw=x(endAge)-bx;
+        ctx.fillStyle=fills[index%2];
+        ctx.fillRect(bx,y(100),bw,innerH);
+        ctx.fillStyle='#6f747a';
+        ctx.font='700 13px Arial, sans-serif';
+        ctx.textAlign='center';
+        ctx.fillText(band.name,bx+bw/2,y(0)-9);
+        ctx.textAlign='left';
+      });
+    
       if (xMax > 80) {
-        ctx.fillStyle = '#f0f2f4';
-        ctx.fillRect(x(80), y(100), x(xMax) - x(80), innerH);
-        ctx.fillStyle = '#73808c';
-        ctx.font = '400 13px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('hors repères après 80 ans', (x(80)+x(xMax))/2, y(100)+24);
-        ctx.textAlign = 'left';
+        ctx.save();
+        ctx.strokeStyle='#9aa0a6'; ctx.lineWidth=1; ctx.setLineDash([4,6]);
+        ctx.beginPath(); ctx.moveTo(x(80),y(100)); ctx.lineTo(x(80),y(0)); ctx.stroke(); ctx.restore();
+        ctx.fillStyle='#7d858d'; ctx.font='400 12px Arial, sans-serif'; ctx.textAlign='center';
+        ctx.fillText('hors repères population après 80 ans',(x(80)+x(xMax))/2,y(100)+18);
+        ctx.textAlign='left';
       }
     
       [0, 50, 100].forEach(value => {
-        ctx.strokeStyle = '#e5ebf0';
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#dde1e5'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(x(10), y(value)); ctx.lineTo(x(xMax), y(value)); ctx.stroke();
-        ctx.textAlign = 'right'; ctx.fillStyle = '#7b8994';
-        ctx.fillText(String(value), x(10) - 14, y(value) + 6);
+        ctx.textAlign = 'right'; ctx.fillStyle = '#7b8994'; ctx.font='400 13px Arial, sans-serif';
+        ctx.fillText(String(value), x(10) - 14, y(value) + 5);
       });
     
       const ages = xMax === 100 ? [10,20,40,60,80,100] : xMax === 90 ? [10,20,40,60,80,90] : [10,20,40,60,80];
       ctx.textAlign = 'center';
       ages.forEach(age => ctx.fillText(String(age), x(age), y0 + height - 35));
-      ctx.font = '400 15px Arial, sans-serif';
+      ctx.font = '400 14px Arial, sans-serif';
       ctx.fillText('Âge (années)', x0 + width / 2, y0 + height - 11);
       ctx.textAlign = 'left';
     
@@ -198,7 +218,7 @@
         if (item.age > xMax) return;
         const tx=x(item.age);
         ctx.save();
-        ctx.strokeStyle=item.color; ctx.lineWidth=1.3; ctx.globalAlpha=.7; ctx.setLineDash([4,6]);
+        ctx.strokeStyle=item.color; ctx.lineWidth=1.6; ctx.globalAlpha=.9; ctx.setLineDash([4,6]);
         ctx.beginPath(); ctx.moveTo(tx,y(100)); ctx.lineTo(tx,y(0)); ctx.stroke(); ctx.restore();
         reportRoundRect(ctx, Math.max(x0+margin.left,Math.min(tx-20,x0+width-margin.right-40)), y0+44+(index%2)*25, 40, 20, 10, item.color);
         ctx.fillStyle='#ffffff'; ctx.font='700 10px Arial, sans-serif'; ctx.textAlign='center';
@@ -211,26 +231,7 @@
       ordered.forEach(series => {
         const active = ids.has(series.id);
         const points = series.points.filter(point => point[0] <= Math.min(80,xMax)).map(point => ({x:x(point[0]), y:y(point[1])}));
-        strokeSmooth(points, colorById[series.id], active ? 3.1 : 1.8, active ? .72 : .11);
-      });
-    
-      ordered.filter(series => ids.has(series.id)).forEach(series => {
-        const value = interpolateSeries(series.points, state.age);
-        if (value !== null) {
-          ctx.beginPath(); ctx.arc(x(state.age), y(value), 5.5, 0, Math.PI * 2);
-          ctx.fillStyle = colorById[series.id]; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-        }
-        timeline.forEach(item => {
-          if (item.age > 80 || !item.changedCriteria.some(c => c.id === series.id)) return;
-          const treatmentValue = interpolateSeries(series.points, item.age);
-          if (treatmentValue === null) return;
-          const tx=x(item.age), ty=y(treatmentValue);
-          ctx.beginPath(); ctx.arc(tx,ty,7,0,Math.PI*2);
-          ctx.fillStyle=item.color; ctx.fill();
-          ctx.strokeStyle=colorById[series.id]; ctx.lineWidth=2; ctx.stroke();
-          ctx.fillStyle='#ffffff'; ctx.font='700 8px Arial, sans-serif'; ctx.textAlign='center';
-          ctx.fillText(String(item.stage),tx,ty+2.8); ctx.textAlign='left';
-        });
+        strokeSmooth(points, colorById[series.id], active ? 2.8 : 1.6, active ? .70 : .10);
       });
     
       const labelX = Math.max(x0 + margin.left, Math.min(x(state.age) - 43, x0 + width - margin.right - 86));
@@ -242,7 +243,7 @@
 
         function createPopulationReportPage() {
       const page = makeReportPage('2 - Repères de vie', 'Votre parcours dans le temps',
-        'Votre âge situe les repères SourirePlus ; les marqueurs numérotés positionnent les étapes thérapeutiques.', 2);
+        'Les bandes grises structurent les périodes de vie ; les verticales colorées positionnent les étapes thérapeutiques.', 2);
       const ctx = page.ctx;
       const changed = solutionCriteria();
       const visible = changed.length ? changed : criteria;
@@ -252,13 +253,13 @@
       ctx.fillStyle = '#ffffff'; ctx.font = '700 24px Arial, sans-serif';
       ctx.fillText('Vos étapes', 1132, 432);
       ctx.fillStyle = '#c9cbd1'; ctx.font = '400 16px Arial, sans-serif';
-      drawWrappedText(ctx, 'La position horizontale indique l’âge estimé de réalisation. La couleur correspond à la catégorie du devis.', 1132, 462, 350, 22, 4);
+      drawWrappedText(ctx, 'La verticale colorée indique l’âge estimé de réalisation. Aucun point supplémentaire n’est ajouté sur les courbes.', 1132, 462, 350, 22, 4);
     
       const timeline = treatmentTimeline();
       timeline.slice(0,5).forEach((item,index) => {
         const y = 555 + index * 80;
         reportRoundRect(ctx, 1130, y, 360, 62, 12, '#ffffff14');
-        ctx.fillStyle = item.color; ctx.beginPath(); ctx.arc(1150, y + 22, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = item.color; ctx.fillRect(1144, y + 14, 4, 26);
         ctx.fillStyle = '#ffffff'; ctx.font = '700 17px Arial, sans-serif';
         ctx.fillText('Étape ' + item.stage, 1166, y + 27);
         ctx.textAlign = 'right'; ctx.fillStyle = item.color; ctx.font = '700 18px Arial, sans-serif';
@@ -268,7 +269,7 @@
       });
     
       ctx.fillStyle = '#687b8b'; ctx.font = '400 16px Arial, sans-serif';
-      ctx.fillText('Les courbes sont des repères de population ; les marqueurs numérotés représentent votre parcours.', 80, 1015);
+      ctx.fillText('Les courbes restent des repères de population ; les verticales pointillées colorées représentent votre calendrier de soins.', 80, 1015);
       return page.canvas;
     }
 
