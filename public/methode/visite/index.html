@@ -1006,9 +1006,55 @@
     }
     .time-cell strong { display: block; margin-bottom: 2px; font-size: .78rem; }
     .time-cell span { display: block; overflow: hidden; color: var(--muted); font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
-    .time-cell em { display: block; margin-top: 4px; color: #555861; font-size: .69rem; font-style: normal; line-height: 1.25; }
-    .time-cell b { display: block; margin-top: 5px; color: var(--ink); font-size: .7rem; line-height: 1.25; }
+    .time-cell em { display: block; margin-top: 5px; color: #555861; font-size: .69rem; font-style: normal; line-height: 1.3; }
+    .time-cell b { display: block; margin-top: 6px; color: var(--ink); font-size: .72rem; line-height: 1.25; }
     .time-cell.warning b { color: #9b3f00; }
+    .time-cell .step-score {
+      margin: 7px 0 2px;
+      font-size: clamp(1.7rem, 4vw, 2.55rem);
+      line-height: .92;
+      font-weight: 820;
+      letter-spacing: -.055em;
+      color: var(--ink);
+    }
+    .time-cell .step-score small { font-size: .38em; letter-spacing: 0; font-weight: 720; }
+    .time-cell .step-amount {
+      display: block;
+      margin-top: 6px;
+      color: var(--ink);
+      font-size: .92rem;
+      font-weight: 820;
+      letter-spacing: -.01em;
+    }
+    .time-cell.essential .step-score, .time-cell.essential > strong { color: var(--red); }
+    .time-cell.needs .step-score, .time-cell.needs > strong { color: var(--blue); }
+    .time-cell.strategic .step-score, .time-cell.strategic > strong { color: var(--violet); }
+    .general-trajectory-card {
+      margin-bottom: 14px;
+      padding: 18px 18px 12px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: white;
+    }
+    .general-trajectory-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 4px;
+    }
+    .general-trajectory-head h3 { margin: 0 0 3px; font-size: 1.12rem; }
+    .general-trajectory-head p { margin: 0; color: var(--muted); font-size: .84rem; }
+    .general-trajectory-head .general-final {
+      color: var(--objective);
+      font-size: clamp(1.8rem, 4vw, 2.7rem);
+      font-weight: 820;
+      letter-spacing: -.055em;
+      white-space: nowrap;
+    }
+    .general-trajectory-head .general-final small { font-size: .38em; letter-spacing: 0; }
+    .general-trajectory-svg { display: block; width: 100%; height: 220px; overflow: visible; }
+    .journey-amount { display: block; margin-top: 3px; color: var(--ink); font-size: 1rem; font-weight: 800; }
     .journey-list { display: grid; gap: 9px; }
     .journey-step {
       padding: 12px 13px;
@@ -1480,12 +1526,31 @@ function resampleTrajectory(oldCount, newCount) {
   });
 }
 
+function trajectoryScale(criterionId) {
+  ensureTrajectory(false);
+  const start = Number(state.clinician[criterionId]);
+  const end = Number(state.objective[criterionId]);
+  let low = Math.min(start, end);
+  let high = Math.max(start, end);
+  const rawRange = high - low;
+  const padding = rawRange < 1 ? 1 : Math.max(.5, rawRange * .15);
+  low = Math.max(0, low - padding);
+  high = Math.min(10, high + padding);
+  if (high - low < 2) {
+    const mid = (high + low) / 2;
+    low = Math.max(0, mid - 1);
+    high = Math.min(10, mid + 1);
+  }
+  return {low, high};
+}
+
 function trajectoryCoordinates(criterionId) {
   ensureTrajectory(false);
   const values = state.trajectory[criterionId];
+  const scale = trajectoryScale(criterionId);
   const width = 900;
   const height = 150;
-  const left = 30;
+  const left = 42;
   const right = 30;
   const top = 18;
   const bottom = 24;
@@ -1493,7 +1558,7 @@ function trajectoryCoordinates(criterionId) {
   const usableH = height - top - bottom;
   return values.map((value, index) => ({
     x: left + (index / Math.max(1, values.length - 1)) * usableW,
-    y: top + ((10 - value) / 10) * usableH,
+    y: top + ((scale.high - value) / Math.max(.001, scale.high - scale.low)) * usableH,
     value
   }));
 }
@@ -1503,23 +1568,70 @@ function trajectoryPath(criterionId) {
   return points.map((point, index) => (index ? 'L ' : 'M ') + point.x.toFixed(1) + ' ' + point.y.toFixed(1)).join(' ');
 }
 
+function scoreTick(value) {
+  return Math.round(value * 10) / 10;
+}
+
 function trajectorySvgMarkup(criterion, editable) {
   const points = trajectoryCoordinates(criterion.id);
-  const grid = [0,5,10].map(value => {
-    const y = 18 + ((10 - value) / 10) * 108;
-    return '<line x1="30" y1="' + y + '" x2="870" y2="' + y + '" stroke="#e6e7ea" stroke-width="1"/><text x="7" y="' + (y + 4) + '" fill="#8a8d94" font-size="10">' + value + '</text>';
+  const scale = trajectoryScale(criterion.id);
+  const ticks = [scale.low, (scale.low + scale.high) / 2, scale.high].map(scoreTick);
+  const grid = ticks.map(value => {
+    const y = 18 + ((scale.high - value) / Math.max(.001, scale.high - scale.low)) * 108;
+    return '<line x1="42" y1="' + y + '" x2="870" y2="' + y + '" stroke="#e6e7ea" stroke-width="1"/><text x="31" y="' + (y + 4) + '" text-anchor="end" fill="#8a8d94" font-size="10">' + value + '</text>';
   }).join('');
   const verticals = points.map(point => '<line x1="' + point.x + '" y1="18" x2="' + point.x + '" y2="126" stroke="#f0f1f3" stroke-width="1"/>').join('');
   const handles = points.map((point, index) => {
-    const fixed = index === 0;
-    const radius = fixed ? 7 : (editable ? 10 : 7);
+    const fixed = index === 0 || index === points.length - 1;
+    const radius = fixed ? 8 : (editable ? 11 : 8);
     const klass = editable && !fixed ? 'trajectory-handle' : '';
     const attrs = editable && !fixed
-      ? ' tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="10" aria-valuenow="' + point.value + '" data-criterion="' + criterion.id + '" data-stage="' + index + '"'
+      ? ' tabindex="0" role="slider" aria-valuemin="' + Math.min(state.clinician[criterion.id], state.objective[criterion.id]) + '" aria-valuemax="' + Math.max(state.clinician[criterion.id], state.objective[criterion.id]) + '" aria-valuenow="' + point.value + '" data-criterion="' + criterion.id + '" data-stage="' + index + '"'
       : '';
-    return '<g><circle id="handle-' + criterion.id + '-' + index + '" class="' + klass + '" cx="' + point.x + '" cy="' + point.y + '" r="' + radius + '" fill="' + (fixed ? '#101114' : criterion.color) + '" stroke="white" stroke-width="4"' + attrs + '></circle><text id="value-' + criterion.id + '-' + index + '" x="' + point.x + '" y="' + Math.max(13, point.y - 15) + '" text-anchor="middle" fill="' + (fixed ? '#101114' : criterion.color) + '" font-size="12" font-weight="800">' + point.value + '</text></g>';
+    const fill = index === 0 ? '#101114' : (index === points.length - 1 ? '#078878' : criterion.color);
+    return '<g><circle id="handle-' + criterion.id + '-' + index + '" class="' + klass + '" cx="' + point.x + '" cy="' + point.y + '" r="' + radius + '" fill="' + fill + '" stroke="white" stroke-width="4"' + attrs + '></circle><text id="value-' + criterion.id + '-' + index + '" x="' + point.x + '" y="' + Math.max(13, point.y - 15) + '" text-anchor="middle" fill="' + fill + '" font-size="12" font-weight="800">' + point.value + '</text></g>';
   }).join('');
-  return grid + verticals + '<path id="path-' + criterion.id + '" d="' + trajectoryPath(criterion.id) + '" fill="none" stroke="' + criterion.color + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".78"/>' + handles;
+  return grid + verticals + '<path id="path-' + criterion.id + '" d="' + trajectoryPath(criterion.id) + '" fill="none" stroke="' + criterion.color + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".84"/>' + handles;
+}
+
+function generalTrajectoryValues() {
+  ensureTrajectory(false);
+  return Array.from({length: state.quotes.length + 1}, (_, stage) =>
+    average(criteria.map(criterion => state.trajectory[criterion.id][stage]))
+  );
+}
+
+function stageCategoryColor(index) {
+  if (index === 0) return '#101114';
+  const quote = state.quotes[index - 1];
+  if (!quote) return '#078878';
+  return quote.category === 'essential' ? '#e3262e' : quote.category === 'needs' ? '#1473e6' : '#7137b9';
+}
+
+function generalTrajectorySvgMarkup() {
+  const values = generalTrajectoryValues();
+  let low = Math.min(...values);
+  let high = Math.max(...values);
+  const rawRange = high - low;
+  const padding = rawRange < 1 ? 1 : Math.max(.5, rawRange * .18);
+  low = Math.max(0, low - padding);
+  high = Math.min(10, high + padding);
+  if (high - low < 2) { const mid=(high+low)/2; low=Math.max(0,mid-1); high=Math.min(10,mid+1); }
+  const left=48, right=32, top=22, bottom=30, width=900, height=220;
+  const usableW=width-left-right, usableH=height-top-bottom;
+  const pts=values.map((value,index)=>({x:left+(index/Math.max(1,values.length-1))*usableW,y:top+((high-value)/Math.max(.001,high-low))*usableH,value}));
+  const ticks=[low,(low+high)/2,high].map(scoreTick);
+  const grid=ticks.map(value=>{const y=top+((high-value)/Math.max(.001,high-low))*usableH;return '<line x1="'+left+'" y1="'+y+'" x2="'+(width-right)+'" y2="'+y+'" stroke="#e5e7ea" stroke-width="1"/><text x="'+(left-10)+'" y="'+(y+4)+'" text-anchor="end" fill="#8a8d94" font-size="11">'+value+'</text>';}).join('');
+  const verticals=pts.map(p=>'<line x1="'+p.x+'" y1="'+top+'" x2="'+p.x+'" y2="'+(height-bottom)+'" stroke="#f0f1f3" stroke-width="1"/>').join('');
+  const path=pts.map((p,i)=>(i?'L ':'M ')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+  const marks=pts.map((p,index)=>'<g><circle cx="'+p.x+'" cy="'+p.y+'" r="11" fill="'+stageCategoryColor(index)+'" stroke="white" stroke-width="4"></circle><text x="'+p.x+'" y="'+Math.max(14,p.y-18)+'" text-anchor="middle" fill="'+stageCategoryColor(index)+'" font-size="14" font-weight="800">'+formatShortScore(p.value)+'</text></g>').join('');
+  return grid+verticals+'<path d="'+path+'" fill="none" stroke="#263d55" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>'+marks;
+}
+
+function generalTrajectoryCard() {
+  const values=generalTrajectoryValues();
+  const first=values[0], last=values[values.length-1];
+  return '<article class="general-trajectory-card"><div class="general-trajectory-head"><div><h3>Évolution globale</h3><p>Moyenne des six critères à chaque étape du parcours.</p></div><div class="general-final">'+formatShortScore(last)+'<small>/10</small></div></div><svg class="general-trajectory-svg" viewBox="0 0 900 220" role="img" aria-label="Évolution globale de '+formatShortScore(first)+' à '+formatShortScore(last)+' sur 10">'+generalTrajectorySvgMarkup()+'</svg>'+treatmentStageGrid()+'</article>';
 }
 
 function treatmentStageGrid() {
@@ -1531,13 +1643,16 @@ function treatmentStageGrid() {
 function treatmentTimeBand() {
   const count = state.quotes.length + 1;
   const finance = financialSchedule();
+  const global = generalTrajectoryValues();
   return '<div class="time-band" style="grid-template-columns:repeat(' + count + ',minmax(0,1fr))">' +
-    '<div class="time-cell"><strong>Aujourd’hui</strong><span>État actuel</span><em>Point de départ</em></div>' +
+    '<div class="time-cell current"><strong>Aujourd’hui</strong><span>État actuel</span><div class="step-score">' + formatShortScore(global[0]) + '<small>/10</small></div><em>Point de départ</em></div>' +
     state.quotes.map((quote, index) => {
       const timing = finance[index];
       const proposed = combinedWindow(quote, timing.month);
-      return '<div class="time-cell ' + (proposed.warning ? 'warning' : '') + '"><strong>' + escapeHtml(quoteCategoryLabel(quote.category)) + '</strong>' +
+      return '<div class="time-cell ' + quote.category + ' ' + (proposed.warning ? 'warning' : '') + '"><strong>' + escapeHtml(quoteCategoryLabel(quote.category)) + '</strong>' +
         '<span>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</span>' +
+        '<div class="step-score">' + formatShortScore(global[index + 1]) + '<small>/10</small></div>' +
+        '<span class="step-amount">' + escapeHtml(moneyLabel(quote.amount)) + '</span>' +
         '<em>Clinique : ' + escapeHtml(quote.window || 'À définir') + '<br>Financier : ' + escapeHtml(monthLabel(timing.month)) + '</em>' +
         '<b>Fenêtre proposée : ' + escapeHtml(proposed.label) + '</b></div>';
     }).join('') +
@@ -1619,9 +1734,10 @@ function updateTrajectoryDom(criterionId) {
 function setTrajectoryPoint(criterionId, stage, score) {
   ensureTrajectory(false);
   const values = state.trajectory[criterionId];
-  if (!values || stage <= 0 || stage >= values.length) return;
-  values[stage] = clampTreatmentScore(score);
-  if (stage === values.length - 1) state.objective[criterionId] = values[stage];
+  if (!values || stage <= 0 || stage >= values.length - 1) return;
+  const low = Math.min(state.clinician[criterionId], state.objective[criterionId]);
+  const high = Math.max(state.clinician[criterionId], state.objective[criterionId]);
+  values[stage] = Math.max(low, Math.min(high, clampTreatmentScore(score)));
   updateTrajectoryDom(criterionId);
 }
 
@@ -1678,7 +1794,9 @@ function bindTreatmentPlan() {
       const move = moveEvent => {
         const rect = svg.getBoundingClientRect();
         const localY = ((moveEvent.clientY - rect.top) / Math.max(1, rect.height)) * 150;
-        const score = 10 - ((localY - 18) / 108) * 10;
+        const scale = trajectoryScale(criterionId);
+        const ratio = Math.max(0, Math.min(1, (localY - 18) / 108));
+        const score = scale.high - ratio * (scale.high - scale.low);
         setTrajectoryPoint(criterionId, stage, score);
       };
       const stop = stopEvent => {
@@ -1697,7 +1815,9 @@ function bindTreatmentPlan() {
       const criterionId = event.currentTarget.dataset.criterion;
       const stage = Number(event.currentTarget.dataset.stage);
       const current = state.trajectory[criterionId][stage];
-      const next = event.key === 'ArrowUp' ? current + 1 : event.key === 'ArrowDown' ? current - 1 : event.key === 'Home' ? 0 : 10;
+      const low = Math.min(state.clinician[criterionId], state.objective[criterionId]);
+      const high = Math.max(state.clinician[criterionId], state.objective[criterionId]);
+      const next = event.key === 'ArrowUp' ? current + 1 : event.key === 'ArrowDown' ? current - 1 : event.key === 'Home' ? low : high;
       setTrajectoryPoint(criterionId, stage, next);
     });
   });
@@ -1901,10 +2021,10 @@ function bindTreatmentPlan() {
     function treatmentView() {
       ensureTrajectory(false);
       return '<section><div class="stage-head"><div><p class="eyebrow">3 · Parcours de soins</p><h2>Le progrès se construit par étapes.</h2><p>Chaque devis correspond à une étape du parcours. Les points montrent l’évolution attendue des six notes ; la bande temporelle indique quand chaque étape devient favorable.</p></div><div class="stage-actions"><button class="btn btn-secondary" id="editPlanBtn" type="button">Modifier le parcours</button></div></div>' +
-        '<div class="visual-grid"><div><div class="trajectory-result-list">' + criteria.map(resultTrajectoryRow).join('') + '</div>' + treatmentTimeBand() + '</div><aside class="panel"><h3>Les étapes proposées</h3><div class="journey-list">' +
+        '<div class="visual-grid"><div>' + generalTrajectoryCard() + '<div class="trajectory-result-list">' + criteria.map(resultTrajectoryRow).join('') + '</div>' + treatmentTimeBand() + '</div><aside class="panel"><h3>Les étapes proposées</h3><div class="journey-list">' +
         state.quotes.map((quote, index) => {
           const mean = average(criteria.map(criterion => state.trajectory[criterion.id][index + 1]));
-          return '<div class="journey-step" data-category="' + quote.category + '"><strong>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</strong><span>' + escapeHtml(quoteCategoryLabel(quote.category)) + ' · ' + escapeHtml(moneyLabel(quote.amount)) + ' · clinique ' + escapeHtml(quote.window || 'À définir') + ' · moyenne projetée ' + formatShortScore(mean) + '/10</span></div>';
+          return '<div class="journey-step" data-category="' + quote.category + '"><strong>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</strong><span class="journey-amount">' + escapeHtml(moneyLabel(quote.amount)) + '</span><span>' + escapeHtml(quoteCategoryLabel(quote.category)) + ' · clinique ' + escapeHtml(quote.window || 'À définir') + ' · moyenne projetée ' + formatShortScore(mean) + '/10</span></div>';
         }).join('') + '</div></aside></div>' +
         '<div class="scale-warning"><span aria-hidden="true">i</span><div><strong>Une trajectoire, pas un calendrier rigide.</strong> Les fenêtres thérapeutiques peuvent être avancées, reportées ou réévaluées selon l’évolution clinique et les choix du patient.</div></div>' +
         '<div class="view-next"><button class="btn btn-primary" type="button" data-next-view="summary">Voir les trois notes →</button></div></section>';
@@ -2170,7 +2290,7 @@ function bindTreatmentPlan() {
       ctx.fillStyle = '#6e7178';
       ctx.font = '700 19px Arial, sans-serif';
       ctx.textAlign = 'right';
-      ctx.fillText(pageNumber + ' / 4', 1525, 88);
+      ctx.fillText(pageNumber + ' / 5', 1525, 88);
       ctx.textAlign = 'left';
       ctx.fillStyle = '#6e7178';
       ctx.font = '800 18px Arial, sans-serif';
@@ -2477,10 +2597,10 @@ function bindTreatmentPlan() {
         ? 'Avec cette solution, l’objectif est de faire passer votre bouche de ' + formatShortScore(clinicalMean) + '/10 à ' + formatShortScore(objectiveMean) + '/10.'
         : 'Avec cette solution, l’objectif clinique évolue de ' + formatShortScore(clinicalMean) + '/10 à ' + formatShortScore(objectiveMean) + '/10.';
       const page = makeReportPage(
-        '4 - Synthèse',
+        '5 - Synthèse',
         'Votre situation en trois notes',
         'Une lecture simple pour comprendre le point de départ, le ressenti et l’objectif proposé.',
-        4
+        5
       );
       const ctx = page.ctx;
       const cards = [
@@ -2515,6 +2635,95 @@ function bindTreatmentPlan() {
       ctx.font = '700 20px Arial, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Ressenti · Évaluation clinique · Repères de vie · Objectif', 800, 968);
+      ctx.textAlign = 'left';
+      return page.canvas;
+    }
+
+    function createJourneyReportPage() {
+      ensureTrajectory(false);
+      const page = makeReportPage(
+        '4 - Parcours thérapeutique',
+        'Votre progression, étape par étape',
+        'La courbe principale montre la moyenne des six critères. Les mini-courbes détaillent les évolutions par domaine.',
+        4
+      );
+      const ctx = page.ctx;
+      const global = generalTrajectoryValues();
+      const count = Math.max(1, state.quotes.length);
+      const stageColors = Array.from({length: count + 1}, (_, index) => stageCategoryColor(index));
+
+      function bounds(values, minRange) {
+        let low = Math.min(...values), high = Math.max(...values);
+        const range = high - low;
+        const padding = range < 1 ? 1 : Math.max(.45, range * .16);
+        low = Math.max(0, low - padding);
+        high = Math.min(10, high + padding);
+        if (high - low < minRange) {
+          const mid = (low + high) / 2;
+          low = Math.max(0, mid - minRange / 2);
+          high = Math.min(10, mid + minRange / 2);
+        }
+        return {low, high};
+      }
+
+      function drawLineChart(x, y, width, height, values, colors, lineColor, showStageText) {
+        const scale = bounds(values, 2);
+        const left = x + 42, right = x + width - 20, top = y + 20, bottom = y + height - 38;
+        const plotW = right - left, plotH = bottom - top;
+        const yy = value => top + (scale.high - value) / Math.max(.001, scale.high - scale.low) * plotH;
+        const xx = index => left + index / Math.max(1, values.length - 1) * plotW;
+        [scale.low, (scale.low + scale.high) / 2, scale.high].forEach(value => {
+          const v = Math.round(value * 10) / 10;
+          const py = yy(v);
+          ctx.strokeStyle = '#e5e9ed'; ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(left, py); ctx.lineTo(right, py); ctx.stroke();
+          ctx.fillStyle = '#7a8792'; ctx.font = '400 13px Arial, sans-serif'; ctx.textAlign = 'right';
+          ctx.fillText(String(v), left - 9, py + 4);
+        });
+        ctx.strokeStyle = lineColor; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        values.forEach((value,index) => { const px=xx(index), py=yy(value); if(index===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+        ctx.stroke();
+        values.forEach((value,index) => {
+          const px=xx(index), py=yy(value);
+          ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2);
+          ctx.fillStyle = colors[index] || lineColor; ctx.fill();
+          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.stroke();
+          ctx.fillStyle = colors[index] || lineColor; ctx.font = '700 17px Arial, sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText(formatShortScore(value), px, Math.max(y + 16, py - 16));
+          if (showStageText) {
+            ctx.fillStyle = '#556572'; ctx.font = '600 13px Arial, sans-serif';
+            ctx.fillText(index === 0 ? 'Aujourd’hui' : 'Étape ' + index, px, bottom + 23);
+          }
+        });
+        ctx.textAlign = 'left';
+      }
+
+      reportRoundRect(ctx, 80, 318, 1440, 360, 22, '#f8fafc', '#e1e6ea');
+      ctx.fillStyle = '#263d55'; ctx.font = '700 25px Arial, sans-serif';
+      ctx.fillText('Évolution globale · moyenne des six critères', 110, 358);
+      drawLineChart(105, 375, 1390, 275, global, stageColors, '#263d55', true);
+
+      const miniW = 455, miniH = 142;
+      criteria.forEach((criterion, index) => {
+        const col = index % 3, row = Math.floor(index / 3);
+        const x = 80 + col * 490, y = 716 + row * 156;
+        reportRoundRect(ctx, x, y, miniW, miniH, 16, '#ffffff', '#e6e9ec');
+        ctx.fillStyle = criterion.color; ctx.beginPath(); ctx.arc(x + 20, y + 25, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#31495e'; ctx.font = '700 16px Arial, sans-serif';
+        ctx.fillText(criterion.name, x + 34, y + 30);
+        drawLineChart(x + 10, y + 34, miniW - 20, 104, state.trajectory[criterion.id], stageColors, criterion.color, false);
+      });
+
+      ctx.fillStyle = '#66727d'; ctx.font = '400 14px Arial, sans-serif'; ctx.textAlign = 'center';
+      const finance = financialSchedule();
+      state.quotes.forEach((quote, index) => {
+        const x = 105 + ((index + 1) / count) * 1390;
+        ctx.fillStyle = stageColors[index + 1]; ctx.font = '700 15px Arial, sans-serif';
+        ctx.fillText(moneyLabel(quote.amount), x, 694);
+        ctx.fillStyle = '#71808c'; ctx.font = '400 12px Arial, sans-serif';
+        ctx.fillText(monthLabel(finance[index].month), x, 710);
+      });
       ctx.textAlign = 'left';
       return page.canvas;
     }
@@ -2594,13 +2803,14 @@ function bindTreatmentPlan() {
       const status = document.getElementById('reportStatus');
       button.disabled = true;
       button.textContent = 'Création en cours…';
-      status.textContent = 'Préparation des quatre pages, dont le parcours thérapeutique.';
+      status.textContent = 'Préparation des cinq pages, dont la trajectoire thérapeutique.';
       try {
         if (document.fonts && document.fonts.ready) await document.fonts.ready;
         const pages = [
           createComparisonReportPage(),
           createPopulationReportPage(),
           createTreatmentReportPage(),
+          createJourneyReportPage(),
           createSummaryReportPage()
         ];
         const images = pages.map(canvas => canvas.toDataURL('image/jpeg', .94));
@@ -2616,7 +2826,7 @@ function bindTreatmentPlan() {
         link.click();
         link.remove();
         window.setTimeout(() => URL.revokeObjectURL(url), 15000);
-        status.textContent = 'Rapport téléchargé : 4 pages.';
+        status.textContent = 'Rapport téléchargé : 5 pages.';
       } catch (error) {
         status.textContent = 'La création du rapport n’a pas abouti. Réessayez.';
       } finally {
