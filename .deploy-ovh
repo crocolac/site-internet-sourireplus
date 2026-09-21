@@ -31,3 +31,4 @@ Deploy the validated SourirePlus treatment trajectory with Essentiels / Besoins 
 Deploy the validated trajectory visual update on 2026-09-21 UTC: local-scale score curves between current and objective, prominent colored step averages and quote amounts, global trajectory chart, and 5-page PDF with dedicated treatment-journey page.
 Deploy trajectory segment colors and live global-score recalculation on 2026-09-21 UTC: treatment-colored segments in web/PDF, pastel criterion panels, refined line weights.
 Deploy smoothed treatment trajectories and restored life-stage age chart on 2026-09-22 UTC: treatment steps positioned by patient age and therapeutic/financial windows in web and PDF.
+Deploy simplified life-stage chart on 2026-09-22 UTC: no curve points, only dashed treatment verticals, alternating gray life-stage bands with labels, same in PDF.
