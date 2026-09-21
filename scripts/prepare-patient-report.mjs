@@ -26,6 +26,6 @@ for (const match of result.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi))
 if (brandPatientVisit(result) !== result || stabilizePatientVisit(result) !== result)
   throw new Error('La préparation du bilan doit être idempotente.');
 if (result !== source) writeFileSync(path, result, 'utf8');
-console.log('PDF_PASTEL_OK: quatre pages, questionnaire/courbes/notes de synthèse conservés.');
+console.log('PDF_PASTEL_OK: cinq pages, parcours thérapeutique et synthèse conservés.');
 console.log('CLINIC_BRANDING_OK: logo original à gauche, maxime à droite en HTML et PDF.');
 console.log('VISIT_NAVIGATION_OK: position des questions conservée, onglets mis à jour en place.');
