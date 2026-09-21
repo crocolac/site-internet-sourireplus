@@ -121,87 +121,154 @@
       return page.canvas;
     }
 
-    function drawPopulationReportChart(ctx, x0, y0, width, height, visibleCriteria) {
+        function drawPopulationReportChart(ctx, x0, y0, width, height, visibleCriteria) {
       reportRoundRect(ctx, x0, y0, width, height, 20, '#fafcfe');
-      const margin = {left:66, right:32, top:78, bottom:65};
+      const margin = {left:66, right:32, top:86, bottom:65};
       const innerW = width - margin.left - margin.right;
       const innerH = height - margin.top - margin.bottom;
-      const xMax = state.age > 80 ? 100 : 80;
+      const timeline = treatmentTimeline().filter(item => Number.isFinite(item.age));
+      const maxTreatmentAge = timeline.length ? Math.max(...timeline.map(item => item.age)) : state.age;
+      const ageNeed = Math.max(state.age, maxTreatmentAge);
+      const xMax = ageNeed > 80 ? Math.min(100, Math.max(90, Math.ceil(ageNeed / 10) * 10)) : 80;
       const x = age => x0 + margin.left + (age - 10) / (xMax - 10) * innerW;
       const y = value => y0 + margin.top + innerH * (1 - value / 100);
-      ctx.fillStyle = '#687b8b'; ctx.font = '400 17px Arial, sans-serif';
+    
+      function strokeSmooth(points, color, width, alpha) {
+        if (!points.length) return;
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.globalAlpha = alpha;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let index = 0; index < points.length - 1; index++) {
+          const p0 = points[index - 1] || points[index];
+          const p1 = points[index];
+          const p2 = points[index + 1];
+          const p3 = points[index + 2] || p2;
+          ctx.bezierCurveTo(
+            p1.x + (p2.x - p0.x) / 6,
+            p1.y + (p2.y - p0.y) / 6,
+            p2.x - (p3.x - p1.x) / 6,
+            p2.y - (p3.y - p1.y) / 6,
+            p2.x, p2.y
+          );
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+    
+      ctx.fillStyle = '#687b8b';
+      ctx.font = '400 17px Arial, sans-serif';
       ctx.fillText('Population concernée (%) · repères du modèle', x0 + 27, y0 + 34);
+    
+      if (xMax > 80) {
+        ctx.fillStyle = '#f0f2f4';
+        ctx.fillRect(x(80), y(100), x(xMax) - x(80), innerH);
+        ctx.fillStyle = '#73808c';
+        ctx.font = '400 13px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('hors repères après 80 ans', (x(80)+x(xMax))/2, y(100)+24);
+        ctx.textAlign = 'left';
+      }
+    
       [0, 50, 100].forEach(value => {
-        ctx.strokeStyle = '#e5ebf0'; ctx.lineWidth = 1;
+        ctx.strokeStyle = '#e5ebf0';
+        ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(x(10), y(value)); ctx.lineTo(x(xMax), y(value)); ctx.stroke();
         ctx.textAlign = 'right'; ctx.fillStyle = '#7b8994';
         ctx.fillText(String(value), x(10) - 14, y(value) + 6);
       });
-      const ages = xMax === 100 ? [10, 20, 40, 60, 80, 100] : [10, 20, 40, 60, 80];
+    
+      const ages = xMax === 100 ? [10,20,40,60,80,100] : xMax === 90 ? [10,20,40,60,80,90] : [10,20,40,60,80];
       ctx.textAlign = 'center';
       ages.forEach(age => ctx.fillText(String(age), x(age), y0 + height - 35));
       ctx.font = '400 15px Arial, sans-serif';
       ctx.fillText('Âge (années)', x0 + width / 2, y0 + height - 11);
-      if (xMax > 80) {
-        ctx.fillStyle = '#f0f2f4'; ctx.fillRect(x(80), y(100), x(100) - x(80), innerH);
-        ctx.fillStyle = '#73808c'; ctx.font = '400 14px Arial, sans-serif';
-        ctx.fillText('Hors du modèle', (x(80) + x(100)) / 2, y(100) + 32);
-      }
+      ctx.textAlign = 'left';
+    
+      ctx.save();
+      ctx.strokeStyle = '#101114'; ctx.lineWidth = 1.4; ctx.setLineDash([5,7]);
+      ctx.beginPath(); ctx.moveTo(x(state.age), y(100)); ctx.lineTo(x(state.age), y(0)); ctx.stroke();
+      ctx.restore();
+    
+      timeline.forEach((item,index) => {
+        if (item.age > xMax) return;
+        const tx=x(item.age);
+        ctx.save();
+        ctx.strokeStyle=item.color; ctx.lineWidth=1.3; ctx.globalAlpha=.7; ctx.setLineDash([4,6]);
+        ctx.beginPath(); ctx.moveTo(tx,y(100)); ctx.lineTo(tx,y(0)); ctx.stroke(); ctx.restore();
+        reportRoundRect(ctx, Math.max(x0+margin.left,Math.min(tx-20,x0+width-margin.right-40)), y0+44+(index%2)*25, 40, 20, 10, item.color);
+        ctx.fillStyle='#ffffff'; ctx.font='700 10px Arial, sans-serif'; ctx.textAlign='center';
+        ctx.fillText('E'+item.stage, Math.max(x0+margin.left+20,Math.min(tx,x0+width-margin.right-20)), y0+58+(index%2)*25);
+        ctx.textAlign='left';
+      });
+    
       const ids = new Set(visibleCriteria.map(c => c.id));
-      // Use the existing reference points and interpolation, without extrapolation.
       const ordered = referenceSeries.slice().sort((a,b) => Number(ids.has(a.id)) - Number(ids.has(b.id)));
       ordered.forEach(series => {
         const active = ids.has(series.id);
-        ctx.save(); ctx.strokeStyle = colorById[series.id]; ctx.globalAlpha = active ? .75 : .12;
-        ctx.lineWidth = active ? 3.5 : 2; ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.beginPath();
-        series.points.forEach((point,i) => { if (i === 0) ctx.moveTo(x(point[0]), y(point[1])); else ctx.lineTo(x(point[0]), y(point[1])); });
-        ctx.stroke(); ctx.restore();
+        const points = series.points.filter(point => point[0] <= Math.min(80,xMax)).map(point => ({x:x(point[0]), y:y(point[1])}));
+        strokeSmooth(points, colorById[series.id], active ? 3.1 : 1.8, active ? .72 : .11);
       });
-      ctx.save(); ctx.strokeStyle = '#7d8b99'; ctx.lineWidth = 1.5; ctx.setLineDash([5,7]);
-      ctx.beginPath(); ctx.moveTo(x(state.age), y(100)); ctx.lineTo(x(state.age), y(0)); ctx.stroke(); ctx.restore();
-      ordered.filter(s => ids.has(s.id)).forEach(series => {
+    
+      ordered.filter(series => ids.has(series.id)).forEach(series => {
         const value = interpolateSeries(series.points, state.age);
-        if (value === null) return;
-        ctx.beginPath(); ctx.arc(x(state.age), y(value), 6, 0, Math.PI * 2);
-        ctx.fillStyle = colorById[series.id]; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        if (value !== null) {
+          ctx.beginPath(); ctx.arc(x(state.age), y(value), 5.5, 0, Math.PI * 2);
+          ctx.fillStyle = colorById[series.id]; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+        }
+        timeline.forEach(item => {
+          if (item.age > 80 || !item.changedCriteria.some(c => c.id === series.id)) return;
+          const treatmentValue = interpolateSeries(series.points, item.age);
+          if (treatmentValue === null) return;
+          const tx=x(item.age), ty=y(treatmentValue);
+          ctx.beginPath(); ctx.arc(tx,ty,7,0,Math.PI*2);
+          ctx.fillStyle=item.color; ctx.fill();
+          ctx.strokeStyle=colorById[series.id]; ctx.lineWidth=2; ctx.stroke();
+          ctx.fillStyle='#ffffff'; ctx.font='700 8px Arial, sans-serif'; ctx.textAlign='center';
+          ctx.fillText(String(item.stage),tx,ty+2.8); ctx.textAlign='left';
+        });
       });
-      const labelX = Math.max(x0 + 24, Math.min(x(state.age) - 79, x0 + width - 182));
-      reportRoundRect(ctx, labelX, y0 + 42, 158, 28, 14, '#e9eff5');
-      ctx.fillStyle = '#34536e'; ctx.font = '600 16px Arial, sans-serif'; ctx.textAlign = 'center';
-      ctx.fillText('Votre âge : ' + state.age + ' ans', labelX + 79, y0 + 62);
+    
+      const labelX = Math.max(x0 + margin.left, Math.min(x(state.age) - 43, x0 + width - margin.right - 86));
+      reportRoundRect(ctx, labelX, y0 + 12, 86, 30, 15, '#101114');
+      ctx.fillStyle = '#ffffff'; ctx.font = '700 14px Arial, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(state.age + ' ans', labelX + 43, y0 + 32);
       ctx.textAlign = 'left';
     }
 
-    function createPopulationReportPage() {
-      const page = makeReportPage('2 - Repères de vie', 'Votre solution à ' + state.age + ' ans',
-        'Des repères à votre âge, distincts de votre évaluation personnelle.', 2);
+        function createPopulationReportPage() {
+      const page = makeReportPage('2 - Repères de vie', 'Votre parcours dans le temps',
+        'Votre âge situe les repères SourirePlus ; les marqueurs numérotés positionnent les étapes thérapeutiques.', 2);
       const ctx = page.ctx;
       const changed = solutionCriteria();
       const visible = changed.length ? changed : criteria;
-      reportRoundRect(ctx, 80, 322, 1440, 62, 16, '#f1f6fb');
-      ctx.fillStyle = '#395873'; ctx.font = '600 22px Arial, sans-serif';
-      ctx.fillText(changed.length ? 'La proposition fait évoluer ' + changed.length + ' critère' + (changed.length > 1 ? 's.' : '.')
-        : 'La proposition conserve les objectifs actuels.', 107, 361);
-      drawPopulationReportChart(ctx, 80, 410, 965, 550, visible);
-      ctx.fillStyle = '#263d55'; ctx.font = '700 23px Arial, sans-serif';
-      ctx.fillText('Vos repères en un regard', 1080, 436);
-      visible.forEach((c, i) => {
-        const y = 456 + i * 79;
-        const series = referenceSeries.find(item => item.id === c.id);
-        const value = series ? interpolateSeries(series.points, state.age) : null;
-        reportRoundRect(ctx, 1080, y, 440, 65, 12, c.color + '0d');
-        ctx.fillStyle = c.color; ctx.beginPath(); ctx.arc(1100, y + 23, 4, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#2e4559'; ctx.font = '600 20px Arial, sans-serif';
-        ctx.fillText(c.name, 1117, y + 29);
-        ctx.textAlign = 'right'; ctx.fillStyle = c.color; ctx.font = '700 24px Arial, sans-serif';
-        ctx.fillText(value === null ? '—' : Math.round(value) + ' %', 1497, y + 29);
-        ctx.textAlign = 'left'; ctx.fillStyle = '#637786'; ctx.font = '400 16px Arial, sans-serif';
-        ctx.fillText(value === null ? 'Pas de valeur au-delà de 80 ans.' : 'Repère indicatif du modèle à ' + state.age + ' ans.', 1117, y + 51);
+      drawPopulationReportChart(ctx, 80, 390, 990, 590, visible);
+    
+      reportRoundRect(ctx, 1100, 390, 420, 590, 20, '#101114');
+      ctx.fillStyle = '#ffffff'; ctx.font = '700 24px Arial, sans-serif';
+      ctx.fillText('Vos étapes', 1132, 432);
+      ctx.fillStyle = '#c9cbd1'; ctx.font = '400 16px Arial, sans-serif';
+      drawWrappedText(ctx, 'La position horizontale indique l’âge estimé de réalisation. La couleur correspond à la catégorie du devis.', 1132, 462, 350, 22, 4);
+    
+      const timeline = treatmentTimeline();
+      timeline.slice(0,5).forEach((item,index) => {
+        const y = 555 + index * 80;
+        reportRoundRect(ctx, 1130, y, 360, 62, 12, '#ffffff14');
+        ctx.fillStyle = item.color; ctx.beginPath(); ctx.arc(1150, y + 22, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.font = '700 17px Arial, sans-serif';
+        ctx.fillText('Étape ' + item.stage, 1166, y + 27);
+        ctx.textAlign = 'right'; ctx.fillStyle = item.color; ctx.font = '700 18px Arial, sans-serif';
+        ctx.fillText(Number.isFinite(item.age) ? formatTreatmentAge(item.age) : 'À réévaluer', 1472, y + 27);
+        ctx.textAlign = 'left'; ctx.fillStyle = '#c9cbd1'; ctx.font = '400 13px Arial, sans-serif';
+        drawWrappedText(ctx, item.quote.title || quoteCategoryLabel(item.quote.category), 1166, y + 48, 300, 17, 1);
       });
+    
       ctx.fillStyle = '#687b8b'; ctx.font = '400 16px Arial, sans-serif';
-      ctx.fillText('Les autres courbes restent visibles en arrière-plan.', 80, 987);
-      ctx.font = '400 18px Arial, sans-serif';
-      ctx.fillText('Ces pourcentages sont des repères du modèle : ni une note personnelle, ni une probabilité individuelle.', 80, 1020);
+      ctx.fillText('Les courbes sont des repères de population ; les marqueurs numérotés représentent votre parcours.', 80, 1015);
       return page.canvas;
     }
 
