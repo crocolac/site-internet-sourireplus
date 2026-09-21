@@ -4,10 +4,10 @@
       canvas.height = 1131;
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Le dessin du rapport est indisponible.');
-      ctx.fillStyle = pageNumber === 4 ? '#f6f6f4' : '#ffffff';
+      ctx.fillStyle = pageNumber === 5 ? '#f6f6f4' : '#ffffff';
       ctx.fillRect(0, 0, 1600, 1131);
-      // The three-note summary retains its original body, background and layout.
-      if (pageNumber === 4) criteria.forEach((c, i) => {
+      // The three-note summary retains its original body, background and layout on page 5.
+      if (pageNumber === 5) criteria.forEach((c, i) => {
         ctx.fillStyle = c.color;
         ctx.fillRect(i * 1600 / criteria.length, 0, Math.ceil(1600 / criteria.length), 12);
       });
@@ -23,7 +23,7 @@
       ctx.font = '600 18px Arial, sans-serif';
       ctx.fillText('LA MÉTHODE SOURIREPLUS', 1520, 77);
       ctx.font = '400 17px Arial, sans-serif';
-      ctx.fillText(pageNumber + ' / 4', 1520, 108);
+      ctx.fillText(pageNumber + ' / 5', 1520, 108);
       ctx.textAlign = 'left';
       ctx.fillStyle = '#6e7178';
       ctx.font = '700 17px Arial, sans-serif';
