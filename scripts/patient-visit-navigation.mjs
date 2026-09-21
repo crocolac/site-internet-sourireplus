@@ -8,6 +8,7 @@ export function stabilizePatientVisit(source) {
       else if (state.phase === 'question') renderQuestion();
       else if (state.phase === 'handoff') renderHandoff();
       else if (state.phase === 'projection') renderProjectionHandoff();
+      else if (state.phase === 'plan') renderTreatmentPlan();
       else renderResults();
     }`;
   const newRender = `    // VISIT_NAVIGATION_STABLE_V1
@@ -25,6 +26,7 @@ export function stabilizePatientVisit(source) {
       else if (state.phase === 'question') renderQuestion();
       else if (state.phase === 'handoff') renderHandoff();
       else if (state.phase === 'projection') renderProjectionHandoff();
+      else if (state.phase === 'plan') renderTreatmentPlan();
       else renderResults();
 
       // Preserve a content anchor, not the briefly collapsed height of a replaced DOM.
@@ -35,10 +37,10 @@ export function stabilizePatientVisit(source) {
       } else if (state.phase === 'intro') {
         setVisitScroll(0, 0);
       } else {
-        const target = app.querySelector('.question-copy, .handoff-inner, .results-head');
+        const target = app.querySelector('.question-copy, .handoff-inner, .plan-head, .results-head');
         setVisitScroll(previousX, target ? window.scrollY + target.getBoundingClientRect().top - 20 : previousY);
       }
-      const heading = app.querySelector('.question-copy h2, .handoff-inner h1, .results-head h1');
+      const heading = app.querySelector('.question-copy h2, .handoff-inner h1, .plan-head h1, .results-head h1');
       if (heading) {
         heading.setAttribute('tabindex', '-1');
         heading.focus({preventScroll: true});
