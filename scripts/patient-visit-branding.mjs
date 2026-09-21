@@ -127,7 +127,7 @@ export function brandPatientVisit(source, logoBytes = readFileSync(
   const fontsReady = '        if (document.fonts && document.fonts.ready) await document.fonts.ready;';
   result = replaceOnce(result, fontsReady + '\n        const pages = [',
     fontsReady + '\n' + logoReady + '\n        const pages = [', 'chargement du logo');
-  const summary = /    function createSummaryReportPage\([\s\S]*?(?=    function textBytes\()/;
+  const summary = /    function createSummaryReportPage\([\s\S]*?(?=    function createJourneyReportPage\()/;
   if (!source.match(summary) || source.match(summary)[0] !== result.match(summary)?.[0])
     throw new Error('La synthèse à trois notes a changé.');
   return result;

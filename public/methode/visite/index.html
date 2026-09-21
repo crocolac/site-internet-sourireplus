@@ -1482,6 +1482,42 @@ function combinedWindow(quote, financialMonth) {
   return {label:start + ' à ' + max + ' mois', warning:false};
 }
 
+function treatmentTimeline() {
+  ensureTrajectory(false);
+  const finance = financialSchedule();
+  return state.quotes.map((quote, index) => {
+    const bounds = therapeuticWindowBounds(quote.window);
+    const clinicalStart = bounds[0];
+    const financialMonth = finance[index] ? finance[index].month : null;
+    let month = null;
+    if (clinicalStart !== null && financialMonth !== null && financialMonth !== undefined) month = Math.max(clinicalStart, financialMonth);
+    else if (clinicalStart !== null) month = clinicalStart;
+    else if (financialMonth !== null && financialMonth !== undefined) month = financialMonth;
+    const age = month === null ? null : state.age + month / 12;
+    const changedCriteria = criteria.filter(criterion => {
+      const values = state.trajectory[criterion.id] || [];
+      return values[index + 1] !== values[index];
+    });
+    return {stage:index + 1, quote, month, age, color:stageCategoryColor(index + 1), changedCriteria};
+  });
+}
+
+function formatTreatmentAge(age) {
+  if (!Number.isFinite(age)) return 'âge à réévaluer';
+  const rounded = Math.round(age * 10) / 10;
+  return (Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',')) + ' ans';
+}
+
+function treatmentAgeFacts() {
+  return treatmentTimeline().map(item =>
+    '<article class="population-fact" style="--c:' + item.color + '">' +
+      '<div class="fact-value">' + (Number.isFinite(item.age) ? formatTreatmentAge(item.age).replace(' ans','') + '<small> ans</small>' : '—') + '</div>' +
+      '<p class="fact-copy"><strong>Étape ' + item.stage + ' · ' + escapeHtml(item.quote.title || quoteCategoryLabel(item.quote.category)) + '</strong>' +
+      (Number.isFinite(item.age) ? ' Positionnée vers ' + escapeHtml(formatTreatmentAge(item.age)) + ' selon la fenêtre thérapeutique actuelle.' : ' Cette étape reste à repositionner dans le temps.') +
+      '</p></article>'
+  ).join('');
+}
+
 function clampTreatmentScore(value) {
   return Math.max(0, Math.min(10, Math.round(Number(value) || 0)));
 }
@@ -1565,7 +1601,22 @@ function trajectoryCoordinates(criterionId) {
 
 function trajectoryPath(criterionId) {
   const points = trajectoryCoordinates(criterionId);
-  return points.map((point, index) => (index ? 'L ' : 'M ') + point.x.toFixed(1) + ' ' + point.y.toFixed(1)).join(' ');
+  return smoothPath(points.map(point => [point.x, point.y]));
+}
+
+function smoothObjectSegment(points, index) {
+  const p0 = points[index - 1] || points[index];
+  const p1 = points[index];
+  const p2 = points[index + 1];
+  const p3 = points[index + 2] || p2;
+  const cp1x = p1.x + (p2.x - p0.x) / 6;
+  const cp1y = p1.y + (p2.y - p0.y) / 6;
+  const cp2x = p2.x - (p3.x - p1.x) / 6;
+  const cp2y = p2.y - (p3.y - p1.y) / 6;
+  return 'M ' + p1.x.toFixed(1) + ' ' + p1.y.toFixed(1) +
+    ' C ' + cp1x.toFixed(1) + ' ' + cp1y.toFixed(1) + ', ' +
+    cp2x.toFixed(1) + ' ' + cp2y.toFixed(1) + ', ' +
+    p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
 }
 
 function scoreTick(value) {
@@ -1623,10 +1674,9 @@ function generalTrajectorySvgMarkup() {
   const ticks=[low,(low+high)/2,high].map(scoreTick);
   const grid=ticks.map(value=>{const y=top+((high-value)/Math.max(.001,high-low))*usableH;return '<line x1="'+left+'" y1="'+y+'" x2="'+(width-right)+'" y2="'+y+'" stroke="#e5e7ea" stroke-width="1"/><text x="'+(left-10)+'" y="'+(y+4)+'" text-anchor="end" fill="#8a8d94" font-size="11">'+value+'</text>';}).join('');
   const verticals=pts.map(p=>'<line x1="'+p.x+'" y1="'+top+'" x2="'+p.x+'" y2="'+(height-bottom)+'" stroke="#f0f1f3" stroke-width="1"/>').join('');
-  const segments=pts.slice(0,-1).map((p,index)=>{
-    const next=pts[index+1];
-    return '<path d="M '+p.x.toFixed(1)+' '+p.y.toFixed(1)+' L '+next.x.toFixed(1)+' '+next.y.toFixed(1)+'" fill="none" stroke="'+stageCategoryColor(index+1)+'" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>';
-  }).join('');
+  const segments=pts.slice(0,-1).map((p,index)=>
+    '<path d="'+smoothObjectSegment(pts,index)+'" fill="none" stroke="'+stageCategoryColor(index+1)+'" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>'
+  ).join('');
   const marks=pts.map((p,index)=>'<g><circle cx="'+p.x+'" cy="'+p.y+'" r="10" fill="'+stageCategoryColor(index)+'" stroke="white" stroke-width="3"></circle><text x="'+p.x+'" y="'+Math.max(14,p.y-17)+'" text-anchor="middle" fill="'+stageCategoryColor(index)+'" font-size="14" font-weight="800">'+formatShortScore(p.value)+'</text></g>').join('');
   return grid+verticals+segments+marks;
 }
@@ -1835,7 +1885,7 @@ function bindTreatmentPlan() {
   });
   document.getElementById('finishPlanBtn').addEventListener('click', () => {
     state.phase = 'results';
-    state.resultView = 'treatment';
+    state.resultView = 'comparison';
     state.filter = 'treatment';
     render();
   });
@@ -1860,7 +1910,7 @@ function bindTreatmentPlan() {
 
           <nav class="result-tabs" aria-label="Les quatre lectures SourirePlus">
             ${resultTab('comparison', '1 · Ressenti & clinique')}
-            ${resultTab('population', '2 · Solution & âge')}
+            ${resultTab('population', '2 · Repères de vie')}
             ${resultTab('treatment', '3 · Parcours de soins')}
             ${resultTab('summary', '4 · Synthèse')}
           </nav>
@@ -1956,51 +2006,51 @@ function bindTreatmentPlan() {
     }
 
     function populationView() {
-      const stages = [
-        ['Mise en place', 'jusqu’à 20 ans'],
-        ['Séduire', 'autour de 30 ans'],
-        ['Préserver', 'autour de 40 ans'],
-        ['Préparer', 'autour de 50 ans'],
-        ['Profiter', 'à partir de 70 ans']
-      ];
-      const active = lifeStageIndex(state.age);
-      return `
-        <section>
-          <div class="stage-head">
-            <div>
-              <p class="eyebrow">2 · Repères de vie</p>
-              <h2>Cette solution est-elle fréquente à ${state.age} ans ?</h2>
-              <p>Nous affichons d’abord les critères que le traitement prévoit de modifier. Chaque point indique la proportion de personnes concernées au même âge.</p>
-            </div>
+  const stages = [
+    ['Mise en place', 'jusqu’à 20 ans'],
+    ['Séduire', 'autour de 30 ans'],
+    ['Préserver', 'autour de 40 ans'],
+    ['Préparer', 'autour de 50 ans'],
+    ['Profiter', 'à partir de 70 ans']
+  ];
+  const active = lifeStageIndex(state.age);
+  return `
+    <section>
+      <div class="stage-head">
+        <div>
+          <p class="eyebrow">2 · Repères de vie</p>
+          <h2>Où se situe votre parcours dans la vie ?</h2>
+          <p>Votre âge situe les repères SourirePlus. Les marqueurs numérotés placent aussi les devis successifs à l’âge auquel leur fenêtre de réalisation devient favorable.</p>
+        </div>
+      </div>
+      <div class="life-strip" aria-label="Les cinq périodes de la vie">
+        ${stages.map((stage, index) => `<div class="life-stage ${index === active ? 'active' : ''}"><strong>${stage[0]}</strong><span>${stage[1]}</span></div>`).join('')}
+      </div>
+      <div class="filter-row" id="filterRow" aria-label="Choisir une trajectoire">
+        <button class="filter ${state.filter === 'treatment' ? 'active' : ''}" data-filter="treatment">Ce que votre solution modifie</button>
+        <button class="filter ${state.filter === 'all' ? 'active' : ''}" data-filter="all">Les 6 trajectoires</button>
+        ${criteria.map(c => `<button class="filter ${state.filter === c.id ? 'active' : ''}" data-filter="${c.id}"><i class="color-dot" style="--c:${c.color}"></i>${c.name}</button>`).join('')}
+      </div>
+      <div class="population-grid">
+        <div>
+          <div class="chart-card">
+            <div class="chart-titles"><span>Population concernée · %</span><span>Repères SourirePlus</span></div>
+            <svg id="chart" role="img" aria-label="Repères de vie et position des étapes thérapeutiques selon l’âge"></svg>
+            <p class="chart-note"><strong>Les marqueurs numérotés correspondent aux étapes de traitement.</strong> Leur position horizontale traduit l’âge prévu ; leur couleur indique Essentiels, Besoins patient ou Stratégique.</p>
           </div>
-          <div class="life-strip" aria-label="Les cinq périodes de la vie">
-            ${stages.map((stage, index) => `<div class="life-stage ${index === active ? 'active' : ''}"><strong>${stage[0]}</strong><span>${stage[1]}</span></div>`).join('')}
-          </div>
-          <div class="filter-row" id="filterRow" aria-label="Choisir une trajectoire">
-            <button class="filter ${state.filter === 'treatment' ? 'active' : ''}" data-filter="treatment">Ce que votre solution modifie</button>
-            <button class="filter ${state.filter === 'all' ? 'active' : ''}" data-filter="all">Les 6 trajectoires</button>
-            ${criteria.map(c => `<button class="filter ${state.filter === c.id ? 'active' : ''}" data-filter="${c.id}"><i class="color-dot" style="--c:${c.color}"></i>${c.name}</button>`).join('')}
-          </div>
-          <div class="population-grid">
-            <div>
-              <div class="chart-card">
-                <div class="chart-titles"><span>Population concernée · %</span><span>Repères SourirePlus</span></div>
-                <svg id="chart" role="img" aria-label="Proportion de population concernée par les critères liés à la solution selon l’âge"></svg>
-                <p class="chart-note"><strong>Plus la courbe est haute, plus ce type de traitement concerne de personnes à cet âge.</strong> C’est un repère de discussion, jamais une obligation de traitement.</p>
-              </div>
-              <div class="population-key"><span aria-hidden="true">●</span><div><strong>Le point coloré marque le croisement exact entre votre âge et la courbe.</strong> Il indique une proportion de population, pas votre note personnelle.</div></div>
-            </div>
-            <aside class="population-story">
-              <h3>Le message à retenir</h3>
-              <p>La solution proposée agit sur les critères ci-dessous. Le pourcentage montre à quel point ce type de prise en charge est fréquent à votre âge.</p>
-              <div class="population-facts">${populationFacts()}</div>
-            </aside>
-          </div>
-          <div class="view-next"><button class="btn btn-primary" type="button" data-next-view="treatment">Voir l’effet de la solution →</button></div>
-        </section>`;
-    }
+          <div class="population-key"><span aria-hidden="true">●</span><div><strong>La ligne noire marque votre âge aujourd’hui.</strong> Les lignes et points numérotés placent les étapes thérapeutiques dans le temps ; les courbes de fond restent des repères de population.</div></div>
+        </div>
+        <aside class="population-story">
+          <h3>Votre parcours dans le temps</h3>
+          <p>Les étapes sont positionnées à partir de votre âge actuel et des fenêtres thérapeutiques calculées.</p>
+          <div class="population-facts">${treatmentAgeFacts()}</div>
+        </aside>
+      </div>
+      <div class="view-next"><button class="btn btn-primary" type="button" data-next-view="treatment">Voir l’effet de la solution →</button></div>
+    </section>`;
+}
 
-    function solutionCriteria() {
+function solutionCriteria() {
       return criteria.filter(c => state.objective[c.id] !== state.clinician[c.id]);
     }
 
@@ -2133,70 +2183,95 @@ function bindTreatmentPlan() {
     }
 
     function renderChart() {
-      const svg = document.getElementById('chart');
-      if (!svg) return;
-      const width = Math.max(310, Math.round(svg.getBoundingClientRect().width));
-      const height = width < 560 ? 390 : 460;
-      const margin = width < 560 ? {top:42,right:34,bottom:44,left:36} : {top:44,right:46,bottom:48,left:46};
-      const innerW = width - margin.left - margin.right;
-      const innerH = height - margin.top - margin.bottom;
-      const xMin = 10;
-      const xMax = state.age > 80 ? Math.min(100, Math.ceil(state.age / 10) * 10) : 80;
-      const x = age => margin.left + ((age - xMin) / (xMax - xMin)) * innerW;
-      const y = value => margin.top + innerH - (value / 100) * innerH;
-      const changed = solutionCriteria();
-      const visible = state.filter === 'all'
-        ? criteria
-        : (state.filter === 'treatment' ? (changed.length ? changed : criteria) : criteria.filter(c => c.id === state.filter));
-      const visibleIds = new Set(visible.map(c => c.id));
-      const singleCurve = visible.length === 1;
-      const parts = [];
+  const svg = document.getElementById('chart');
+  if (!svg) return;
+  const width = Math.max(310, Math.round(svg.getBoundingClientRect().width));
+  const height = width < 560 ? 410 : 480;
+  const margin = width < 560 ? {top:62,right:34,bottom:44,left:36} : {top:64,right:46,bottom:48,left:46};
+  const innerW = width - margin.left - margin.right;
+  const innerH = height - margin.top - margin.bottom;
+  const timeline = treatmentTimeline().filter(item => Number.isFinite(item.age));
+  const maxTreatmentAge = timeline.length ? Math.max(...timeline.map(item => item.age)) : state.age;
+  const xMin = 10;
+  const ageNeed = Math.max(state.age, maxTreatmentAge);
+  const xMax = ageNeed > 80 ? Math.min(100, Math.max(90, Math.ceil(ageNeed / 10) * 10)) : 80;
+  const x = age => margin.left + ((age - xMin) / (xMax - xMin)) * innerW;
+  const y = value => margin.top + innerH - (value / 100) * innerH;
+  const changed = solutionCriteria();
+  const visible = state.filter === 'all'
+    ? criteria
+    : (state.filter === 'treatment' ? (changed.length ? changed : criteria) : criteria.filter(c => c.id === state.filter));
+  const visibleIds = new Set(visible.map(c => c.id));
+  const singleCurve = visible.length === 1;
+  const parts = [];
 
-      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      svg.setAttribute('height', height);
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('height', height);
 
-      for (let value = 0; value <= 100; value += 20) {
-        parts.push(`<line x1="${margin.left}" y1="${y(value)}" x2="${width-margin.right}" y2="${y(value)}" stroke="#e4e5e8" stroke-width="1"/>`);
-        parts.push(`<text x="${margin.left-8}" y="${y(value)+4}" text-anchor="end" fill="#777a82" font-size="11">${value}</text>`);
+  if (xMax > 80) {
+    parts.push(`<rect x="${x(80)}" y="${margin.top}" width="${Math.max(0,x(xMax)-x(80))}" height="${innerH}" fill="#f3f4f6"/>`);
+    parts.push(`<text x="${(x(80)+x(xMax))/2}" y="${margin.top+18}" text-anchor="middle" fill="#8a8d94" font-size="10">hors repères population après 80 ans</text>`);
+  }
+
+  for (let value = 0; value <= 100; value += 20) {
+    parts.push(`<line x1="${margin.left}" y1="${y(value)}" x2="${width-margin.right}" y2="${y(value)}" stroke="#e4e5e8" stroke-width="1"/>`);
+    parts.push(`<text x="${margin.left-8}" y="${y(value)+4}" text-anchor="end" fill="#777a82" font-size="11">${value}</text>`);
+  }
+
+  const ageStep = width < 560 ? 20 : 10;
+  for (let age = 10; age <= xMax; age += ageStep) {
+    parts.push(`<line x1="${x(age)}" y1="${margin.top}" x2="${x(age)}" y2="${height-margin.bottom}" stroke="#f0f0f2" stroke-width="1"/>`);
+    parts.push(`<text x="${x(age)}" y="${height-margin.bottom+25}" text-anchor="middle" fill="#777a82" font-size="11">${age}</text>`);
+  }
+  parts.push(`<text x="${width/2}" y="${height-7}" text-anchor="middle" fill="#777a82" font-size="11">Âge</text>`);
+  parts.push(`<text x="${margin.left}" y="${margin.top-17}" fill="#777a82" font-size="11">Population concernée (%)</text>`);
+
+  const ageX = x(Math.min(state.age, xMax));
+  parts.push(`<rect x="${ageX-10}" y="${margin.top}" width="20" height="${innerH}" rx="10" fill="#101114" opacity=".035"/>`);
+  parts.push(`<line x1="${ageX}" y1="${margin.top-8}" x2="${ageX}" y2="${height-margin.bottom}" stroke="#101114" stroke-width="1.4" stroke-dasharray="4 5"/>`);
+
+  timeline.forEach((item,index) => {
+    if (item.age > xMax) return;
+    const tx=x(item.age);
+    const labelY=margin.top-24+(index%2)*22;
+    parts.push(`<line x1="${tx}" y1="${margin.top}" x2="${tx}" y2="${height-margin.bottom}" stroke="${item.color}" stroke-width="1.4" stroke-dasharray="3 5" opacity=".65"/>`);
+    parts.push(`<rect x="${Math.max(margin.left,Math.min(tx-18,width-margin.right-36))}" y="${labelY}" width="36" height="18" rx="9" fill="${item.color}"/>`);
+    parts.push(`<text x="${Math.max(margin.left+18,Math.min(tx,width-margin.right-18))}" y="${labelY+12.5}" text-anchor="middle" fill="white" font-size="9" font-weight="800">E${item.stage}</text>`);
+  });
+
+  referenceSeries.forEach(series => {
+    if (!visibleIds.has(series.id)) return;
+    const points = series.points.filter(p => p[0] <= Math.min(80,xMax)).map(p => [x(p[0]), y(p[1])]);
+    const color = colorById[series.id];
+    parts.push(`<path d="${smoothPath(points)}" fill="none" stroke="${color}" stroke-width="${state.filter === 'all' ? 2.4 : 4}" stroke-linecap="round" stroke-linejoin="round" opacity="${state.filter === 'all' ? .30 : .72}"/>`);
+    const valueAtAge = interpolateSeries(series.points, state.age);
+    if (valueAtAge !== null) {
+      const dotX = ageXValue(state.age, x, xMax);
+      const dotY = y(valueAtAge);
+      parts.push(`<circle cx="${dotX}" cy="${dotY}" r="${state.filter === 'all' ? 3.5 : 6}" fill="${color}" stroke="white" stroke-width="2.5"><title>${criteria.find(c => c.id === series.id).name} : environ ${Math.round(valueAtAge)} % à ${state.age} ans</title></circle>`);
+      if (singleCurve) {
+        const labelX = Math.min(width - margin.right - 48, dotX + 12);
+        const labelY = Math.max(margin.top + 6, dotY - 30);
+        parts.push(`<rect x="${labelX}" y="${labelY}" width="54" height="25" rx="12.5" fill="${color}"/>`);
+        parts.push(`<text x="${labelX + 27}" y="${labelY + 17}" text-anchor="middle" fill="white" font-size="11" font-weight="800">${Math.round(valueAtAge)} %</text>`);
       }
-
-      const ageStep = width < 560 ? 20 : 10;
-      for (let age = 10; age <= xMax; age += ageStep) {
-        parts.push(`<line x1="${x(age)}" y1="${margin.top}" x2="${x(age)}" y2="${height-margin.bottom}" stroke="#f0f0f2" stroke-width="1"/>`);
-        parts.push(`<text x="${x(age)}" y="${height-margin.bottom+25}" text-anchor="middle" fill="#777a82" font-size="11">${age}</text>`);
-      }
-      parts.push(`<text x="${width/2}" y="${height-7}" text-anchor="middle" fill="#777a82" font-size="11">Âge</text>`);
-      parts.push(`<text x="${margin.left}" y="${margin.top-17}" fill="#777a82" font-size="11">Population concernée (%)</text>`);
-      const ageX = x(Math.min(state.age, xMax));
-      parts.push(`<rect x="${ageX-12}" y="${margin.top}" width="24" height="${innerH}" rx="12" fill="#101114" opacity=".035"/>`);
-      parts.push(`<line x1="${ageX}" y1="${margin.top-8}" x2="${ageX}" y2="${height-margin.bottom}" stroke="#101114" stroke-width="1.5" stroke-dasharray="4 5"/>`);
-
-      referenceSeries.forEach(series => {
-        if (!visibleIds.has(series.id)) return;
-        const points = series.points.filter(p => p[0] <= xMax).map(p => [x(p[0]), y(p[1])]);
-        const color = colorById[series.id];
-        parts.push(`<path d="${smoothPath(points)}" fill="none" stroke="${color}" stroke-width="${state.filter === 'all' ? 3 : 5}" stroke-linecap="round" stroke-linejoin="round" opacity="${state.filter === 'all' ? .34 : .78}"/>`);
-        const valueAtAge = interpolateSeries(series.points, state.age);
-        if (valueAtAge !== null) {
-          const dotX = ageXValue(state.age, x, xMax);
-          const dotY = y(valueAtAge);
-          parts.push(`<circle cx="${dotX}" cy="${dotY}" r="${state.filter === 'all' ? 4 : 7}" fill="${color}" stroke="white" stroke-width="3"><title>${criteria.find(c => c.id === series.id).name} : environ ${Math.round(valueAtAge)} % de population concernée à ${state.age} ans</title></circle>`);
-          if (singleCurve) {
-            const labelX = Math.min(width - margin.right - 48, dotX + 12);
-            const labelY = Math.max(margin.top + 6, dotY - 30);
-            parts.push(`<rect x="${labelX}" y="${labelY}" width="54" height="25" rx="12.5" fill="${color}"/>`);
-            parts.push(`<text x="${labelX + 27}" y="${labelY + 17}" text-anchor="middle" fill="white" font-size="11" font-weight="800">${Math.round(valueAtAge)} %</text>`);
-          }
-        }
-      });
-
-      parts.push(`<rect x="${Math.max(margin.left, Math.min(ageX-27, width-margin.right-54))}" y="8" width="54" height="25" rx="12.5" fill="#101114"/>`);
-      parts.push(`<text x="${Math.max(margin.left+27, Math.min(ageX, width-margin.right-27))}" y="25" text-anchor="middle" fill="white" font-size="11" font-weight="700">${state.age} ans</text>`);
-
-      svg.innerHTML = parts.join('');
     }
+    timeline.forEach(item => {
+      if (item.age > 80 || item.age > xMax || !item.changedCriteria.some(c => c.id === series.id)) return;
+      const valueAtTreatment = interpolateSeries(series.points, item.age);
+      if (valueAtTreatment === null) return;
+      const tx=x(item.age), ty=y(valueAtTreatment);
+      parts.push(`<circle cx="${tx}" cy="${ty}" r="7.5" fill="${item.color}" stroke="${color}" stroke-width="2.3"><title>Étape ${item.stage} · ${criteria.find(c => c.id === series.id).name} · ${formatTreatmentAge(item.age)}</title></circle>`);
+      parts.push(`<text x="${tx}" y="${ty+3}" text-anchor="middle" fill="white" font-size="8" font-weight="800">${item.stage}</text>`);
+    });
+  });
 
-    function ageXValue(age, scale, xMax) {
+  parts.push(`<rect x="${Math.max(margin.left, Math.min(ageX-27, width-margin.right-54))}" y="8" width="54" height="22" rx="11" fill="#101114"/>`);
+  parts.push(`<text x="${Math.max(margin.left+27, Math.min(ageX, width-margin.right-27))}" y="23" text-anchor="middle" fill="white" font-size="10" font-weight="700">${state.age} ans</text>`);
+  svg.innerHTML = parts.join('');
+}
+
+function ageXValue(age, scale, xMax) {
       return scale(Math.min(age, xMax));
     }
 
@@ -2652,108 +2727,119 @@ function bindTreatmentPlan() {
     }
 
     function createJourneyReportPage() {
-      ensureTrajectory(false);
-      const page = makeReportPage(
-        '4 - Parcours thérapeutique',
-        'Votre progression, étape par étape',
-        'La courbe principale montre la moyenne des six critères. Les mini-courbes détaillent les évolutions par domaine.',
-        4
-      );
-      const ctx = page.ctx;
-      const global = generalTrajectoryValues();
-      const count = Math.max(1, state.quotes.length);
-      const stageColors = Array.from({length: count + 1}, (_, index) => stageCategoryColor(index));
+  ensureTrajectory(false);
+  const page = makeReportPage(
+    '4 - Parcours thérapeutique',
+    'Votre progression, étape par étape',
+    'La courbe principale montre la moyenne des six critères. Les mini-courbes détaillent les évolutions par domaine.',
+    4
+  );
+  const ctx = page.ctx;
+  const global = generalTrajectoryValues();
+  const count = Math.max(1, state.quotes.length);
+  const stageColors = Array.from({length: count + 1}, (_, index) => stageCategoryColor(index));
 
-      function bounds(values, minRange) {
-        let low = Math.min(...values), high = Math.max(...values);
-        const range = high - low;
-        const padding = range < 1 ? 1 : Math.max(.45, range * .16);
-        low = Math.max(0, low - padding);
-        high = Math.min(10, high + padding);
-        if (high - low < minRange) {
-          const mid = (low + high) / 2;
-          low = Math.max(0, mid - minRange / 2);
-          high = Math.min(10, mid + minRange / 2);
-        }
-        return {low, high};
-      }
-
-      function pastelize(hex, ratio) {
-        const clean = String(hex || '#ffffff').replace('#','');
-        if (clean.length !== 6) return '#f7f8fa';
-        const r=parseInt(clean.slice(0,2),16), g=parseInt(clean.slice(2,4),16), b=parseInt(clean.slice(4,6),16);
-        const mix = value => Math.round(255 - (255 - value) * ratio).toString(16).padStart(2,'0');
-        return '#' + mix(r) + mix(g) + mix(b);
-      }
-
-      function drawLineChart(x, y, width, height, values, colors, lineColor, showStageText, segmentColors) {
-        const scale = bounds(values, 2);
-        const left = x + 42, right = x + width - 20, top = y + 20, bottom = y + height - 38;
-        const plotW = right - left, plotH = bottom - top;
-        const yy = value => top + (scale.high - value) / Math.max(.001, scale.high - scale.low) * plotH;
-        const xx = index => left + index / Math.max(1, values.length - 1) * plotW;
-        [scale.low, (scale.low + scale.high) / 2, scale.high].forEach(value => {
-          const v = Math.round(value * 10) / 10;
-          const py = yy(v);
-          ctx.strokeStyle = '#e4e8ec'; ctx.lineWidth = .8;
-          ctx.beginPath(); ctx.moveTo(left, py); ctx.lineTo(right, py); ctx.stroke();
-          ctx.fillStyle = '#7a8792'; ctx.font = '400 12px Arial, sans-serif'; ctx.textAlign = 'right';
-          ctx.fillText(String(v), left - 9, py + 4);
-        });
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        for (let index = 0; index < values.length - 1; index++) {
-          ctx.strokeStyle = (segmentColors && segmentColors[index]) || lineColor;
-          ctx.lineWidth = showStageText ? 4 : 2.4;
-          ctx.beginPath();
-          ctx.moveTo(xx(index), yy(values[index]));
-          ctx.lineTo(xx(index + 1), yy(values[index + 1]));
-          ctx.stroke();
-        }
-        values.forEach((value,index) => {
-          const px=xx(index), py=yy(value);
-          ctx.beginPath(); ctx.arc(px, py, showStageText ? 8 : 5.5, 0, Math.PI * 2);
-          ctx.fillStyle = colors[index] || lineColor; ctx.fill();
-          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = showStageText ? 2.5 : 1.8; ctx.stroke();
-          ctx.fillStyle = colors[index] || lineColor; ctx.font = showStageText ? '700 16px Arial, sans-serif' : '700 13px Arial, sans-serif'; ctx.textAlign = 'center';
-          ctx.fillText(formatShortScore(value), px, Math.max(y + 15, py - (showStageText ? 14 : 10)));
-          if (showStageText) {
-            ctx.fillStyle = '#556572'; ctx.font = '600 13px Arial, sans-serif';
-            ctx.fillText(index === 0 ? 'Aujourd’hui' : 'Étape ' + index, px, bottom + 23);
-          }
-        });
-        ctx.textAlign = 'left';
-      }
-
-      reportRoundRect(ctx, 80, 318, 1440, 360, 22, '#f8fafc', '#e1e6ea');
-      ctx.fillStyle = '#263d55'; ctx.font = '700 25px Arial, sans-serif';
-      ctx.fillText('Évolution globale · moyenne des six critères', 110, 358);
-      drawLineChart(105, 375, 1390, 275, global, stageColors, '#263d55', true, state.quotes.map((quote, index) => stageColors[index + 1]));
-
-      const miniW = 455, miniH = 142;
-      criteria.forEach((criterion, index) => {
-        const col = index % 3, row = Math.floor(index / 3);
-        const x = 80 + col * 490, y = 716 + row * 156;
-        reportRoundRect(ctx, x, y, miniW, miniH, 16, pastelize(criterion.color, .10), '#e3e7ea');
-        ctx.fillStyle = criterion.color; ctx.beginPath(); ctx.arc(x + 20, y + 25, 4.5, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#31495e'; ctx.font = '700 16px Arial, sans-serif';
-        ctx.fillText(criterion.name, x + 34, y + 30);
-        drawLineChart(x + 10, y + 34, miniW - 20, 104, state.trajectory[criterion.id], stageColors, criterion.color, false, state.quotes.map((quote, segmentIndex) => stageColors[segmentIndex + 1]));
-      });
-
-      ctx.fillStyle = '#66727d'; ctx.font = '400 14px Arial, sans-serif'; ctx.textAlign = 'center';
-      const finance = financialSchedule();
-      state.quotes.forEach((quote, index) => {
-        const x = 105 + ((index + 1) / count) * 1390;
-        ctx.fillStyle = stageColors[index + 1]; ctx.font = '700 15px Arial, sans-serif';
-        ctx.fillText(moneyLabel(quote.amount), x, 694);
-        ctx.fillStyle = '#71808c'; ctx.font = '400 12px Arial, sans-serif';
-        ctx.fillText(monthLabel(finance[index].month), x, 710);
-      });
-      ctx.textAlign = 'left';
-      return page.canvas;
+  function bounds(values, minRange) {
+    let low = Math.min(...values), high = Math.max(...values);
+    const range = high - low;
+    const padding = range < 1 ? 1 : Math.max(.45, range * .16);
+    low = Math.max(0, low - padding);
+    high = Math.min(10, high + padding);
+    if (high - low < minRange) {
+      const mid = (low + high) / 2;
+      low = Math.max(0, mid - minRange / 2);
+      high = Math.min(10, mid + minRange / 2);
     }
+    return {low, high};
+  }
 
-    function textBytes(value) {
+  function pastelize(hex, ratio) {
+    const clean = String(hex || '#ffffff').replace('#','');
+    if (clean.length !== 6) return '#f7f8fa';
+    const r=parseInt(clean.slice(0,2),16), g=parseInt(clean.slice(2,4),16), b=parseInt(clean.slice(4,6),16);
+    const mix = value => Math.round(255 - (255 - value) * ratio).toString(16).padStart(2,'0');
+    return '#' + mix(r) + mix(g) + mix(b);
+  }
+
+  function drawLineChart(x, y, width, height, values, colors, lineColor, showStageText, segmentColors) {
+    const scale = bounds(values, 2);
+    const left = x + 42, right = x + width - 20, top = y + 20, bottom = y + height - 38;
+    const plotW = right - left, plotH = bottom - top;
+    const yy = value => top + (scale.high - value) / Math.max(.001, scale.high - scale.low) * plotH;
+    const xx = index => left + index / Math.max(1, values.length - 1) * plotW;
+    [scale.low, (scale.low + scale.high) / 2, scale.high].forEach(value => {
+      const v = Math.round(value * 10) / 10;
+      const py = yy(v);
+      ctx.strokeStyle = '#e4e8ec'; ctx.lineWidth = .8;
+      ctx.beginPath(); ctx.moveTo(left, py); ctx.lineTo(right, py); ctx.stroke();
+      ctx.fillStyle = '#7a8792'; ctx.font = '400 12px Arial, sans-serif'; ctx.textAlign = 'right';
+      ctx.fillText(String(v), left - 9, py + 4);
+    });
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const points = values.map((value,index) => ({x:xx(index), y:yy(value)}));
+    for (let index = 0; index < points.length - 1; index++) {
+      const p0 = points[index - 1] || points[index];
+      const p1 = points[index];
+      const p2 = points[index + 1];
+      const p3 = points[index + 2] || p2;
+      ctx.strokeStyle = (segmentColors && segmentColors[index]) || lineColor;
+      ctx.lineWidth = showStageText ? 4 : 2.4;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.bezierCurveTo(
+        p1.x + (p2.x - p0.x) / 6,
+        p1.y + (p2.y - p0.y) / 6,
+        p2.x - (p3.x - p1.x) / 6,
+        p2.y - (p3.y - p1.y) / 6,
+        p2.x, p2.y
+      );
+      ctx.stroke();
+    }
+    values.forEach((value,index) => {
+      const px=xx(index), py=yy(value);
+      ctx.beginPath(); ctx.arc(px, py, showStageText ? 8 : 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = colors[index] || lineColor; ctx.fill();
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = showStageText ? 2.5 : 1.8; ctx.stroke();
+      ctx.fillStyle = colors[index] || lineColor; ctx.font = showStageText ? '700 16px Arial, sans-serif' : '700 13px Arial, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(formatShortScore(value), px, Math.max(y + 15, py - (showStageText ? 14 : 10)));
+      if (showStageText) {
+        ctx.fillStyle = '#556572'; ctx.font = '600 13px Arial, sans-serif';
+        ctx.fillText(index === 0 ? 'Aujourd’hui' : 'Étape ' + index, px, bottom + 23);
+      }
+    });
+    ctx.textAlign = 'left';
+  }
+
+  reportRoundRect(ctx, 80, 318, 1440, 360, 22, '#f8fafc', '#e1e6ea');
+  ctx.fillStyle = '#263d55'; ctx.font = '700 25px Arial, sans-serif';
+  ctx.fillText('Évolution globale · moyenne des six critères', 110, 358);
+  drawLineChart(105, 375, 1390, 275, global, stageColors, '#263d55', true, state.quotes.map((quote, index) => stageColors[index + 1]));
+
+  const miniW = 455, miniH = 142;
+  criteria.forEach((criterion, index) => {
+    const col = index % 3, row = Math.floor(index / 3);
+    const x = 80 + col * 490, y = 716 + row * 156;
+    reportRoundRect(ctx, x, y, miniW, miniH, 16, pastelize(criterion.color, .10), '#e3e7ea');
+    ctx.fillStyle = criterion.color; ctx.beginPath(); ctx.arc(x + 20, y + 25, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#31495e'; ctx.font = '700 16px Arial, sans-serif';
+    ctx.fillText(criterion.name, x + 34, y + 30);
+    drawLineChart(x + 10, y + 34, miniW - 20, 104, state.trajectory[criterion.id], stageColors, criterion.color, false, state.quotes.map((quote, segmentIndex) => stageColors[segmentIndex + 1]));
+  });
+
+  ctx.fillStyle = '#66727d'; ctx.font = '400 14px Arial, sans-serif'; ctx.textAlign = 'center';
+  const finance = financialSchedule();
+  state.quotes.forEach((quote, index) => {
+    const x = 105 + ((index + 1) / count) * 1390;
+    ctx.fillStyle = stageColors[index + 1]; ctx.font = '700 15px Arial, sans-serif';
+    ctx.fillText(moneyLabel(quote.amount), x, 694);
+    ctx.fillStyle = '#71808c'; ctx.font = '400 12px Arial, sans-serif';
+    ctx.fillText(monthLabel(finance[index].month), x, 710);
+  });
+  ctx.textAlign = 'left';
+  return page.canvas;
+}
+
+function textBytes(value) {
       const bytes = new Uint8Array(value.length);
       for (let index = 0; index < value.length; index++) bytes[index] = value.charCodeAt(index) & 255;
       return bytes;
