@@ -241,13 +241,11 @@
       ctx.textAlign = 'left';
     }
 
-        function createPopulationReportPage() {
+            function createPopulationReportPage() {
       const page = makeReportPage('2 - Repères de vie', 'Votre parcours dans le temps',
         'Les bandes grises structurent les périodes de vie ; les verticales colorées positionnent les étapes thérapeutiques.', 2);
       const ctx = page.ctx;
-      const changed = solutionCriteria();
-      const visible = changed.length ? changed : criteria;
-      drawPopulationReportChart(ctx, 80, 390, 990, 590, visible);
+      drawPopulationReportChart(ctx, 80, 390, 990, 590, criteria);
     
       reportRoundRect(ctx, 1100, 390, 420, 590, 20, '#101114');
       ctx.fillStyle = '#ffffff'; ctx.font = '700 24px Arial, sans-serif';
@@ -268,8 +266,17 @@
         drawWrappedText(ctx, item.quote.title || quoteCategoryLabel(item.quote.category), 1166, y + 48, 300, 17, 1);
       });
     
-      ctx.fillStyle = '#687b8b'; ctx.font = '400 16px Arial, sans-serif';
-      ctx.fillText('Les courbes restent des repères de population ; les verticales pointillées colorées représentent votre calendrier de soins.', 80, 1015);
+      ctx.fillStyle = '#687b8b'; ctx.font = '700 13px Arial, sans-serif';
+      ctx.fillText('LÉGENDE DES 6 COURBES', 80, 1011);
+      criteria.forEach((criterion,index) => {
+        const x = 80 + index * 163;
+        ctx.strokeStyle = criterion.color;
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(x, 1032); ctx.lineTo(x + 24, 1032); ctx.stroke();
+        ctx.fillStyle = '#4f5f6d'; ctx.font = '600 12px Arial, sans-serif';
+        ctx.fillText(criterion.name, x + 32, 1036);
+      });
       return page.canvas;
     }
 

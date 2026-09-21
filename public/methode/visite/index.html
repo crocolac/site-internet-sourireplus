@@ -447,6 +447,17 @@
       font-weight: 700;
     }
     .filter.active { border-color: var(--ink); background: var(--ink); color: white; }
+    .filter.criterion {
+      border-color: color-mix(in srgb, var(--c) 46%, white);
+      background: color-mix(in srgb, var(--c) 10%, white);
+      color: var(--c);
+    }
+    .filter.criterion .color-dot { box-shadow: 0 0 0 2px white; }
+    .filter.criterion.active {
+      border-color: var(--c);
+      background: var(--c);
+      color: white;
+    }
 
     .chart-card {
       overflow: hidden;
@@ -2006,6 +2017,7 @@ function bindTreatmentPlan() {
     }
 
     function populationView() {
+  if (state.filter === 'treatment') state.filter = 'all';
   const stages = [
     ['Mise en place', 'jusqu’à 20 ans'],
     ['Séduire', '20–35 ans'],
@@ -2026,10 +2038,9 @@ function bindTreatmentPlan() {
       <div class="life-strip" aria-label="Les cinq périodes de la vie">
         ${stages.map((stage, index) => `<div class="life-stage ${index === active ? 'active' : ''}"><strong>${stage[0]}</strong><span>${stage[1]}</span></div>`).join('')}
       </div>
-      <div class="filter-row" id="filterRow" aria-label="Choisir une trajectoire">
-        <button class="filter ${state.filter === 'treatment' ? 'active' : ''}" data-filter="treatment">Ce que votre solution modifie</button>
+      <div class="filter-row" id="filterRow" aria-label="Légende des six trajectoires">
         <button class="filter ${state.filter === 'all' ? 'active' : ''}" data-filter="all">Les 6 trajectoires</button>
-        ${criteria.map(c => `<button class="filter ${state.filter === c.id ? 'active' : ''}" data-filter="${c.id}"><i class="color-dot" style="--c:${c.color}"></i>${c.name}</button>`).join('')}
+        ${criteria.map(c => `<button class="filter criterion ${state.filter === c.id ? 'active' : ''}" style="--c:${c.color}" data-filter="${c.id}"><i class="color-dot" style="--c:${c.color}"></i>${c.name}</button>`).join('')}
       </div>
       <div class="population-grid">
         <div>
