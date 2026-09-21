@@ -834,6 +834,159 @@
       .results-head h1 { font-size: 2.6rem; }
       #chart { height: 390px; }
     }
+
+    /* Parcours thérapeutique par devis */
+    .plan-screen { padding: clamp(24px, 5vw, 56px); }
+    .plan-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+    .plan-head h1 { margin-bottom: 10px; font-size: clamp(2.4rem, 5.8vw, 4.8rem); }
+    .plan-head .lead { margin-bottom: 0; }
+    .quote-config {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .quote-card {
+      display: grid;
+      grid-template-columns: 78px minmax(180px, 1.2fr) minmax(170px, .8fr) minmax(170px, .8fr) 44px;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: white;
+    }
+    .quote-step {
+      align-self: center;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .quote-field { display: grid; gap: 6px; min-width: 0; }
+    .quote-field label { color: var(--muted); font-size: .76rem; font-weight: 750; }
+    .quote-field input, .quote-field select {
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: white;
+      color: var(--ink);
+      font-size: .92rem;
+      outline: none;
+    }
+    .quote-field input:focus, .quote-field select:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(16,17,20,.07); }
+    .quote-remove {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: white;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.15rem;
+    }
+    .quote-remove:disabled { opacity: .3; cursor: not-allowed; }
+    .plan-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+    .trajectory-editor {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fbfbfc;
+    }
+    .trajectory-intro {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: end;
+      padding: 2px 2px 8px;
+    }
+    .trajectory-intro h3 { margin: 0 0 5px; font-size: 1.08rem; }
+    .trajectory-intro p { margin: 0; color: var(--muted); font-size: .88rem; }
+    .trajectory-row {
+      padding: 12px 12px 8px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+    }
+    .trajectory-row-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 5px;
+    }
+    .trajectory-row-head strong { display: inline-flex; align-items: center; gap: 8px; }
+    .trajectory-row-meta { color: var(--muted); font-size: .82rem; white-space: nowrap; }
+    .trajectory-svg { display: block; width: 100%; height: 150px; overflow: visible; }
+    .trajectory-handle { cursor: ns-resize; touch-action: none; outline: none; }
+    .trajectory-handle:focus { stroke-width: 6; }
+    .stage-grid {
+      display: grid;
+      gap: 4px;
+      margin: 1px 28px 0;
+      color: var(--muted);
+      font-size: .72rem;
+      text-align: center;
+    }
+    .stage-grid span:first-child { color: var(--ink); font-weight: 750; }
+    .time-band {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 14px;
+      border-top: 1px dashed #cfd1d6;
+    }
+    .time-cell {
+      min-width: 0;
+      padding: 10px 8px;
+      border-radius: 12px;
+      background: white;
+      text-align: center;
+    }
+    .time-cell strong { display: block; margin-bottom: 2px; font-size: .78rem; }
+    .time-cell span { display: block; overflow: hidden; color: var(--muted); font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+    .journey-list { display: grid; gap: 9px; }
+    .journey-step {
+      padding: 12px 13px;
+      border-left: 4px solid var(--ink);
+      border-radius: 9px 13px 13px 9px;
+      background: var(--soft);
+    }
+    .journey-step[data-category="essential"] { border-left-color: #e3262e; }
+    .journey-step[data-category="needs"] { border-left-color: #1473e6; }
+    .journey-step[data-category="strategic"] { border-left-color: #7137b9; }
+    .journey-step strong { display: block; margin-bottom: 2px; }
+    .journey-step span { color: var(--muted); font-size: .84rem; }
+    .trajectory-result-list { display: grid; gap: 9px; }
+    .trajectory-result-row {
+      padding: 11px 12px 7px;
+      border-radius: 14px;
+      background: var(--soft);
+    }
+    .trajectory-result-row .trajectory-svg { height: 118px; }
+    @media (max-width: 760px) {
+      .plan-head, .trajectory-intro { align-items: stretch; flex-direction: column; }
+      .quote-card { grid-template-columns: 1fr 1fr; }
+      .quote-step { grid-column: 1 / -1; }
+      .quote-field:first-of-type { grid-column: 1 / -1; }
+      .quote-remove { justify-self: end; }
+      .trajectory-row-head { align-items: flex-start; flex-direction: column; }
+      .trajectory-row-meta { white-space: normal; }
+      .stage-grid { margin-inline: 12px; font-size: .65rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -913,6 +1066,12 @@
       patient: {},
       clinician: {},
       objective: {},
+      quotes: [
+        {id:'q1', title:'Devis Essentiels', category:'essential', window:'Maintenant'},
+        {id:'q2', title:'Devis Besoins patient', category:'needs', window:'3 à 12 mois'},
+        {id:'q3', title:'Proposition stratégique', category:'strategic', window:'12 à 36 mois'}
+      ],
+      trajectory: {},
       resultView: 'comparison',
       filter: 'treatment'
     };
@@ -938,6 +1097,12 @@
       state.patient = {};
       state.clinician = {};
       state.objective = {};
+      state.quotes = [
+        {id:'q1', title:'Devis Essentiels', category:'essential', window:'Maintenant'},
+        {id:'q2', title:'Devis Besoins patient', category:'needs', window:'3 à 12 mois'},
+        {id:'q3', title:'Proposition stratégique', category:'strategic', window:'12 à 36 mois'}
+      ];
+      state.trajectory = {};
       state.resultView = 'comparison';
       state.filter = 'treatment';
       render();
@@ -954,6 +1119,7 @@
       else if (state.phase === 'question') renderQuestion();
       else if (state.phase === 'handoff') renderHandoff();
       else if (state.phase === 'projection') renderProjectionHandoff();
+      else if (state.phase === 'plan') renderTreatmentPlan();
       else renderResults();
     }
 
@@ -1096,8 +1262,9 @@
           state.phase = 'projection';
           render();
         } else {
-          state.phase = 'results';
+          state.phase = 'plan';
           state.filter = 'treatment';
+          ensureTrajectory(true);
           render();
         }
       });
@@ -1132,8 +1299,8 @@
           <div class="handoff-inner">
             <div class="checkmark" aria-hidden="true">→</div>
             <p class="eyebrow">Après l’évaluation clinique</p>
-            <h1>Évaluons maintenant l’effet du traitement.</h1>
-            <p class="lead">Pour chacun des six critères, le praticien indique la note qu’il pense pouvoir atteindre avec la solution proposée.</p>
+            <h1>Définissons d’abord l’objectif final.</h1>
+            <p class="lead">Pour chacun des six critères, le praticien indique la note attendue à l’issue du parcours. L’étape suivante répartira ensuite ce progrès entre les devis successifs.</p>
             <div class="privacy-pill">◉ Cet objectif est une estimation clinique, pas une garantie.</div><br>
             <button class="btn btn-primary" id="objectiveBtn" type="button">Définir l’objectif après traitement</button>
           </div>
@@ -1148,6 +1315,255 @@
       });
     }
 
+
+function quoteCategoryLabel(category) {
+  return ({essential:'Essentiels', needs:'Besoins patient', strategic:'Proposition stratégique'})[category] || 'Étape';
+}
+
+function clampTreatmentScore(value) {
+  return Math.max(0, Math.min(10, Math.round(Number(value) || 0)));
+}
+
+function ensureTrajectory(force) {
+  const count = Math.max(1, state.quotes.length);
+  criteria.forEach(criterion => {
+    const start = clampTreatmentScore(state.clinician[criterion.id]);
+    const end = clampTreatmentScore(state.objective[criterion.id]);
+    const existing = state.trajectory[criterion.id];
+    if (force || !Array.isArray(existing) || existing.length !== count + 1) {
+      state.trajectory[criterion.id] = Array.from({length: count + 1}, (_, index) => {
+        if (index === 0) return start;
+        if (index === count) return end;
+        return clampTreatmentScore(start + (end - start) * index / count);
+      });
+    } else {
+      existing[0] = start;
+      existing[count] = end;
+    }
+  });
+}
+
+function resampleTrajectory(oldCount, newCount) {
+  criteria.forEach(criterion => {
+    const start = clampTreatmentScore(state.clinician[criterion.id]);
+    const end = clampTreatmentScore(state.objective[criterion.id]);
+    const oldValues = Array.isArray(state.trajectory[criterion.id]) && state.trajectory[criterion.id].length === oldCount + 1
+      ? state.trajectory[criterion.id].slice()
+      : [start, end];
+    const sourceCount = Math.max(1, oldValues.length - 1);
+    const values = Array.from({length: newCount + 1}, (_, index) => {
+      if (index === 0) return start;
+      if (index === newCount) return end;
+      const position = (index / newCount) * sourceCount;
+      const lower = Math.floor(position);
+      const upper = Math.min(sourceCount, Math.ceil(position));
+      const ratio = position - lower;
+      return clampTreatmentScore(oldValues[lower] + (oldValues[upper] - oldValues[lower]) * ratio);
+    });
+    state.trajectory[criterion.id] = values;
+  });
+}
+
+function trajectoryCoordinates(criterionId) {
+  ensureTrajectory(false);
+  const values = state.trajectory[criterionId];
+  const width = 900;
+  const height = 150;
+  const left = 30;
+  const right = 30;
+  const top = 18;
+  const bottom = 24;
+  const usableW = width - left - right;
+  const usableH = height - top - bottom;
+  return values.map((value, index) => ({
+    x: left + (index / Math.max(1, values.length - 1)) * usableW,
+    y: top + ((10 - value) / 10) * usableH,
+    value
+  }));
+}
+
+function trajectoryPath(criterionId) {
+  const points = trajectoryCoordinates(criterionId);
+  return points.map((point, index) => (index ? 'L ' : 'M ') + point.x.toFixed(1) + ' ' + point.y.toFixed(1)).join(' ');
+}
+
+function trajectorySvgMarkup(criterion, editable) {
+  const points = trajectoryCoordinates(criterion.id);
+  const grid = [0,5,10].map(value => {
+    const y = 18 + ((10 - value) / 10) * 108;
+    return '<line x1="30" y1="' + y + '" x2="870" y2="' + y + '" stroke="#e6e7ea" stroke-width="1"/><text x="7" y="' + (y + 4) + '" fill="#8a8d94" font-size="10">' + value + '</text>';
+  }).join('');
+  const verticals = points.map(point => '<line x1="' + point.x + '" y1="18" x2="' + point.x + '" y2="126" stroke="#f0f1f3" stroke-width="1"/>').join('');
+  const handles = points.map((point, index) => {
+    const fixed = index === 0;
+    const radius = fixed ? 7 : (editable ? 10 : 7);
+    const klass = editable && !fixed ? 'trajectory-handle' : '';
+    const attrs = editable && !fixed
+      ? ' tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="10" aria-valuenow="' + point.value + '" data-criterion="' + criterion.id + '" data-stage="' + index + '"'
+      : '';
+    return '<g><circle id="handle-' + criterion.id + '-' + index + '" class="' + klass + '" cx="' + point.x + '" cy="' + point.y + '" r="' + radius + '" fill="' + (fixed ? '#101114' : criterion.color) + '" stroke="white" stroke-width="4"' + attrs + '></circle><text id="value-' + criterion.id + '-' + index + '" x="' + point.x + '" y="' + Math.max(13, point.y - 15) + '" text-anchor="middle" fill="' + (fixed ? '#101114' : criterion.color) + '" font-size="12" font-weight="800">' + point.value + '</text></g>';
+  }).join('');
+  return grid + verticals + '<path id="path-' + criterion.id + '" d="' + trajectoryPath(criterion.id) + '" fill="none" stroke="' + criterion.color + '" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".78"/>' + handles;
+}
+
+function treatmentStageGrid() {
+  const count = state.quotes.length + 1;
+  return '<div class="stage-grid" style="grid-template-columns:repeat(' + count + ',minmax(0,1fr))"><span>Aujourd’hui</span>' +
+    state.quotes.map((quote, index) => '<span>Étape ' + (index + 1) + '</span>').join('') + '</div>';
+}
+
+function treatmentTimeBand() {
+  const count = state.quotes.length + 1;
+  return '<div class="time-band" style="grid-template-columns:repeat(' + count + ',minmax(0,1fr))">' +
+    '<div class="time-cell"><strong>Aujourd’hui</strong><span>État actuel</span></div>' +
+    state.quotes.map((quote, index) => '<div class="time-cell"><strong>' + escapeHtml(quoteCategoryLabel(quote.category)) + '</strong><span>' + escapeHtml(quote.window || 'À définir') + '</span></div>').join('') +
+    '</div>';
+}
+
+function trajectoryEditorRow(criterion) {
+  ensureTrajectory(false);
+  const values = state.trajectory[criterion.id];
+  return '<article class="trajectory-row" data-trajectory-row="' + criterion.id + '">' +
+    '<div class="trajectory-row-head"><strong><i class="color-dot" style="--c:' + criterion.color + '"></i>' + criterion.name + '</strong>' +
+    '<span class="trajectory-row-meta">Aujourd’hui ' + values[0] + '/10 · Final ' + values[values.length - 1] + '/10</span></div>' +
+    '<svg class="trajectory-svg" data-trajectory-svg="' + criterion.id + '" viewBox="0 0 900 150" role="img" aria-label="Trajectoire ' + criterion.name + '">' +
+    trajectorySvgMarkup(criterion, true) + '</svg>' + treatmentStageGrid() + '</article>';
+}
+
+function quoteCard(quote, index) {
+  return '<article class="quote-card" data-quote="' + quote.id + '">' +
+    '<div class="quote-step">Étape ' + (index + 1) + '</div>' +
+    '<div class="quote-field"><label>Référence ou nom du devis</label><input type="text" data-quote-title="' + index + '" value="' + escapeHtml(quote.title) + '" placeholder="Ex. Devis 2418"></div>' +
+    '<div class="quote-field"><label>Position dans la méthode</label><select data-quote-category="' + index + '">' +
+      '<option value="essential"' + (quote.category === 'essential' ? ' selected' : '') + '>Essentiels</option>' +
+      '<option value="needs"' + (quote.category === 'needs' ? ' selected' : '') + '>Besoins patient</option>' +
+      '<option value="strategic"' + (quote.category === 'strategic' ? ' selected' : '') + '>Proposition stratégique</option>' +
+    '</select></div>' +
+    '<div class="quote-field"><label>Fenêtre thérapeutique</label><input type="text" list="timeWindows" data-quote-window="' + index + '" value="' + escapeHtml(quote.window) + '" placeholder="Ex. 6 à 18 mois"></div>' +
+    '<button class="quote-remove" type="button" data-remove-quote="' + index + '" aria-label="Supprimer cette étape"' + (state.quotes.length <= 1 ? ' disabled' : '') + '>×</button>' +
+    '</article>';
+}
+
+function renderTreatmentPlan() {
+  ensureTrajectory(false);
+  setRainbow();
+  document.documentElement.style.setProperty('--accent', '#101114');
+  app.innerHTML = '<section class="plan-screen">' +
+    '<div class="plan-head"><div><p class="method-signature">La Méthode SourirePlus</p><h1>Construisons le parcours.</h1>' +
+    '<p class="lead">Les devis restent détaillés dans ZaWin. Ici, nous les positionnons dans la méthode, dans le temps, puis nous répartissons simplement l’objectif final entre les étapes.</p></div></div>' +
+    '<div class="quote-config">' + state.quotes.map(quoteCard).join('') + '</div>' +
+    '<datalist id="timeWindows"><option value="Maintenant"><option value="0 à 3 mois"><option value="3 à 6 mois"><option value="3 à 12 mois"><option value="6 à 18 mois"><option value="12 à 24 mois"><option value="12 à 36 mois"><option value="2 à 4 ans"><option value="À réévaluer"></datalist>' +
+    '<div class="plan-toolbar"><button class="btn btn-secondary" id="addQuoteBtn" type="button">+ Ajouter un devis</button><button class="btn btn-secondary" id="resetTrajectoryBtn" type="button">Répartir à nouveau régulièrement</button></div>' +
+    '<section class="trajectory-editor"><div class="trajectory-intro"><div><h3>Trajectoire attendue</h3><p>Les points sont régulièrement espacés par étape. Déplacez seulement les poignées verticalement ; la bande du bas porte le vrai temps thérapeutique.</p></div><div class="privacy-pill">◉ État actuel fixe · étapes ajustables</div></div>' +
+    criteria.map(trajectoryEditorRow).join('') + treatmentTimeBand() + '</section>' +
+    '<div class="scale-warning"><span aria-hidden="true">i</span><div><strong>Projection clinique.</strong> La trajectoire représente l’effet attendu des devis successifs. Les fenêtres thérapeutiques restent souples et pourront être réévaluées.</div></div>' +
+    '<div class="view-next"><button class="btn btn-primary" id="finishPlanBtn" type="button">Voir la restitution →</button></div></section>';
+  bindTreatmentPlan();
+}
+
+function updateTrajectoryDom(criterionId) {
+  const criterion = criteria.find(item => item.id === criterionId);
+  const row = document.querySelector('[data-trajectory-row="' + criterionId + '"]');
+  if (!criterion || !row) return;
+  const points = trajectoryCoordinates(criterionId);
+  const path = row.querySelector('#path-' + criterionId);
+  if (path) path.setAttribute('d', trajectoryPath(criterionId));
+  points.forEach((point, index) => {
+    const handle = row.querySelector('#handle-' + criterionId + '-' + index);
+    const value = row.querySelector('#value-' + criterionId + '-' + index);
+    if (handle) {
+      handle.setAttribute('cy', point.y);
+      if (index > 0) handle.setAttribute('aria-valuenow', point.value);
+    }
+    if (value) {
+      value.setAttribute('y', Math.max(13, point.y - 15));
+      value.textContent = point.value;
+    }
+  });
+  const meta = row.querySelector('.trajectory-row-meta');
+  const values = state.trajectory[criterionId];
+  if (meta) meta.textContent = 'Aujourd’hui ' + values[0] + '/10 · Final ' + values[values.length - 1] + '/10';
+}
+
+function setTrajectoryPoint(criterionId, stage, score) {
+  ensureTrajectory(false);
+  const values = state.trajectory[criterionId];
+  if (!values || stage <= 0 || stage >= values.length) return;
+  values[stage] = clampTreatmentScore(score);
+  if (stage === values.length - 1) state.objective[criterionId] = values[stage];
+  updateTrajectoryDom(criterionId);
+}
+
+function bindTreatmentPlan() {
+  document.querySelectorAll('[data-quote-title]').forEach(input => input.addEventListener('input', event => {
+    state.quotes[Number(event.target.dataset.quoteTitle)].title = event.target.value;
+  }));
+  document.querySelectorAll('[data-quote-category]').forEach(select => select.addEventListener('change', event => {
+    state.quotes[Number(event.target.dataset.quoteCategory)].category = event.target.value;
+    renderTreatmentPlan();
+  }));
+  document.querySelectorAll('[data-quote-window]').forEach(input => input.addEventListener('change', event => {
+    state.quotes[Number(event.target.dataset.quoteWindow)].window = event.target.value;
+    renderTreatmentPlan();
+  }));
+  document.querySelectorAll('[data-remove-quote]').forEach(button => button.addEventListener('click', event => {
+    if (state.quotes.length <= 1) return;
+    const oldCount = state.quotes.length;
+    state.quotes.splice(Number(event.currentTarget.dataset.removeQuote), 1);
+    resampleTrajectory(oldCount, state.quotes.length);
+    renderTreatmentPlan();
+  }));
+  document.getElementById('addQuoteBtn').addEventListener('click', () => {
+    const oldCount = state.quotes.length;
+    const next = oldCount + 1;
+    state.quotes.push({id:'q' + Date.now(), title:'Devis ' + next, category:'strategic', window:'À définir'});
+    resampleTrajectory(oldCount, state.quotes.length);
+    renderTreatmentPlan();
+  });
+  document.getElementById('resetTrajectoryBtn').addEventListener('click', () => {
+    ensureTrajectory(true);
+    renderTreatmentPlan();
+  });
+  document.querySelectorAll('.trajectory-handle').forEach(handle => {
+    handle.addEventListener('pointerdown', event => {
+      const svg = event.currentTarget.closest('svg');
+      const criterionId = event.currentTarget.dataset.criterion;
+      const stage = Number(event.currentTarget.dataset.stage);
+      event.currentTarget.setPointerCapture(event.pointerId);
+      const move = moveEvent => {
+        const rect = svg.getBoundingClientRect();
+        const localY = ((moveEvent.clientY - rect.top) / Math.max(1, rect.height)) * 150;
+        const score = 10 - ((localY - 18) / 108) * 10;
+        setTrajectoryPoint(criterionId, stage, score);
+      };
+      const stop = stopEvent => {
+        try { event.currentTarget.releasePointerCapture(stopEvent.pointerId); } catch (_) {}
+        event.currentTarget.removeEventListener('pointermove', move);
+        event.currentTarget.removeEventListener('pointerup', stop);
+        event.currentTarget.removeEventListener('pointercancel', stop);
+      };
+      event.currentTarget.addEventListener('pointermove', move);
+      event.currentTarget.addEventListener('pointerup', stop);
+      event.currentTarget.addEventListener('pointercancel', stop);
+    });
+    handle.addEventListener('keydown', event => {
+      if (!['ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      const criterionId = event.currentTarget.dataset.criterion;
+      const stage = Number(event.currentTarget.dataset.stage);
+      const current = state.trajectory[criterionId][stage];
+      const next = event.key === 'ArrowUp' ? current + 1 : event.key === 'ArrowDown' ? current - 1 : event.key === 'Home' ? 0 : 10;
+      setTrajectoryPoint(criterionId, stage, next);
+    });
+  });
+  document.getElementById('finishPlanBtn').addEventListener('click', () => {
+    state.phase = 'results';
+    state.resultView = 'treatment';
+    state.filter = 'treatment';
+    render();
+  });
+}
+
     function renderResults() {
       setRainbow();
       document.documentElement.style.setProperty('--accent', '#101114');
@@ -1157,7 +1573,7 @@
             <div>
               <p class="method-signature">La Méthode SourirePlus</p>
               <h1>Quatre lectures pour<br>décider ensemble.</h1>
-              <p class="lead">Nous comparons d’abord votre perception au constat clinique, puis nous situons la solution à votre âge et montrons le résultat attendu.</p>
+              <p class="lead">Nous comparons d’abord votre perception au constat clinique, puis nous situons la solution à votre âge et montrons comment les devis successifs construisent le résultat attendu.</p>
             </div>
             <div class="results-actions">
               <button class="btn btn-secondary" id="printBtn" type="button">Imprimer</button>
@@ -1168,7 +1584,7 @@
           <nav class="result-tabs" aria-label="Les quatre lectures SourirePlus">
             ${resultTab('comparison', '1 · Ressenti & clinique')}
             ${resultTab('population', '2 · Solution & âge')}
-            ${resultTab('treatment', '3 · Avant & après')}
+            ${resultTab('treatment', '3 · Parcours de soins')}
             ${resultTab('summary', '4 · Synthèse')}
           </nav>
 
@@ -1212,13 +1628,9 @@
         renderChart();
       }
 
-      const editObjective = document.getElementById('editObjectiveBtn');
-      if (editObjective) editObjective.addEventListener('click', () => {
-        state.role = 'objective';
-        state.index = 0;
-        state.answer = null;
-        state.phase = 'question';
-        state.resultView = 'treatment';
+      const editPlan = document.getElementById('editPlanBtn');
+      if (editPlan) editPlan.addEventListener('click', () => {
+        state.phase = 'plan';
         render();
       });
 
@@ -1335,61 +1747,30 @@
       return 4;
     }
 
+    function resultTrajectoryRow(criterion) {
+      ensureTrajectory(false);
+      const values = state.trajectory[criterion.id];
+      return '<article class="trajectory-result-row"><div class="trajectory-row-head"><strong><i class="color-dot" style="--c:' + criterion.color + '"></i>' + criterion.name + '</strong><span class="trajectory-row-meta">' + values[0] + '/10 → ' + values[values.length - 1] + '/10</span></div><svg class="trajectory-svg" viewBox="0 0 900 150" role="img" aria-label="Parcours ' + criterion.name + '">' + trajectorySvgMarkup(criterion, false) + '</svg>' + treatmentStageGrid() + '</article>';
+    }
+    
     function treatmentView() {
-      return `
-        <section>
-          <div class="stage-head">
-            <div>
-              <p class="eyebrow">3 · Avant et après le traitement</p>
-              <h2>Voici ce que la solution devrait améliorer.</h2>
-              <p>Pour chaque critère, la note d’aujourd’hui est comparée à la note estimée après traitement.</p>
-            </div>
-            <div class="stage-actions">
-              <button class="btn btn-secondary" id="editObjectiveBtn" type="button">Modifier l’objectif</button>
-            </div>
-          </div>
-          <div class="legend" aria-label="Légende de la projection">
-            <span class="legend-item"><i class="legend-shape clinician"></i> Constat clinique</span>
-            <span class="legend-item"><i class="legend-shape objective"></i> Objectif après traitement</span>
-          </div>
-          <div class="visual-grid">
-            <div class="comparison-list">${criteria.map(treatmentRow).join('')}</div>
-            <aside class="panel">
-              <h3>Principaux changements</h3>
-              <div class="effect-list">${effectItems()}</div>
-            </aside>
-          </div>
-          <div class="scale-warning">
-            <span aria-hidden="true">i</span>
-            <div><strong>Un objectif, pas une promesse.</strong> Ces notes sont estimées à partir du jumeau numérique, des radios, de l’examen et de la solution choisie.</div>
-          </div>
-          <div class="view-next"><button class="btn btn-primary" type="button" data-next-view="summary">Voir les trois notes →</button></div>
-        </section>`;
+      ensureTrajectory(false);
+      return '<section><div class="stage-head"><div><p class="eyebrow">3 · Parcours de soins</p><h2>Le progrès se construit par étapes.</h2><p>Chaque devis correspond à une étape du parcours. Les points montrent l’évolution attendue des six notes ; la bande temporelle indique quand chaque étape devient favorable.</p></div><div class="stage-actions"><button class="btn btn-secondary" id="editPlanBtn" type="button">Modifier le parcours</button></div></div>' +
+        '<div class="visual-grid"><div><div class="trajectory-result-list">' + criteria.map(resultTrajectoryRow).join('') + '</div>' + treatmentTimeBand() + '</div><aside class="panel"><h3>Les étapes proposées</h3><div class="journey-list">' +
+        state.quotes.map((quote, index) => {
+          const mean = average(criteria.map(criterion => state.trajectory[criterion.id][index + 1]));
+          return '<div class="journey-step" data-category="' + quote.category + '"><strong>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</strong><span>' + escapeHtml(quoteCategoryLabel(quote.category)) + ' · ' + escapeHtml(quote.window || 'À définir') + ' · moyenne projetée ' + formatShortScore(mean) + '/10</span></div>';
+        }).join('') + '</div></aside></div>' +
+        '<div class="scale-warning"><span aria-hidden="true">i</span><div><strong>Une trajectoire, pas un calendrier rigide.</strong> Les fenêtres thérapeutiques peuvent être avancées, reportées ou réévaluées selon l’évolution clinique et les choix du patient.</div></div>' +
+        '<div class="view-next"><button class="btn btn-primary" type="button" data-next-view="summary">Voir les trois notes →</button></div></section>';
     }
-
+    
     function treatmentRow(c) {
-      const clinical = state.clinician[c.id];
-      const objective = state.objective[c.id];
-      const from = Math.min(clinical, objective);
-      const to = Math.max(clinical, objective);
-      return `<div class="comparison-row">
-        <div class="criterion-label"><i class="color-dot" style="--c:${c.color}"></i>${c.name}</div>
-        <div class="score-track" role="img" aria-label="${c.name} : constat clinique ${clinical}, objectif ${objective} sur 10">
-          <i class="impact-line" style="--from:${from};--to:${to}"></i>
-          <i class="track-marker clinical" style="--score:${clinical}"></i>
-          <i class="track-marker objective" style="--score:${objective}"></i>
-        </div>
-        <div class="comparison-values">Clinique <strong>${clinical}/10</strong> · Objectif <strong>${objective}/10</strong></div>
-      </div>`;
+      return resultTrajectoryRow(c);
     }
-
+    
     function effectItems() {
-      const effects = criteria
-        .map(c => ({c, delta: state.objective[c.id] - state.clinician[c.id]}))
-        .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
-      const changed = effects.filter(item => item.delta !== 0).slice(0, 3);
-      if (!changed.length) return '<p class="empty-discussion">Cette solution vise à maintenir les six critères à leur niveau actuel.</p>';
-      return changed.map(({c, delta}) => `<div class="effect-item" style="--c:${c.color}"><strong>${c.name} · ${delta > 0 ? '+' : '−'}${Math.abs(delta)} point${Math.abs(delta) > 1 ? 's' : ''}</strong><span>${state.clinician[c.id]}/10 aujourd’hui → ${state.objective[c.id]}/10 après traitement</span></div>`).join('');
+      return state.quotes.map((quote, index) => '<div class="effect-item"><strong>' + escapeHtml(quote.title) + '</strong><span>' + escapeHtml(quoteCategoryLabel(quote.category)) + ' · ' + escapeHtml(quote.window) + '</span></div>').join('');
     }
 
     function summaryView() {
@@ -1870,34 +2251,75 @@
     }
 
     function createTreatmentReportPage() {
+      ensureTrajectory(false);
       const page = makeReportPage(
-        '3 - Avant et après le traitement',
-        'L’effet attendu de la solution',
-        'Pour chaque critère, la situation actuelle est comparée à l’objectif estimé après traitement.',
+        '3 - Parcours de soins',
+        'Votre trajectoire thérapeutique',
+        'Les devis successifs construisent progressivement l’objectif final. Les étapes sont régulièrement espacées ; leurs fenêtres temporelles restent souples.',
         3
       );
       const ctx = page.ctx;
+      const xStart = 500;
+      const xEnd = 1460;
+      const count = Math.max(1, state.quotes.length);
       criteria.forEach((criterion, index) => {
-        const y = 330 + index * 113;
-        reportRoundRect(ctx, 80, y, 1440, 92, 18, '#ffffff', '#e1e2e5');
+        const y = 315 + index * 105;
+        reportRoundRect(ctx, 80, y, 1440, 88, 18, '#ffffff', '#e1e2e5');
         ctx.fillStyle = criterion.color;
         ctx.beginPath();
-        ctx.arc(111, y + 46, 8, 0, Math.PI * 2);
+        ctx.arc(111, y + 44, 8, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#101114';
-        ctx.font = '700 23px Arial, sans-serif';
-        ctx.fillText(criterion.name, 134, y + 42);
-        const delta = state.objective[criterion.id] - state.clinician[criterion.id];
-        ctx.fillStyle = delta === 0 ? '#6e7178' : '#078878';
-        ctx.font = '700 18px Arial, sans-serif';
-        ctx.fillText(delta === 0 ? 'Maintien' : (delta > 0 ? '+' : '') + delta + ' point' + (Math.abs(delta) === 1 ? '' : 's'), 134, y + 68);
-        drawReportTrack(ctx, 520, y + 46, 650, null, state.clinician[criterion.id], state.objective[criterion.id]);
-        ctx.fillStyle = '#101114';
-        ctx.font = '700 20px Arial, sans-serif';
-        ctx.fillText('Clinique ' + state.clinician[criterion.id] + '/10', 1215, y + 36);
-        ctx.fillStyle = '#078878';
-        ctx.fillText('Objectif ' + state.objective[criterion.id] + '/10', 1215, y + 65);
+        ctx.font = '700 22px Arial, sans-serif';
+        ctx.fillText(criterion.name, 134, y + 40);
+        const values = state.trajectory[criterion.id];
+        ctx.fillStyle = '#6e7178';
+        ctx.font = '400 16px Arial, sans-serif';
+        ctx.fillText(values[0] + '/10 → ' + values[values.length - 1] + '/10', 134, y + 64);
+        const pts = values.map((value, stage) => ({
+          x: xStart + (stage / count) * (xEnd - xStart),
+          y: y + 69 - value * 5
+        }));
+        ctx.strokeStyle = criterion.color;
+        ctx.lineWidth = 5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        pts.forEach((point, pointIndex) => {
+          if (pointIndex === 0) ctx.moveTo(point.x, point.y);
+          else ctx.lineTo(point.x, point.y);
+        });
+        ctx.stroke();
+        pts.forEach((point, pointIndex) => {
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, pointIndex === 0 ? 7 : 9, 0, Math.PI * 2);
+          ctx.fillStyle = pointIndex === 0 ? '#101114' : criterion.color;
+          ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.fillStyle = pointIndex === 0 ? '#101114' : criterion.color;
+          ctx.font = '700 14px Arial, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(String(values[pointIndex]), point.x, Math.max(y + 17, point.y - 13));
+        });
+        ctx.textAlign = 'left';
       });
+      const labelY = 985;
+      ctx.font = '700 14px Arial, sans-serif';
+      ctx.fillStyle = '#101114';
+      ctx.textAlign = 'center';
+      ctx.fillText('Aujourd’hui', xStart, labelY);
+      state.quotes.forEach((quote, index) => {
+        const x = xStart + ((index + 1) / count) * (xEnd - xStart);
+        ctx.fillStyle = '#101114';
+        ctx.font = '700 13px Arial, sans-serif';
+        ctx.fillText('Étape ' + (index + 1), x, labelY - 12);
+        ctx.fillStyle = '#6e7178';
+        ctx.font = '400 12px Arial, sans-serif';
+        ctx.fillText((quote.window || 'À définir').slice(0, 18), x, labelY + 10);
+      });
+      ctx.textAlign = 'left';
       return page.canvas;
     }
 
@@ -2027,7 +2449,7 @@
       const status = document.getElementById('reportStatus');
       button.disabled = true;
       button.textContent = 'Création en cours…';
-      status.textContent = 'Préparation des quatre pages.';
+      status.textContent = 'Préparation des quatre pages, dont le parcours thérapeutique.';
       try {
         if (document.fonts && document.fonts.ready) await document.fonts.ready;
         const pages = [
