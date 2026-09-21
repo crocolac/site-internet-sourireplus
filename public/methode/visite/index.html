@@ -28,6 +28,55 @@
       --shadow: 0 24px 70px rgba(16, 17, 20, .10);
     }
 
+    .finance-frame {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr);
+      gap: 18px;
+      margin-bottom: 24px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #f7f8fa;
+    }
+    .finance-frame h3 { margin: 0 0 6px; font-size: 1.08rem; }
+    .finance-frame p { margin: 0; color: var(--muted); font-size: .88rem; }
+    .finance-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+    .finance-field { display: grid; gap: 6px; }
+    .finance-field label { color: var(--muted); font-size: .76rem; font-weight: 750; }
+    .money-input {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      min-height: 48px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+    }
+    .money-input input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font-size: 1rem;
+    }
+    .money-input span { color: var(--muted); font-size: .82rem; font-weight: 750; }
+    .finance-rule {
+      grid-column: 1 / -1;
+      padding-top: 4px;
+      color: #555861;
+      font-size: .82rem;
+    }
+    .finance-rule strong { color: var(--ink); }
+
+
     * { box-sizing: border-box; }
     html { color-scheme: light; }
     body {
@@ -853,7 +902,7 @@
     }
     .quote-card {
       display: grid;
-      grid-template-columns: 78px minmax(180px, 1.2fr) minmax(170px, .8fr) minmax(170px, .8fr) 44px;
+      grid-template-columns: 72px minmax(170px, 1.15fr) minmax(140px, .65fr) minmax(155px, .75fr) minmax(155px, .75fr) 44px;
       gap: 10px;
       align-items: end;
       padding: 14px;
@@ -957,6 +1006,9 @@
     }
     .time-cell strong { display: block; margin-bottom: 2px; font-size: .78rem; }
     .time-cell span { display: block; overflow: hidden; color: var(--muted); font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+    .time-cell em { display: block; margin-top: 4px; color: #555861; font-size: .69rem; font-style: normal; line-height: 1.25; }
+    .time-cell b { display: block; margin-top: 5px; color: var(--ink); font-size: .7rem; line-height: 1.25; }
+    .time-cell.warning b { color: #9b3f00; }
     .journey-list { display: grid; gap: 9px; }
     .journey-step {
       padding: 12px 13px;
@@ -977,6 +1029,8 @@
     }
     .trajectory-result-row .trajectory-svg { height: 118px; }
     @media (max-width: 760px) {
+      .finance-frame { grid-template-columns: 1fr; }
+      .finance-fields { grid-template-columns: 1fr; }
       .plan-head, .trajectory-intro { align-items: stretch; flex-direction: column; }
       .quote-card { grid-template-columns: 1fr 1fr; }
       .quote-step { grid-column: 1 / -1; }
@@ -1066,10 +1120,11 @@
       patient: {},
       clinician: {},
       objective: {},
+      finance: {immediate:null, monthly:null},
       quotes: [
-        {id:'q1', title:'Devis Essentiels', category:'essential', window:'Maintenant'},
-        {id:'q2', title:'Devis Besoins patient', category:'needs', window:'3 à 12 mois'},
-        {id:'q3', title:'Proposition stratégique', category:'strategic', window:'12 à 36 mois'}
+        {id:'q1', title:'Devis Essentiels', category:'essential', window:'Maintenant', amount:null},
+        {id:'q2', title:'Devis Besoins patient', category:'needs', window:'3 à 12 mois', amount:null},
+        {id:'q3', title:'Proposition stratégique', category:'strategic', window:'12 à 36 mois', amount:null}
       ],
       trajectory: {},
       resultView: 'comparison',
@@ -1097,10 +1152,11 @@
       state.patient = {};
       state.clinician = {};
       state.objective = {};
+      state.finance = {immediate:null, monthly:null};
       state.quotes = [
-        {id:'q1', title:'Devis Essentiels', category:'essential', window:'Maintenant'},
-        {id:'q2', title:'Devis Besoins patient', category:'needs', window:'3 à 12 mois'},
-        {id:'q3', title:'Proposition stratégique', category:'strategic', window:'12 à 36 mois'}
+        {id:'q1', title:'Devis Essentiels', category:'essential', window:'Maintenant', amount:null},
+        {id:'q2', title:'Devis Besoins patient', category:'needs', window:'3 à 12 mois', amount:null},
+        {id:'q3', title:'Proposition stratégique', category:'strategic', window:'12 à 36 mois', amount:null}
       ];
       state.trajectory = {};
       state.resultView = 'comparison';
@@ -1319,6 +1375,66 @@
 function quoteCategoryLabel(category) {
   return ({essential:'Essentiels', needs:'Besoins patient', strategic:'Proposition stratégique'})[category] || 'Étape';
 }
+function moneyValue(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : null;
+}
+function moneyLabel(value) {
+  const number = moneyValue(value);
+  if (number === null) return '—';
+  return Math.round(number).toLocaleString('fr-CH') + ' CHF';
+}
+function therapeuticWindowBounds(label) {
+  const windows = {
+    'Maintenant':[0,1],
+    '0 à 3 mois':[0,3],
+    '3 à 6 mois':[3,6],
+    '3 à 12 mois':[3,12],
+    '6 à 18 mois':[6,18],
+    '12 à 24 mois':[12,24],
+    '12 à 36 mois':[12,36],
+    '2 à 4 ans':[24,48],
+    'À réévaluer':[null,null]
+  };
+  return windows[label] || [null,null];
+}
+function financialSchedule() {
+  const immediate = moneyValue(state.finance.immediate);
+  const monthly = moneyValue(state.finance.monthly);
+  let previousTotal = 0;
+  return state.quotes.map(quote => {
+    const amount = moneyValue(quote.amount);
+    if (amount === null || amount <= 0 || immediate === null) {
+      previousTotal += amount || 0;
+      return {month:null, threshold:null, amount};
+    }
+    const threshold = previousTotal + amount * .5;
+    let month = null;
+    if (immediate >= threshold) month = 0;
+    else if (monthly !== null && monthly > 0) month = Math.ceil((threshold - immediate) / monthly);
+    previousTotal += amount;
+    return {month, threshold, amount};
+  });
+}
+function monthLabel(month) {
+  if (month === null || month === undefined) return 'à calculer';
+  if (month <= 0) return 'dès maintenant';
+  if (month === 1) return 'dès 1 mois';
+  return 'dès ' + month + ' mois';
+}
+function combinedWindow(quote, financialMonth) {
+  const bounds = therapeuticWindowBounds(quote.window);
+  const min = bounds[0];
+  const max = bounds[1];
+  if (min === null && max === null) return {label:'à réévaluer', warning:false};
+  if (financialMonth === null || financialMonth === undefined) return {label:quote.window, warning:false};
+  const start = Math.max(min || 0, financialMonth);
+  if (max !== null && start > max) return {label:'à réévaluer : financement après la fenêtre clinique', warning:true};
+  if (max === null) return {label:monthLabel(start), warning:false};
+  if (start === max) return {label:'vers ' + start + ' mois', warning:false};
+  if (start <= 0 && max <= 1) return {label:'maintenant', warning:false};
+  return {label:start + ' à ' + max + ' mois', warning:false};
+}
 
 function clampTreatmentScore(value) {
   return Math.max(0, Math.min(10, Math.round(Number(value) || 0)));
@@ -1414,9 +1530,17 @@ function treatmentStageGrid() {
 
 function treatmentTimeBand() {
   const count = state.quotes.length + 1;
+  const finance = financialSchedule();
   return '<div class="time-band" style="grid-template-columns:repeat(' + count + ',minmax(0,1fr))">' +
-    '<div class="time-cell"><strong>Aujourd’hui</strong><span>État actuel</span></div>' +
-    state.quotes.map((quote, index) => '<div class="time-cell"><strong>' + escapeHtml(quoteCategoryLabel(quote.category)) + '</strong><span>' + escapeHtml(quote.window || 'À définir') + '</span></div>').join('') +
+    '<div class="time-cell"><strong>Aujourd’hui</strong><span>État actuel</span><em>Point de départ</em></div>' +
+    state.quotes.map((quote, index) => {
+      const timing = finance[index];
+      const proposed = combinedWindow(quote, timing.month);
+      return '<div class="time-cell ' + (proposed.warning ? 'warning' : '') + '"><strong>' + escapeHtml(quoteCategoryLabel(quote.category)) + '</strong>' +
+        '<span>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</span>' +
+        '<em>Clinique : ' + escapeHtml(quote.window || 'À définir') + '<br>Financier : ' + escapeHtml(monthLabel(timing.month)) + '</em>' +
+        '<b>Fenêtre proposée : ' + escapeHtml(proposed.label) + '</b></div>';
+    }).join('') +
     '</div>';
 }
 
@@ -1431,15 +1555,19 @@ function trajectoryEditorRow(criterion) {
 }
 
 function quoteCard(quote, index) {
+  const windows = ['Maintenant','0 à 3 mois','3 à 6 mois','3 à 12 mois','6 à 18 mois','12 à 24 mois','12 à 36 mois','2 à 4 ans','À réévaluer'];
   return '<article class="quote-card" data-quote="' + quote.id + '">' +
     '<div class="quote-step">Étape ' + (index + 1) + '</div>' +
     '<div class="quote-field"><label>Référence ou nom du devis</label><input type="text" data-quote-title="' + index + '" value="' + escapeHtml(quote.title) + '" placeholder="Ex. Devis 2418"></div>' +
+    '<div class="quote-field"><label>Montant du devis</label><div class="money-input"><input type="number" min="0" step="50" inputmode="decimal" data-quote-amount="' + index + '" value="' + (moneyValue(quote.amount) === null ? '' : moneyValue(quote.amount)) + '" placeholder="0"><span>CHF</span></div></div>' +
     '<div class="quote-field"><label>Position dans la méthode</label><select data-quote-category="' + index + '">' +
       '<option value="essential"' + (quote.category === 'essential' ? ' selected' : '') + '>Essentiels</option>' +
       '<option value="needs"' + (quote.category === 'needs' ? ' selected' : '') + '>Besoins patient</option>' +
       '<option value="strategic"' + (quote.category === 'strategic' ? ' selected' : '') + '>Proposition stratégique</option>' +
     '</select></div>' +
-    '<div class="quote-field"><label>Fenêtre thérapeutique</label><input type="text" list="timeWindows" data-quote-window="' + index + '" value="' + escapeHtml(quote.window) + '" placeholder="Ex. 6 à 18 mois"></div>' +
+    '<div class="quote-field"><label>Fenêtre clinique favorable</label><select data-quote-window="' + index + '">' +
+      windows.map(value => '<option value="' + value + '"' + (quote.window === value ? ' selected' : '') + '>' + value + '</option>').join('') +
+    '</select></div>' +
     '<button class="quote-remove" type="button" data-remove-quote="' + index + '" aria-label="Supprimer cette étape"' + (state.quotes.length <= 1 ? ' disabled' : '') + '>×</button>' +
     '</article>';
 }
@@ -1451,8 +1579,11 @@ function renderTreatmentPlan() {
   app.innerHTML = '<section class="plan-screen">' +
     '<div class="plan-head"><div><p class="method-signature">La Méthode SourirePlus</p><h1>Construisons le parcours.</h1>' +
     '<p class="lead">Les devis restent détaillés dans ZaWin. Ici, nous les positionnons dans la méthode, dans le temps, puis nous répartissons simplement l’objectif final entre les étapes.</p></div></div>' +
+    '<section class="finance-frame"><div><h3>Pour adapter le rythme de votre parcours</h3><p>Ces montants servent uniquement à positionner les étapes dans le temps. Ils ne modifient jamais les priorités médicales.</p></div>' +
+    '<div class="finance-fields"><div class="finance-field"><label>Montant que vous souhaitez mobiliser maintenant</label><div class="money-input"><input id="financeImmediate" type="number" min="0" step="50" inputmode="decimal" value="' + (moneyValue(state.finance.immediate) === null ? '' : moneyValue(state.finance.immediate)) + '" placeholder="Ex. 3000"><span>CHF</span></div></div>' +
+    '<div class="finance-field"><label>Rythme mensuel que vous souhaitez consacrer au parcours</label><div class="money-input"><input id="financeMonthly" type="number" min="0" step="50" inputmode="decimal" value="' + (moneyValue(state.finance.monthly) === null ? '' : moneyValue(state.finance.monthly)) + '" placeholder="Ex. 500"><span>CHF/mois</span></div></div>' +
+    '<div class="finance-rule"><strong>Règle de la clinique :</strong> 50 % du devis au démarrage. Une nouvelle étape ne commence qu’une fois la précédente intégralement réglée et 50 % de la suivante disponible. Les urgences restent hors de cette méthode.</div></div></section>' +
     '<div class="quote-config">' + state.quotes.map(quoteCard).join('') + '</div>' +
-    '<datalist id="timeWindows"><option value="Maintenant"><option value="0 à 3 mois"><option value="3 à 6 mois"><option value="3 à 12 mois"><option value="6 à 18 mois"><option value="12 à 24 mois"><option value="12 à 36 mois"><option value="2 à 4 ans"><option value="À réévaluer"></datalist>' +
     '<div class="plan-toolbar"><button class="btn btn-secondary" id="addQuoteBtn" type="button">+ Ajouter un devis</button><button class="btn btn-secondary" id="resetTrajectoryBtn" type="button">Répartir à nouveau régulièrement</button></div>' +
     '<section class="trajectory-editor"><div class="trajectory-intro"><div><h3>Trajectoire attendue</h3><p>Les points sont régulièrement espacés par étape. Déplacez seulement les poignées verticalement ; la bande du bas porte le vrai temps thérapeutique.</p></div><div class="privacy-pill">◉ État actuel fixe · étapes ajustables</div></div>' +
     criteria.map(trajectoryEditorRow).join('') + treatmentTimeBand() + '</section>' +
@@ -1495,8 +1626,22 @@ function setTrajectoryPoint(criterionId, stage, score) {
 }
 
 function bindTreatmentPlan() {
+  const immediate = document.getElementById('financeImmediate');
+  const monthly = document.getElementById('financeMonthly');
+  if (immediate) immediate.addEventListener('change', event => {
+    state.finance.immediate = event.target.value === '' ? null : Math.max(0, Number(event.target.value));
+    renderTreatmentPlan();
+  });
+  if (monthly) monthly.addEventListener('change', event => {
+    state.finance.monthly = event.target.value === '' ? null : Math.max(0, Number(event.target.value));
+    renderTreatmentPlan();
+  });
   document.querySelectorAll('[data-quote-title]').forEach(input => input.addEventListener('input', event => {
     state.quotes[Number(event.target.dataset.quoteTitle)].title = event.target.value;
+  }));
+  document.querySelectorAll('[data-quote-amount]').forEach(input => input.addEventListener('change', event => {
+    state.quotes[Number(event.target.dataset.quoteAmount)].amount = event.target.value === '' ? null : Math.max(0, Number(event.target.value));
+    renderTreatmentPlan();
   }));
   document.querySelectorAll('[data-quote-category]').forEach(select => select.addEventListener('change', event => {
     state.quotes[Number(event.target.dataset.quoteCategory)].category = event.target.value;
@@ -1516,7 +1661,7 @@ function bindTreatmentPlan() {
   document.getElementById('addQuoteBtn').addEventListener('click', () => {
     const oldCount = state.quotes.length;
     const next = oldCount + 1;
-    state.quotes.push({id:'q' + Date.now(), title:'Devis ' + next, category:'strategic', window:'À définir'});
+    state.quotes.push({id:'q' + Date.now(), title:'Devis ' + next, category:'strategic', window:'À réévaluer', amount:null});
     resampleTrajectory(oldCount, state.quotes.length);
     renderTreatmentPlan();
   });
@@ -1759,7 +1904,7 @@ function bindTreatmentPlan() {
         '<div class="visual-grid"><div><div class="trajectory-result-list">' + criteria.map(resultTrajectoryRow).join('') + '</div>' + treatmentTimeBand() + '</div><aside class="panel"><h3>Les étapes proposées</h3><div class="journey-list">' +
         state.quotes.map((quote, index) => {
           const mean = average(criteria.map(criterion => state.trajectory[criterion.id][index + 1]));
-          return '<div class="journey-step" data-category="' + quote.category + '"><strong>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</strong><span>' + escapeHtml(quoteCategoryLabel(quote.category)) + ' · ' + escapeHtml(quote.window || 'À définir') + ' · moyenne projetée ' + formatShortScore(mean) + '/10</span></div>';
+          return '<div class="journey-step" data-category="' + quote.category + '"><strong>' + escapeHtml(quote.title || ('Étape ' + (index + 1))) + '</strong><span>' + escapeHtml(quoteCategoryLabel(quote.category)) + ' · ' + escapeHtml(moneyLabel(quote.amount)) + ' · clinique ' + escapeHtml(quote.window || 'À définir') + ' · moyenne projetée ' + formatShortScore(mean) + '/10</span></div>';
         }).join('') + '</div></aside></div>' +
         '<div class="scale-warning"><span aria-hidden="true">i</span><div><strong>Une trajectoire, pas un calendrier rigide.</strong> Les fenêtres thérapeutiques peuvent être avancées, reportées ou réévaluées selon l’évolution clinique et les choix du patient.</div></div>' +
         '<div class="view-next"><button class="btn btn-primary" type="button" data-next-view="summary">Voir les trois notes →</button></div></section>';
