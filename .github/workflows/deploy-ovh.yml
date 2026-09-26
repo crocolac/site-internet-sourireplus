@@ -44,6 +44,17 @@ jobs:
           META_PAGE_ID: ${{ secrets.META_PAGE_ID }}
           META_PAGE_ACCESS_TOKEN: ${{ secrets.META_PAGE_ACCESS_TOKEN }}
           META_INSTAGRAM_USER_ID: ${{ secrets.META_INSTAGRAM_USER_ID }}
+          META_PRO_LABEL: ${{ secrets.META_PRO_LABEL }}
+          META_PRO_PAGE_ID: ${{ secrets.META_PRO_PAGE_ID }}
+          META_PRO_PAGE_ACCESS_TOKEN: ${{ secrets.META_PRO_PAGE_ACCESS_TOKEN }}
+          META_PRO_INSTAGRAM_USER_ID: ${{ secrets.META_PRO_INSTAGRAM_USER_ID }}
+          META_PRO_INSTAGRAM_ACCOUNT_TYPE: ${{ secrets.META_PRO_INSTAGRAM_ACCOUNT_TYPE }}
+          META_PRIVATE_LABEL: ${{ secrets.META_PRIVATE_LABEL }}
+          META_PRIVATE_KIND: ${{ secrets.META_PRIVATE_KIND }}
+          META_PRIVATE_PAGE_ID: ${{ secrets.META_PRIVATE_PAGE_ID }}
+          META_PRIVATE_PAGE_ACCESS_TOKEN: ${{ secrets.META_PRIVATE_PAGE_ACCESS_TOKEN }}
+          META_PRIVATE_INSTAGRAM_USER_ID: ${{ secrets.META_PRIVATE_INSTAGRAM_USER_ID }}
+          META_PRIVATE_INSTAGRAM_ACCOUNT_TYPE: ${{ secrets.META_PRIVATE_INSTAGRAM_ACCOUNT_TYPE }}
         run: node scripts/write-social-hub-config.mjs
       - name: Validate Google Places access
         env:
