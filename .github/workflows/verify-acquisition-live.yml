@@ -1,0 +1,122 @@
+name: Verify live acquisition endpoints
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/verify-acquisition-live.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify public assets and protected endpoints without creating visits or bookings
+        env:
+          BUILD_REF: ${{ github.sha }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import time
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          # No credentials, patient data, valid visit IDs, reservations or SMS.
+          # OPTIONS and deliberately invalid POST bodies stop before application/database access.
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  return None
+
+          opener = urllib.request.build_opener(NoRedirect)
+          ref = urllib.parse.quote(os.environ['BUILD_REF'], safe='')
+          results = []
+
+          def request(url, method='GET', headers=None, data=None):
+              parsed = urllib.parse.urlsplit(url)
+              assert parsed.scheme == 'https' and parsed.hostname in {'sourireplus.ch', 'mydentalpass.ch'}
+              req = urllib.request.Request(url, method=method, data=data, headers={
+                  'User-Agent': 'SourirePlus-Deployment-Verification/1.0',
+                  'Cache-Control': 'no-cache',
+                  **(headers or {}),
+              })
+              try:
+                  response = opener.open(req, timeout=20)
+              except urllib.error.HTTPError as error:
+                  response = error
+              with response:
+                  content = response.read(8_000_001)
+                  assert len(content) <= 8_000_000, 'Unexpected response size'
+                  return response.status, response.headers, content
+
+          def check(condition, name):
+              if not condition:
+                  raise AssertionError(name)
+              results.append(name)
+              print('PASS ' + name)
+
+          endpoint = 'https://mydentalpass.ch/borne/ads-visit.php'
+          status, headers, body = request(endpoint, 'OPTIONS', {
+              'Origin': 'https://sourireplus.ch',
+              'Access-Control-Request-Method': 'POST',
+              'Access-Control-Request-Headers': 'content-type',
+          })
+          check(status == 204 and not body, 'CORS preflight available without an event')
+          check(headers.get('Access-Control-Allow-Origin') == 'https://sourireplus.ch', 'CORS origin restricted')
+          check(not headers.get('Access-Control-Allow-Credentials'), 'No cross-origin credentials requested')
+
+          status, headers, body = request(endpoint, 'POST', {
+              'Origin': 'https://sourireplus.ch', 'Content-Type': 'application/json',
+          }, b'{}')
+          check(status == 400 and json.loads(body) == {'ok': False, 'error': 'INVALID_REQUEST'}, 'New strict endpoint rejects invalid event before database access')
+
+          status, headers, body = request(endpoint, 'POST', {
+              'Origin': 'https://unapproved.example', 'Content-Type': 'application/json',
+          }, b'{}')
+          check(status == 403 and not headers.get('Access-Control-Allow-Origin'), 'Unapproved origin rejected without CORS allowance')
+
+          private = 'https://mydentalpass.ch/borne/admin/statistiques-publicite.php?verification=' + ref
+          status, headers, body = request(private)
+          location = urllib.parse.urljoin(private, headers.get('Location', ''))
+          check(status in (302, 303) and urllib.parse.urlsplit(location).path == '/borne/admin/index.php', 'Private dashboard redirects anonymous visitors to login')
+          check('no-store' in headers.get('Cache-Control', ''), 'Private response not cacheable')
+
+          # Allow the separately authorized static deployment to finish; no writes are made here.
+          for attempt in range(12):
+              try:
+                  status, headers, body = request('https://sourireplus.ch/mesure-publicitaire/?verification=' + ref)
+                  text = body.decode('utf-8').lower()
+                  if status == 200 and 'premier clic' in text and 'mesure des visites' in text:
+                      break
+              except (urllib.error.URLError, TimeoutError):
+                  pass
+              time.sleep(5)
+          else:
+              raise AssertionError('Updated measurement information not found')
+          check(True, 'Updated measurement information is live')
+
+          status, headers, body = request('https://sourireplus.ch/?verification=' + ref)
+          check(status == 200, 'Homepage is available')
+          assets = list(dict.fromkeys(re.findall(r'<script[^>]+src="([^"]+)"', body.decode('utf-8'))))
+          assert 0 < len(assets) <= 32, 'Unexpected script inventory'
+          found = False
+          for source in assets:
+              url = urllib.parse.urljoin('https://sourireplus.ch/', source)
+              if urllib.parse.urlsplit(url).hostname != 'sourireplus.ch':
+                  continue
+              status, headers, content = request(url)
+              if status == 200 and b'sourireplus-acquisition-v2' in content:
+                  found = True
+                  break
+          check(found, 'Homepage references the deployed acquisition client')
+          print('LIVE_ACQUISITION_CHECKS_OK: ' + str(len(results)) + ' checks; no visits, bookings, SMS or patient data created.')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as report:
+              report.write('## Live acquisition verification\n\n')
+              report.write('\n'.join('- PASS: ' + name for name in results))
+              report.write('\n\nNo authenticated session, valid tracking event, appointment or SMS was created.\n')
+          PY
