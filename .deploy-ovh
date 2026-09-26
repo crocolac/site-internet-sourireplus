@@ -33,3 +33,4 @@ Deploy trajectory segment colors and live global-score recalculation on 2026-09-
 Deploy smoothed treatment trajectories and restored life-stage age chart on 2026-09-22 UTC: treatment steps positioned by patient age and therapeutic/financial windows in web and PDF.
 Deploy simplified life-stage chart on 2026-09-22 UTC: no curve points, only dashed treatment verticals, alternating gray life-stage bands with labels, same in PDF.
 Deploy colored life-trajectory legend on 2026-09-22 UTC: remove solution-filter button, color criterion buttons, add six-curve legend to PDF.
+Deploy PR #43 after backend PR #55 on 2026-09-26 Europe/Zurich, as explicitly requested in the conversation: consented site and ChatGPT visits, first booking clicks and internal confirmed-booking attribution. Preserve the existing site, patient workflow and advertising budget. Real advertising costs remain imported separately.
