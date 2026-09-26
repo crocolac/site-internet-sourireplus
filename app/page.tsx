@@ -29,6 +29,7 @@ import {
 import { NeighborhoodMap } from "./NeighborhoodMap";
 import { SiteHeader } from "./SiteHeader";
 import { Topline } from "./Topline";
+import { AdAttribution, getAdAttribution } from "./AdAttribution";
 
 const services = [
   {
@@ -149,6 +150,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
               phone,
               need,
               existing_patient: existingPatient === "yes",
+              ad_attribution: await getAdAttribution(),
             }
           : { action: "manage_link", phone, code: code.trim() }),
       });
@@ -274,6 +276,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
 export default function Home() {
   return (
     <main id="accueil">
+      <AdAttribution />
       <Topline message="Nouveaux patients bienvenus" />
 
       <SiteHeader

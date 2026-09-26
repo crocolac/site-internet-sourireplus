@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SiteAcquisition } from "./AdAttribution";
 import {
   ADDRESS_LINE,
   CLINIC_GEO,
@@ -149,6 +150,7 @@ export default function RootLayout({
             object-position: center center;
           }
         `}</style>
+        <SiteAcquisition />
         {children}
         <script
           type="application/ld+json"

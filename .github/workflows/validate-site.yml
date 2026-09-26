@@ -18,10 +18,16 @@ jobs:
         with:
           node-version: 22
       - run: npm install --no-audit --no-fund
+      - name: Test consented acquisition client
+        run: |
+          npx tsc app/acquisition-client.ts --target ES2020 --module commonjs --lib ES2020,DOM --strict --skipLibCheck --outDir "$RUNNER_TEMP/acquisition-client"
+          ACQUISITION_COMPILED_DIR="$RUNNER_TEMP/acquisition-client" node tests/acquisition-client.cjs
       - run: npm run build
       - name: Verify static export
         run: |
           test -s out/index.html
+          test -s out/mesure-publicitaire/index.html
+          grep -R -q 'sourireplus-acquisition-v2' out/_next/static
           test -s out/methode/visite/index.html
           grep -q 'id="visitClinicLogo"' out/methode/visite/index.html
           grep -q 'await reportLogo.decode()' out/methode/visite/index.html
