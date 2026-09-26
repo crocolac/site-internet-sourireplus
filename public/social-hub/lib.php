@@ -40,7 +40,7 @@ function hub_authenticate(array $config): void
         ], 503);
     }
 
-    $header = (string)($_SERVER['HTTP_AUTHORIZATION'] ?? '');
+    $header = (string)($_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '');
     if (!preg_match('/^Bearer\s+(.+)$/i', $header, $matches)) {
         hub_json_response(['ok' => false, 'error' => 'UNAUTHORIZED'], 401);
     }
