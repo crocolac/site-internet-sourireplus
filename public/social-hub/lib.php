@@ -51,6 +51,45 @@ function hub_authenticate(array $config): void
     }
 }
 
+function hub_require_admin(array $config): void
+{
+    $expected = (string)($config['api_key'] ?? '');
+    if ($expected === '') {
+        return;
+    }
+
+    $provided = (string)($_SERVER['PHP_AUTH_PW'] ?? '');
+    if ($provided === '' || !hash_equals($expected, $provided)) {
+        header('WWW-Authenticate: Basic realm="SourirePlus Social Hub"');
+        http_response_code(401);
+        header('Content-Type: text/plain; charset=utf-8');
+        echo "Accès réservé au Social Hub.";
+        exit;
+    }
+}
+
+function hub_csrf_token(): string
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start([
+            'cookie_httponly' => true,
+            'cookie_samesite' => 'Strict',
+            'cookie_secure' => true,
+            'use_strict_mode' => true,
+        ]);
+    }
+    if (!isset($_SESSION['social_hub_csrf']) || !is_string($_SESSION['social_hub_csrf'])) {
+        $_SESSION['social_hub_csrf'] = bin2hex(random_bytes(24));
+    }
+    return $_SESSION['social_hub_csrf'];
+}
+
+function hub_validate_csrf(string $token): bool
+{
+    $expected = hub_csrf_token();
+    return $token !== '' && hash_equals($expected, $token);
+}
+
 function hub_read_json_body(): array
 {
     $raw = file_get_contents('php://input');
@@ -150,24 +189,50 @@ function hub_valid_platforms(mixed $platforms): array
     return $clean;
 }
 
-function hub_graph_post(string $url, array $params): array
+function hub_derive_title(string $caption): string
+{
+    $plain = trim(preg_replace('/\s+/u', ' ', strip_tags($caption)) ?? '');
+    if ($plain === '') {
+        return 'Publication sans titre';
+    }
+    if (function_exists('mb_substr')) {
+        $title = mb_substr($plain, 0, 72);
+        return mb_strlen($plain) > 72 ? rtrim($title) . '…' : $title;
+    }
+    $title = substr($plain, 0, 72);
+    return strlen($plain) > 72 ? rtrim($title) . '…' : $title;
+}
+
+function hub_graph_request(string $method, string $url, array $params): array
 {
     if (!function_exists('curl_init')) {
         throw new RuntimeException('PHP cURL extension is unavailable.');
     }
+
+    $method = strtoupper($method);
+    if ($method === 'DELETE' && $params !== []) {
+        $url .= (str_contains($url, '?') ? '&' : '?') . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+    }
+
     $ch = curl_init($url);
     if ($ch === false) {
         throw new RuntimeException('Unable to initialize cURL.');
     }
-    curl_setopt_array($ch, [
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => http_build_query($params, '', '&', PHP_QUERY_RFC3986),
+
+    $options = [
+        CURLOPT_CUSTOMREQUEST => $method,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_TIMEOUT => 30,
         CURLOPT_HTTPHEADER => ['Accept: application/json'],
-        CURLOPT_USERAGENT => 'SourirePlusSocialHub/1.0',
-    ]);
+        CURLOPT_USERAGENT => 'SourirePlusSocialHub/1.1',
+    ];
+    if ($method === 'POST') {
+        $options[CURLOPT_POST] = true;
+        $options[CURLOPT_POSTFIELDS] = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+    }
+    curl_setopt_array($ch, $options);
+
     $raw = curl_exec($ch);
     $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
     $error = curl_error($ch);
@@ -185,6 +250,64 @@ function hub_graph_post(string $url, array $params): array
         throw new RuntimeException('Meta API error: ' . $message);
     }
     return $decoded;
+}
+
+function hub_graph_post(string $url, array $params): array
+{
+    return hub_graph_request('POST', $url, $params);
+}
+
+function hub_delete_remote_object(array $config, string $objectId): array
+{
+    $version = (string)($config['graph_version'] ?? 'v26.0');
+    $token = (string)($config['page_access_token'] ?? '');
+    if ($token === '') {
+        throw new RuntimeException('Meta access token is not configured.');
+    }
+    if ($objectId === '') {
+        throw new RuntimeException('Remote publication id is missing.');
+    }
+
+    return hub_graph_request(
+        'DELETE',
+        sprintf('https://graph.facebook.com/%s/%s', rawurlencode($version), rawurlencode($objectId)),
+        ['access_token' => $token]
+    );
+}
+
+function hub_suspend_online(array $config, array $draft): array
+{
+    $results = (array)($draft['results'] ?? []);
+    $removal = [];
+    foreach ((array)($draft['platforms'] ?? []) as $platform) {
+        $platformResult = is_array($results[$platform] ?? null) ? $results[$platform] : [];
+        $objectId = (string)($platformResult['post_id'] ?? $platformResult['id'] ?? '');
+        if ($objectId === '') {
+            $removal[$platform] = [
+                'ok' => false,
+                'manual_action_required' => true,
+                'error' => 'Aucun identifiant distant enregistré pour cette publication.',
+            ];
+            continue;
+        }
+
+        try {
+            $remote = hub_delete_remote_object($config, $objectId);
+            $removal[$platform] = [
+                'ok' => true,
+                'object_id' => $objectId,
+                'response' => $remote,
+            ];
+        } catch (Throwable $exception) {
+            $removal[$platform] = [
+                'ok' => false,
+                'object_id' => $objectId,
+                'manual_action_required' => true,
+                'error' => $exception->getMessage(),
+            ];
+        }
+    }
+    return $removal;
 }
 
 function hub_publish_facebook(array $config, array $draft): array
