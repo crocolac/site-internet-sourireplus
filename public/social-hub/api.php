@@ -14,16 +14,31 @@ if ($method === 'OPTIONS') {
 }
 
 if ($method === 'GET' && $action === 'status') {
+    $accountStatus = [];
+    foreach (hub_accounts($config) as $key => $account) {
+        if (!is_array($account)) {
+            continue;
+        }
+        $accountStatus[$key] = [
+            'label' => (string)($account['label'] ?? ucfirst((string)$key)),
+            'kind' => (string)($account['kind'] ?? ''),
+            'facebook' => hub_account_ready($account, 'facebook'),
+            'instagram' => hub_account_ready($account, 'instagram'),
+            'instagram_account_type' => (string)($account['instagram_account_type'] ?? ''),
+        ];
+    }
+
     hub_json_response([
         'ok' => true,
         'service' => 'SourirePlus Social Hub',
-        'version' => '1.1.0',
+        'version' => '1.2.0',
         'graph_version' => (string)($config['graph_version'] ?? 'v26.0'),
         'configured' => [
             'api_key' => (string)($config['api_key'] ?? '') !== '',
-            'facebook' => (string)($config['page_id'] ?? '') !== '' && (string)($config['page_access_token'] ?? '') !== '',
-            'instagram' => (string)($config['instagram_user_id'] ?? '') !== '' && (string)($config['page_access_token'] ?? '') !== '',
+            'accounts' => $accountStatus,
         ],
+        'content_types' => ['post', 'reel', 'story'],
+        'platforms' => ['facebook', 'instagram'],
         'safety' => [
             'draft_required' => true,
             'approval_required' => true,
@@ -56,14 +71,30 @@ if ($action === 'draft') {
     if ($caption === '' || mb_strlen($caption) > 5000) {
         hub_json_response(['ok' => false, 'error' => 'INVALID_CAPTION'], 422);
     }
+
     $platforms = hub_valid_platforms($body['platforms'] ?? []);
     if ($platforms === []) {
         hub_json_response(['ok' => false, 'error' => 'INVALID_PLATFORMS'], 422);
     }
+
+    $contentType = hub_valid_content_type((string)($body['content_type'] ?? 'post'));
+    if ($contentType === '') {
+        hub_json_response(['ok' => false, 'error' => 'INVALID_CONTENT_TYPE'], 422);
+    }
+
+    $accountKey = trim((string)($body['account'] ?? 'pro'));
+    if (hub_account($config, $accountKey) === []) {
+        hub_json_response(['ok' => false, 'error' => 'INVALID_ACCOUNT'], 422);
+    }
+
     $mediaUrl = trim((string)($body['media_url'] ?? ''));
     if ($mediaUrl !== '' && filter_var($mediaUrl, FILTER_VALIDATE_URL) === false) {
         hub_json_response(['ok' => false, 'error' => 'INVALID_MEDIA_URL'], 422);
     }
+    if (in_array($contentType, ['reel', 'story'], true) && $mediaUrl === '') {
+        hub_json_response(['ok' => false, 'error' => 'MEDIA_REQUIRED'], 422);
+    }
+
     $title = trim((string)($body['title'] ?? ''));
     if ($title === '') {
         $title = hub_derive_title($caption);
@@ -77,8 +108,11 @@ if ($action === 'draft') {
         'id' => bin2hex(random_bytes(8)),
         'title' => $title,
         'caption' => $caption,
+        'content_type' => $contentType,
+        'account' => $accountKey,
         'platforms' => $platforms,
         'media_url' => $mediaUrl,
+        'share_to_feed' => !array_key_exists('share_to_feed', $body) || (bool)$body['share_to_feed'],
         'status' => 'draft',
         'created_at' => gmdate('c'),
         'approved_at' => null,
@@ -124,34 +158,63 @@ if ($action === 'publish') {
         hub_json_response(['ok' => false, 'error' => 'APPROVAL_REQUIRED'], 409);
     }
 
-    $results = [];
-    $errors = [];
-    foreach ((array)($drafts[$index]['platforms'] ?? []) as $platform) {
-        try {
-            if ($platform === 'facebook') {
-                $results['facebook'] = hub_publish_facebook($config, $drafts[$index]);
-            } elseif ($platform === 'instagram') {
-                $results['instagram'] = hub_publish_instagram($config, $drafts[$index]);
-            }
-        } catch (Throwable $exception) {
-            $errors[$platform] = $exception->getMessage();
-        }
+    try {
+        $publication = hub_publish_draft($config, $drafts[$index]);
+    } catch (Throwable $exception) {
+        hub_json_response([
+            'ok' => false,
+            'error' => 'PUBLISH_FAILED',
+            'message' => $exception->getMessage(),
+        ], 502);
     }
 
+    $results = (array)($publication['results'] ?? []);
+    $errors = (array)($publication['errors'] ?? []);
+    $manual = (array)($publication['manual'] ?? []);
     $drafts[$index]['results'] = $results;
     $drafts[$index]['errors'] = $errors;
-    if ($errors === []) {
-        $drafts[$index]['status'] = 'published';
+    $drafts[$index]['manual'] = $manual;
+
+    $automated = count($results) - count($manual);
+    if ($errors !== []) {
+        $drafts[$index]['status'] = $automated > 0 ? 'partially_published' : 'publish_failed';
+    } elseif ($manual !== [] && $automated === 0) {
+        $drafts[$index]['status'] = 'manual_ready';
+    } elseif ($manual !== []) {
+        $drafts[$index]['status'] = 'partially_published';
         $drafts[$index]['published_at'] = gmdate('c');
     } else {
-        $drafts[$index]['status'] = 'publish_failed';
+        $drafts[$index]['status'] = 'published';
+        $drafts[$index]['published_at'] = gmdate('c');
     }
+
     hub_save_drafts($drafts);
 
     hub_json_response([
         'ok' => $errors === [],
+        'manual_action_required' => $manual !== [],
         'draft' => $drafts[$index],
-    ], $errors === [] ? 200 : 502);
+    ], $errors === [] ? 200 : 207);
+}
+
+if ($action === 'mark_published') {
+    $id = trim((string)($body['id'] ?? ''));
+    if ((string)($body['confirmation'] ?? '') !== 'MARK_PUBLISHED') {
+        hub_json_response(['ok' => false, 'error' => 'EXPLICIT_CONFIRMATION_REQUIRED'], 409);
+    }
+    $drafts = hub_load_drafts();
+    $index = hub_find_draft_index($drafts, $id);
+    if ($index < 0) {
+        hub_json_response(['ok' => false, 'error' => 'DRAFT_NOT_FOUND'], 404);
+    }
+    if (!in_array((string)($drafts[$index]['status'] ?? ''), ['manual_ready', 'partially_published', 'publish_failed'], true)) {
+        hub_json_response(['ok' => false, 'error' => 'INVALID_STATUS'], 409);
+    }
+    $drafts[$index]['status'] = 'published';
+    $drafts[$index]['published_at'] = gmdate('c');
+    $drafts[$index]['manual_marked_published'] = true;
+    hub_save_drafts($drafts);
+    hub_json_response(['ok' => true, 'draft' => $drafts[$index]]);
 }
 
 if ($action === 'trash') {
@@ -171,7 +234,7 @@ if ($action === 'trash') {
 
     $previousStatus = (string)($drafts[$index]['status'] ?? 'draft');
     $removal = [];
-    if ($previousStatus === 'published') {
+    if (in_array($previousStatus, ['published', 'partially_published'], true)) {
         $removal = hub_suspend_online($config, $drafts[$index]);
     }
 
@@ -204,7 +267,7 @@ if ($action === 'upload') {
         $data = $parts[1] ?? '';
     }
     $binary = base64_decode($data, true);
-    if ($binary === false || strlen($binary) === 0 || strlen($binary) > 8 * 1024 * 1024) {
+    if ($binary === false || strlen($binary) === 0 || strlen($binary) > 12 * 1024 * 1024) {
         hub_json_response(['ok' => false, 'error' => 'INVALID_MEDIA_SIZE'], 422);
     }
     $finfo = new finfo(FILEINFO_MIME_TYPE);
@@ -213,6 +276,8 @@ if ($action === 'upload') {
         'image/jpeg' => 'jpg',
         'image/png' => 'png',
         'image/webp' => 'webp',
+        'video/mp4' => 'mp4',
+        'video/quicktime' => 'mov',
     ];
     if (!isset($extensions[$mime])) {
         hub_json_response(['ok' => false, 'error' => 'UNSUPPORTED_MEDIA_TYPE'], 422);
