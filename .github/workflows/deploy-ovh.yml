@@ -108,6 +108,20 @@ jobs:
           mirror --reverse --verbose --parallel=4 --only-newer out/ ./
           bye
           LFTP
+      - name: Verify the live Social Hub
+        run: |
+          set -euo pipefail
+          response="$(curl --silent --show-error --fail --location --max-time 20 \
+            "https://sourireplus.ch/social-hub/api.php?action=status&build=${{ github.sha }}")"
+          RESPONSE="$response" node <<'NODE'
+          const payload = JSON.parse(process.env.RESPONSE || "{}");
+          if (
+            payload.ok !== true ||
+            payload.service !== "SourirePlus Social Hub" ||
+            typeof payload.version !== "string"
+          ) process.exit(1);
+          console.log("SOCIAL_HUB_LIVE_OK", payload.version);
+          NODE
       - name: Verify the live patient report matches the build
         run: |
           set -euo pipefail
