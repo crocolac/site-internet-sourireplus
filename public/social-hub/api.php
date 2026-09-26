@@ -17,7 +17,7 @@ if ($method === 'GET' && $action === 'status') {
     hub_json_response([
         'ok' => true,
         'service' => 'SourirePlus Social Hub',
-        'version' => '1.0.0',
+        'version' => '1.1.0',
         'graph_version' => (string)($config['graph_version'] ?? 'v26.0'),
         'configured' => [
             'api_key' => (string)($config['api_key'] ?? '') !== '',
@@ -28,14 +28,21 @@ if ($method === 'GET' && $action === 'status') {
             'draft_required' => true,
             'approval_required' => true,
             'publish_confirmation_required' => true,
+            'trash_confirmation_required' => true,
         ],
     ]);
 }
 
 hub_authenticate($config);
 
-if ($method === 'GET' && $action === 'drafts') {
-    hub_json_response(['ok' => true, 'drafts' => hub_load_drafts()]);
+if ($method === 'GET' && in_array($action, ['drafts', 'publications'], true)) {
+    $items = hub_load_drafts();
+    usort($items, static function (array $a, array $b): int {
+        $aDate = (string)($a['published_at'] ?? $a['created_at'] ?? '');
+        $bDate = (string)($b['published_at'] ?? $b['created_at'] ?? '');
+        return strcmp($bDate, $aDate);
+    });
+    hub_json_response(['ok' => true, 'publications' => $items, 'drafts' => $items]);
 }
 
 if ($method !== 'POST') {
@@ -57,10 +64,18 @@ if ($action === 'draft') {
     if ($mediaUrl !== '' && filter_var($mediaUrl, FILTER_VALIDATE_URL) === false) {
         hub_json_response(['ok' => false, 'error' => 'INVALID_MEDIA_URL'], 422);
     }
+    $title = trim((string)($body['title'] ?? ''));
+    if ($title === '') {
+        $title = hub_derive_title($caption);
+    }
+    if (mb_strlen($title) > 140) {
+        hub_json_response(['ok' => false, 'error' => 'INVALID_TITLE'], 422);
+    }
 
     $drafts = hub_load_drafts();
     $draft = [
         'id' => bin2hex(random_bytes(8)),
+        'title' => $title,
         'caption' => $caption,
         'platforms' => $platforms,
         'media_url' => $mediaUrl,
@@ -68,6 +83,7 @@ if ($action === 'draft') {
         'created_at' => gmdate('c'),
         'approved_at' => null,
         'published_at' => null,
+        'trashed_at' => null,
         'results' => [],
     ];
     $drafts[] = $draft;
@@ -85,8 +101,8 @@ if ($action === 'approve') {
     if ($index < 0) {
         hub_json_response(['ok' => false, 'error' => 'DRAFT_NOT_FOUND'], 404);
     }
-    if (($drafts[$index]['status'] ?? '') === 'published') {
-        hub_json_response(['ok' => false, 'error' => 'ALREADY_PUBLISHED'], 409);
+    if (in_array((string)($drafts[$index]['status'] ?? ''), ['published', 'trashed', 'trash_partial'], true)) {
+        hub_json_response(['ok' => false, 'error' => 'INVALID_STATUS_FOR_APPROVAL'], 409);
     }
     $drafts[$index]['status'] = 'approved';
     $drafts[$index]['approved_at'] = gmdate('c');
@@ -136,6 +152,45 @@ if ($action === 'publish') {
         'ok' => $errors === [],
         'draft' => $drafts[$index],
     ], $errors === [] ? 200 : 502);
+}
+
+if ($action === 'trash') {
+    $id = trim((string)($body['id'] ?? ''));
+    if ((string)($body['confirmation'] ?? '') !== 'TRASH') {
+        hub_json_response(['ok' => false, 'error' => 'EXPLICIT_TRASH_CONFIRMATION_REQUIRED'], 409);
+    }
+
+    $drafts = hub_load_drafts();
+    $index = hub_find_draft_index($drafts, $id);
+    if ($index < 0) {
+        hub_json_response(['ok' => false, 'error' => 'DRAFT_NOT_FOUND'], 404);
+    }
+    if (in_array((string)($drafts[$index]['status'] ?? ''), ['trashed', 'trash_partial'], true)) {
+        hub_json_response(['ok' => false, 'error' => 'ALREADY_TRASHED'], 409);
+    }
+
+    $previousStatus = (string)($drafts[$index]['status'] ?? 'draft');
+    $removal = [];
+    if ($previousStatus === 'published') {
+        $removal = hub_suspend_online($config, $drafts[$index]);
+    }
+
+    $failed = array_filter(
+        $removal,
+        static fn (mixed $item): bool => is_array($item) && !((bool)($item['ok'] ?? false))
+    );
+
+    $drafts[$index]['previous_status'] = $previousStatus;
+    $drafts[$index]['status'] = $failed === [] ? 'trashed' : 'trash_partial';
+    $drafts[$index]['trashed_at'] = gmdate('c');
+    $drafts[$index]['remote_removal'] = $removal;
+    hub_save_drafts($drafts);
+
+    hub_json_response([
+        'ok' => $failed === [],
+        'draft' => $drafts[$index],
+        'manual_action_required' => $failed !== [],
+    ], $failed === [] ? 200 : 207);
 }
 
 if ($action === 'upload') {
