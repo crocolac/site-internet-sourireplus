@@ -15,7 +15,9 @@ export const metadata: Metadata = {
 export default function OrthodontiePage() {
   return (
     <TreatmentPage
-      eyebrow="Orthodontie · Enfants et adultes"
+      serviceName="Orthodontie enfants et adultes"
+      servicePath="/orthodontie/"
+      eyebrow="Orthodontie à Neuchâtel · Enfants et adultes"
       title="Aligner à tout âge avec"
       accent="une vision durable."
       lead="Notre pôle orthodontie prend en charge les enfants comme les adultes. L’objectif ne se limite pas à rendre les dents droites : croissance, fonction, esthétique et stabilité à long terme font partie de la décision."

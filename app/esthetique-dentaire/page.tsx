@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 export default function EsthetiqueDentairePage() {
   return (
     <TreatmentPage
+      serviceName="Esthétique dentaire"
+      servicePath="/esthetique-dentaire/"
       eyebrow="Esthétique du sourire · Neuchâtel"
       title="Améliorer le sourire sans lui enlever"
       accent="ce qui le rend naturel."

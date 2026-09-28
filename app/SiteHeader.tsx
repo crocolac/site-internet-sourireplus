@@ -10,7 +10,7 @@ export type HeaderLink = {
 const primaryLinks: readonly HeaderLink[] = [
   { href: "/", label: "La clinique" },
   { href: "/methode/", label: "La méthode" },
-  { href: "/#expertises", label: "Expertises" },
+  { href: "/soins-dentaires-neuchatel/", label: "Soins dentaires" },
   { href: "/proprietaires/", label: "Les propriétaires" },
   { href: "/#journal", label: "Le journal" },
   { href: "/acces/", label: "Accès" },

@@ -27,6 +27,15 @@ jobs:
         run: |
           test -s out/index.html
           test -s out/mesure-publicitaire/index.html
+          test -s out/soins-dentaires-neuchatel/index.html
+          test -s out/traitement-global/index.html
+          test -s out/esthetique-dentaire/index.html
+          test -s out/endodontie/index.html
+          test -s out/hygiene-suivi/index.html
+          test -s out/parodontologie-implantologie/index.html
+          test -s out/orthodontie/index.html
+          grep -q 'BreadcrumbList' out/soins-dentaires-neuchatel/index.html
+          grep -q 'Service' out/endodontie/index.html
           grep -R -q 'sourireplus-acquisition-v2' out/_next/static
           test -s out/methode/visite/index.html
           grep -q 'id="visitClinicLogo"' out/methode/visite/index.html

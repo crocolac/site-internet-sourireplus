@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 export default function EndodontiePage() {
   return (
     <TreatmentPage
+      serviceName="Endodontie spécialisée"
+      servicePath="/endodontie/"
       eyebrow="Endodontie spécialisée · Neuchâtel"
       title="Conserver la dent quand l’intérieur"
       accent="de la dent devient le problème."

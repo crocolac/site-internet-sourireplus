@@ -9,12 +9,42 @@ import Link from "next/link";
 import type { JournalArticle } from "./articles";
 import { SiteHeader } from "../SiteHeader";
 import { Topline } from "../Topline";
+import { SITE_NAME, SITE_URL } from "../site-data";
 
 export function JournalArticlePage({ article }: { article: JournalArticle }) {
   const Icon = article.icon;
+  const articleUrl = `${SITE_URL}/journal/${article.slug}/`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BlogPosting",
+        headline: article.title,
+        description: article.intro,
+        mainEntityOfPage: articleUrl,
+        url: articleUrl,
+        image: [`${SITE_URL}/images/blog-playful.webp`],
+        author: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+        publisher: { "@id": `${SITE_URL}/#clinic` },
+        inLanguage: "fr-CH",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Clinique Dentaire SourirePlus", item: `${SITE_URL}/` },
+          { "@type": "ListItem", position: 2, name: "Journal du sourire", item: `${SITE_URL}/#journal` },
+          { "@type": "ListItem", position: 3, name: article.title, item: articleUrl },
+        ],
+      },
+    ],
+  };
 
   return (
     <main className={`journal-page journal-theme-${article.theme}`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       <Topline />
 
       <SiteHeader

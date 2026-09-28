@@ -1,0 +1,248 @@
+.hero {
+  align-items: center;
+  display: grid;
+  gap: clamp(48px, 7vw, 90px);
+  grid-template-columns: 1.25fr .75fr;
+  margin-inline: auto;
+  padding-block: 86px 94px;
+  width: min(1200px, calc(100% - 48px));
+}
+
+.hero h1 {
+  font-size: clamp(50px, 5.2vw, 76px);
+  line-height: .98;
+  margin-top: 22px;
+}
+
+.lead {
+  color: #52616c;
+  font-size: 18px;
+  line-height: 1.75;
+  margin-top: 28px;
+  max-width: 760px;
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 34px;
+}
+
+.localCard {
+  background: var(--navy);
+  box-shadow: var(--shadow);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 34px;
+}
+
+.localCard strong {
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.localCard span {
+  color: rgba(255,255,255,.72);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.localCard a {
+  align-items: center;
+  color: var(--gold-light);
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  gap: 8px;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
+
+.localCard svg,
+.grid a svg,
+.guideGrid a svg {
+  height: 14px;
+  width: 14px;
+}
+
+.shell {
+  margin-inline: auto;
+  width: min(1200px, calc(100% - 48px));
+}
+
+.services {
+  background: var(--cream);
+  padding-block: 108px;
+}
+
+.heading {
+  display: grid;
+  gap: 50px;
+  grid-template-columns: 1.1fr .9fr;
+}
+
+.heading h2,
+.guideIntro h2,
+.local h2 {
+  font-size: clamp(42px, 4.2vw, 60px);
+  line-height: 1.03;
+  margin-top: 17px;
+}
+
+.heading > p {
+  align-self: end;
+  color: #5d6b74;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 58px;
+}
+
+.grid article {
+  background: white;
+  border: 1px solid var(--line);
+  min-height: 300px;
+  padding: 28px;
+}
+
+.cardTop {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cardTop span {
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+
+.cardTop svg {
+  color: var(--gold);
+  height: 27px;
+  width: 27px;
+}
+
+.grid h3 {
+  color: var(--navy);
+  font-family: Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.15;
+  margin-top: 34px;
+}
+
+.grid p {
+  color: #5f6e77;
+  font-size: 15px;
+  line-height: 1.7;
+  margin-top: 15px;
+}
+
+.grid a,
+.guideGrid a {
+  align-items: center;
+  color: var(--navy);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  gap: 8px;
+  margin-top: 25px;
+  text-transform: uppercase;
+}
+
+.guide {
+  padding-block: 108px;
+}
+
+.guideIntro {
+  max-width: 800px;
+}
+
+.guideGrid {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 52px;
+}
+
+.guideGrid article {
+  border-top: 1px solid var(--line);
+  padding-top: 26px;
+}
+
+.guideGrid h3 {
+  color: var(--navy);
+  font-family: Georgia, serif;
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.guideGrid p {
+  color: #5d6b74;
+  font-size: 15px;
+  line-height: 1.75;
+  margin-top: 14px;
+}
+
+.local {
+  background: var(--blue-soft);
+  padding-block: 86px;
+}
+
+.local > div {
+  display: grid;
+  gap: 55px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.local > div > p {
+  color: #4e606c;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .heading,
+  .local > div {
+    grid-template-columns: 1fr;
+  }
+
+  .grid,
+  .guideGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  .hero,
+  .shell {
+    width: min(100% - 32px, 1200px);
+  }
+
+  .hero h1 {
+    font-size: 46px;
+  }
+
+  .services,
+  .guide {
+    padding-block: 78px;
+  }
+
+  .grid,
+  .guideGrid {
+    grid-template-columns: 1fr;
+  }
+}

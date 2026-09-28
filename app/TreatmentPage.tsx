@@ -1,6 +1,7 @@
 import { ArrowRight, CalendarDays, Check, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { InfoPageShell } from "./InfoPageShell";
+import { SITE_URL } from "./site-data";
 import styles from "./TreatmentPage.module.css";
 
 type Highlight = {
@@ -15,6 +16,8 @@ type Step = {
 };
 
 export type TreatmentPageProps = {
+  serviceName: string;
+  servicePath: string;
   eyebrow: string;
   title: string;
   accent: string;
@@ -46,6 +49,8 @@ const expertiseLinks = [
 ] as const;
 
 export function TreatmentPage({
+  serviceName,
+  servicePath,
   eyebrow,
   title,
   accent,
@@ -66,8 +71,36 @@ export function TreatmentPage({
   ctaTitle,
   ctaText,
 }: TreatmentPageProps) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Clinique Dentaire SourirePlus", item: `${SITE_URL}/` },
+          { "@type": "ListItem", position: 2, name: "Soins dentaires à Neuchâtel", item: `${SITE_URL}/soins-dentaires-neuchatel/` },
+          { "@type": "ListItem", position: 3, name: serviceName, item: `${SITE_URL}${servicePath}` },
+        ],
+      },
+      {
+        "@type": "Service",
+        "@id": `${SITE_URL}${servicePath}#service`,
+        name: serviceName,
+        serviceType: serviceName,
+        description: lead,
+        url: `${SITE_URL}${servicePath}`,
+        provider: { "@id": `${SITE_URL}/#clinic` },
+        areaServed: { "@type": "AdministrativeArea", name: "Neuchâtel, Suisse" },
+      },
+    ],
+  };
+
   return (
     <InfoPageShell secondaryLinks={expertiseLinks}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className="eyebrow">{eyebrow}</p>
