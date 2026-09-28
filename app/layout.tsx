@@ -48,7 +48,6 @@ export const metadata: Metadata = {
     title: "Dentiste à Neuchâtel | Clinique Dentaire SourirePlus",
     description:
       "Clinique dentaire à deux minutes de la gare de Neuchâtel : 6 pôles coordonnés, de la prévention aux traitements spécialisés.",
-  },
     images: [{ url: "/images/hero-premium.webp", width: 1200, height: 630, alt: "Clinique Dentaire SourirePlus à Neuchâtel" }],
   },
   twitter: {
