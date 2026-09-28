@@ -35,9 +35,9 @@ const services = [
   {
     number: "01",
     title: "Maintenance & hygiène",
-    text: "Prévenir, surveiller et intervenir tôt pour conserver vos dents le plus longtemps possible.",
+    text: "3 hygiénistes et 2 assistantes en prophylaxie pour la prévention et le suivi des enfants comme des adultes.",
     tag: "Préserver",
-    href: "#rendez-vous",
+    href: "/hygiene-suivi/",
   },
   {
     number: "02",
@@ -56,16 +56,16 @@ const services = [
   {
     number: "04",
     title: "Orthodontie",
-    text: "Aligner les dents à tout âge en conciliant esthétique, confort et stabilité du résultat.",
+    text: "Orthodontie pour enfants et adultes, avec une attention portée à la croissance, à la fonction et à la stabilité.",
     tag: "Aligner",
-    href: "#rendez-vous",
+    href: "/orthodontie/",
   },
   {
     number: "05",
     title: "Implantologie",
-    text: "Remplacer une ou plusieurs dents avec une planification numérique rigoureuse et lisible.",
+    text: "Parodontologie et implantologie avec un spécialiste dédié aux gencives, tissus de soutien et solutions implantaires.",
     tag: "Reconstruire",
-    href: "#rendez-vous",
+    href: "/parodontologie-implantologie/",
   },
   {
     number: "06",
@@ -289,7 +289,7 @@ export default function Home() {
         action={<AppointmentDialog compact />}
         homeHref="#accueil"
         secondaryLinks={[
-          { href: "#expertises", label: "Nos 3 expertises" },
+          { href: "#expertises", label: "Nos 6 pôles" },
           { href: "#approche", label: "Notre approche" },
           { href: "#technologie", label: "Technologie 3D" },
           { href: "#equipe", label: "L’équipe" },
@@ -301,7 +301,7 @@ export default function Home() {
           <p className="eyebrow"><span>Fondée en 2008</span> · 18 ans d’existence</p>
           <h1 id="hero-title">Votre sourire mérite une <em>vision à long terme.</em></h1>
           <p className="hero-lead">
-            Une clinique solidement installée à Neuchâtel depuis 18 ans, avec trois axes forts&nbsp;: traitement global, esthétique du sourire et endodontie spécialisée — soutenus par des praticiens expérimentés et des protocoles affinés dans la durée.
+            Une clinique solidement installée à Neuchâtel depuis 18 ans, organisée autour de six pôles&nbsp;: traitement global, esthétique, endodontie, hygiène &amp; suivi, parodontologie–implantologie et orthodontie enfants/adultes.
           </p>
           <div className="hero-actions">
             <AppointmentDialog />
@@ -309,7 +309,7 @@ export default function Home() {
           </div>
           <div className="hero-proof" aria-label="Points forts">
             <span><Check aria-hidden="true" /> 18 ans d’existence à Neuchâtel</span>
-            <span><Check aria-hidden="true" /> Traitement global · Esthétique · Endodontie</span>
+            <span><Check aria-hidden="true" /> 6 pôles coordonnés, de la prévention aux traitements spécialisés</span>
           </div>
         </div>
         <div className="hero-visual" role="img" aria-label="Patiente souriante dans une clinique dentaire lumineuse">
@@ -328,18 +328,19 @@ export default function Home() {
         <a href="/traitement-global/">Traitement global</a><i />
         <a href="/esthetique-dentaire/">Esthétique</a><i />
         <a href="/endodontie/">Endodontie</a><i />
-        <span>Orthodontie</span><i />
-        <span>Implantologie</span>
+        <a href="/hygiene-suivi/">Hygiène &amp; suivi</a><i />
+        <a href="/parodontologie-implantologie/">Parodontologie &amp; implants</a><i />
+        <a href="/orthodontie/">Orthodontie</a>
       </div>
 
       <section className="approach section-shell" id="expertises">
         <div className="section-intro">
-          <p className="eyebrow">Trois portes d’entrée</p>
+          <p className="eyebrow">Six pôles coordonnés</p>
           <h2>Le bon traitement commence par<br /><em>la bonne question.</em></h2>
         </div>
         <div className="approach-copy">
           <p className="large-copy">
-            Certaines situations demandent une vision d’ensemble. D’autres un projet esthétique précis ou une expertise endodontique ciblée. Ces trois activités ont désormais leur propre parcours chez SourirePlus.
+            Prévenir, suivre, aligner, préserver, reconstruire ou harmoniser&nbsp;: chaque pôle a son expertise, mais tous partagent la même direction et le même dossier patient.
           </p>
         </div>
         <div className="journey-grid">
@@ -363,6 +364,27 @@ export default function Home() {
             <h3>Endodontie spécialisée</h3>
             <p>Diagnostiquer une douleur, traiter ou retraiter l’intérieur de la dent et la conserver lorsque son pronostic le permet.</p>
             <a className="inline-link" href="/endodontie/">Découvrir <ArrowRight aria-hidden="true" /></a>
+          </article>
+          <article>
+            <span className="step-number">04</span>
+            <ShieldCheck aria-hidden="true" />
+            <h3>Hygiène &amp; suivi</h3>
+            <p>Trois hygiénistes et deux assistantes en prophylaxie accompagnent enfants et adultes dans la prévention et la maintenance.</p>
+            <a className="inline-link" href="/hygiene-suivi/">Découvrir <ArrowRight aria-hidden="true" /></a>
+          </article>
+          <article>
+            <span className="step-number">05</span>
+            <ScanLine aria-hidden="true" />
+            <h3>Parodontologie &amp; implantologie</h3>
+            <p>Un spécialiste dédié aux gencives, aux tissus de soutien et aux solutions implantaires, du diagnostic à la maintenance.</p>
+            <a className="inline-link" href="/parodontologie-implantologie/">Découvrir <ArrowRight aria-hidden="true" /></a>
+          </article>
+          <article>
+            <span className="step-number">06</span>
+            <Activity aria-hidden="true" />
+            <h3>Orthodontie enfants &amp; adultes</h3>
+            <p>Aligner à tout âge en tenant compte de la croissance, de la fonction, de l’esthétique et de la stabilité du résultat.</p>
+            <a className="inline-link" href="/orthodontie/">Découvrir <ArrowRight aria-hidden="true" /></a>
           </article>
         </div>
       </section>
@@ -509,12 +531,12 @@ export default function Home() {
               <img className="team-portrait-guillaume" src="/images/guillaume-guilbert-medical-2026.webp?v=20260902-1426" alt="Portrait du Dr Guillaume Guilbert" loading="lazy" decoding="async" />
             </div>
             <h3>Dr Guillaume Guilbert</h3>
-            <p>Orthodontiste</p>
+            <p>Orthodontie enfants · adultes</p>
           </article>
           <article className="team-more">
-            <span>+</span>
-            <h3>Toute une équipe</h3>
-            <p>Hygiène, assistance et accueil</p>
+            <span>5</span>
+            <h3>Pôle hygiène &amp; prophylaxie</h3>
+            <p>3 hygiénistes · 2 assistantes · enfants &amp; adultes</p>
           </article>
         </div>
       </section>
@@ -589,7 +611,7 @@ export default function Home() {
           </div>
           <div>
             <h3>Accès rapide</h3>
-            <a href="#soins">Nos soins</a>
+            <a href="#expertises">Nos 6 pôles</a>
             <a href="/methode/">La méthode SourirePlus</a>
             <a href="/proprietaires/">Les propriétaires</a>
             <a href="/acces/">Accès et parking</a>
