@@ -86,6 +86,13 @@ jobs:
           test -f out/methode/visite/index.html
           test -f out/mentions-legales/index.html
           test -f out/protection-des-donnees/index.html
+          test -f out/soins-dentaires-neuchatel/index.html
+          test -f out/traitement-global/index.html
+          test -f out/esthetique-dentaire/index.html
+          test -f out/endodontie/index.html
+          test -f out/hygiene-suivi/index.html
+          test -f out/parodontologie-implantologie/index.html
+          test -f out/orthodontie/index.html
           test -f out/robots.txt
           test -f out/sitemap.xml
           test -f out/manifest.webmanifest
