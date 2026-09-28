@@ -16,7 +16,7 @@ import { Topline } from "../Topline";
 export const metadata: Metadata = {
   title: "Les propriétaires | Clinique Dentaire SourirePlus",
   description:
-    "Découvrez les deux propriétaires de SourirePlus : le Dr Raphaël Lacoste, en endodontie et esthétique, et le Dr Guillaume Guilbert, orthodontiste.",
+    "Découvrez les deux propriétaires de SourirePlus : le Dr Raphaël Lacoste, en traitements globaux, endodontie et esthétique, et le Dr Guillaume Guilbert, orthodontiste.",
   alternates: { canonical: "/proprietaires/" },
   openGraph: {
     title: "Raphaël Lacoste et Guillaume Guilbert | SourirePlus",
@@ -116,11 +116,11 @@ export default function ProprietairesPage() {
           <figcaption>Dr Raphaël Lacoste · Médecin-dentiste</figcaption>
         </figure>
         <div className="owner-profile-copy">
-          <p className="eyebrow">Deux pôles de compétence</p>
+          <p className="eyebrow">Trois axes de compétence</p>
           <h2>Dr Raphaël Lacoste</h2>
-          <p className="owner-role">Endodontie &amp; esthétique</p>
+          <p className="owner-role">Traitements globaux · Endodontie · Esthétique</p>
           <p className="owner-intro">
-            Deux domaines qui pourraient sembler opposés, mais qui répondent à la même exigence&nbsp;: préserver la dent quand cela est possible, puis retrouver une harmonie naturelle et cohérente avec le visage.
+            Le traitement global donne la direction ; l’endodontie aide à conserver les dents lorsqu’elles peuvent l’être ; l’esthétique harmonise le résultat. Trois regards réunis autour d’une même exigence&nbsp;: traiter avec cohérence plutôt que par gestes isolés.
           </p>
 
           <div className="skill-poles">
@@ -139,9 +139,9 @@ export default function ProprietairesPage() {
           </div>
 
           <p className="owner-method-note">
-            Ces deux regards s’intègrent à la méthode SourirePlus&nbsp;: situer l’âge de la bouche, comprendre ses six courbes et choisir une trajectoire plutôt qu’une succession de gestes isolés.
+            Le traitement global est le fil conducteur&nbsp;: situer l’âge de la bouche, comprendre ses six courbes, hiérarchiser les besoins et choisir une trajectoire plutôt qu’une succession de gestes isolés.
           </p>
-          <Link className="inline-link" href="/methode/">Découvrir la méthode SourirePlus <ArrowRight aria-hidden="true" /></Link>
+          <Link className="inline-link" href="/traitement-global/">Découvrir le traitement global <ArrowRight aria-hidden="true" /></Link>
         </div>
       </section>
 
