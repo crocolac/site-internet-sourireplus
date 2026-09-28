@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 export default function ParodontologieImplantologiePage() {
   return (
     <TreatmentPage
+      serviceName="Parodontologie et implantologie"
+      servicePath="/parodontologie-implantologie/"
       eyebrow="Parodontologie & implantologie · Neuchâtel"
       title="Préserver les tissus."
       accent="Reconstruire quand il le faut."
