@@ -47,6 +47,7 @@ export function InfoPageShell({ children, secondaryLinks = [] }: { children: Rea
         <div className="section-shell info-footer-bottom">
           <span>© 2026 Clinique Dentaire SourirePlus SA</span>
           <nav aria-label="Informations légales">
+            <Link href="/soins-dentaires-neuchatel/">Soins dentaires</Link>
             <Link href="/acces/">Accès</Link>
             <Link href="/mentions-legales/">Mentions légales</Link>
             <Link href="/protection-des-donnees/">Protection des données</Link>
