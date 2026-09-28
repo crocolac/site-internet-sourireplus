@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -38,6 +39,7 @@ const services = [
     text: "3 hygiénistes et 2 assistantes en prophylaxie pour la prévention et le suivi des enfants comme des adultes.",
     tag: "Préserver",
     href: "/hygiene-suivi/",
+    linkLabel: "Hygiène dentaire à Neuchâtel",
   },
   {
     number: "02",
@@ -45,6 +47,7 @@ const services = [
     text: "Blanchiment, facettes et restaurations pensées pour rester naturelles, jamais standardisées.",
     tag: "Harmoniser",
     href: "/esthetique-dentaire/",
+    linkLabel: "Esthétique dentaire à Neuchâtel",
   },
   {
     number: "03",
@@ -52,6 +55,7 @@ const services = [
     text: "Des traitements précis pour soulager la douleur et donner une nouvelle chance à la dent.",
     tag: "Sauver",
     href: "/endodontie/",
+    linkLabel: "Endodontie à Neuchâtel",
   },
   {
     number: "04",
@@ -59,6 +63,7 @@ const services = [
     text: "Orthodontie pour enfants et adultes, avec une attention portée à la croissance, à la fonction et à la stabilité.",
     tag: "Aligner",
     href: "/orthodontie/",
+    linkLabel: "Orthodontie à Neuchâtel",
   },
   {
     number: "05",
@@ -66,6 +71,7 @@ const services = [
     text: "Parodontologie et implantologie avec un spécialiste dédié aux gencives, tissus de soutien et solutions implantaires.",
     tag: "Reconstruire",
     href: "/parodontologie-implantologie/",
+    linkLabel: "Parodontologie & implantologie",
   },
   {
     number: "06",
@@ -73,6 +79,7 @@ const services = [
     text: "Diagnostic, priorités et traitements coordonnés pour construire une trajectoire cohérente dans le temps.",
     tag: "Coordonner",
     href: "/traitement-global/",
+    linkLabel: "Traitement global à Neuchâtel",
   },
 ];
 
@@ -349,42 +356,42 @@ export default function Home() {
             <Activity aria-hidden="true" />
             <h3>Traitement global</h3>
             <p>Quand plusieurs problèmes se croisent, organiser les priorités et construire un plan cohérent avant d’additionner les soins.</p>
-            <a className="inline-link" href="/traitement-global/">Découvrir <ArrowRight aria-hidden="true" /></a>
+            <a className="inline-link" href="/traitement-global/">Traitement global à Neuchâtel <ArrowRight aria-hidden="true" /></a>
           </article>
           <article>
             <span className="step-number">02</span>
             <Sparkles aria-hidden="true" />
             <h3>Traitement esthétique</h3>
             <p>Améliorer couleur, formes et proportions en recherchant un résultat naturel et le traitement le plus conservateur possible.</p>
-            <a className="inline-link" href="/esthetique-dentaire/">Découvrir <ArrowRight aria-hidden="true" /></a>
+            <a className="inline-link" href="/esthetique-dentaire/">Esthétique dentaire à Neuchâtel <ArrowRight aria-hidden="true" /></a>
           </article>
           <article>
             <span className="step-number">03</span>
             <HeartPulse aria-hidden="true" />
             <h3>Endodontie spécialisée</h3>
             <p>Diagnostiquer une douleur, traiter ou retraiter l’intérieur de la dent et la conserver lorsque son pronostic le permet.</p>
-            <a className="inline-link" href="/endodontie/">Découvrir <ArrowRight aria-hidden="true" /></a>
+            <a className="inline-link" href="/endodontie/">Endodontie à Neuchâtel <ArrowRight aria-hidden="true" /></a>
           </article>
           <article>
             <span className="step-number">04</span>
             <ShieldCheck aria-hidden="true" />
             <h3>Hygiène &amp; suivi</h3>
             <p>Trois hygiénistes et deux assistantes en prophylaxie accompagnent enfants et adultes dans la prévention et la maintenance.</p>
-            <a className="inline-link" href="/hygiene-suivi/">Découvrir <ArrowRight aria-hidden="true" /></a>
+            <a className="inline-link" href="/hygiene-suivi/">Hygiène dentaire &amp; suivi <ArrowRight aria-hidden="true" /></a>
           </article>
           <article>
             <span className="step-number">05</span>
             <ScanLine aria-hidden="true" />
             <h3>Parodontologie &amp; implantologie</h3>
             <p>Un spécialiste dédié aux gencives, aux tissus de soutien et aux solutions implantaires, du diagnostic à la maintenance.</p>
-            <a className="inline-link" href="/parodontologie-implantologie/">Découvrir <ArrowRight aria-hidden="true" /></a>
+            <a className="inline-link" href="/parodontologie-implantologie/">Parodontologie &amp; implantologie <ArrowRight aria-hidden="true" /></a>
           </article>
           <article>
             <span className="step-number">06</span>
             <Activity aria-hidden="true" />
             <h3>Orthodontie enfants &amp; adultes</h3>
             <p>Aligner à tout âge en tenant compte de la croissance, de la fonction, de l’esthétique et de la stabilité du résultat.</p>
-            <a className="inline-link" href="/orthodontie/">Découvrir <ArrowRight aria-hidden="true" /></a>
+            <a className="inline-link" href="/orthodontie/">Orthodontie enfants &amp; adultes <ArrowRight aria-hidden="true" /></a>
           </article>
         </div>
       </section>
@@ -473,7 +480,7 @@ export default function Home() {
                 <div><span>{service.number}</span><small>{service.tag}</small></div>
                 <h3>{service.title}</h3>
                 <p>{service.text}</p>
-                <a href={service.href} aria-label={"En savoir plus sur " + service.title}><ArrowRight aria-hidden="true" /></a>
+                <Link href={service.href}>{service.linkLabel} <ArrowRight aria-hidden="true" /></Link>
               </article>
             ))}
           </div>
@@ -611,7 +618,7 @@ export default function Home() {
           </div>
           <div>
             <h3>Accès rapide</h3>
-            <a href="#expertises">Nos 6 pôles</a>
+            <a href="/soins-dentaires-neuchatel/">Soins dentaires à Neuchâtel</a>
             <a href="/methode/">La méthode SourirePlus</a>
             <a href="/proprietaires/">Les propriétaires</a>
             <a href="/acces/">Accès et parking</a>
