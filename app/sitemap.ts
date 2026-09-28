@@ -7,6 +7,9 @@ const routes = [
   { path: "/", priority: 1, changeFrequency: "weekly" as const },
   { path: "/methode/", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/jumeau-numerique/", priority: 0.9, changeFrequency: "monthly" as const },
+  { path: "/traitement-global/", priority: 0.95, changeFrequency: "monthly" as const },
+  { path: "/esthetique-dentaire/", priority: 0.95, changeFrequency: "monthly" as const },
+  { path: "/endodontie/", priority: 0.95, changeFrequency: "monthly" as const },
   { path: "/proprietaires/", priority: 0.8, changeFrequency: "monthly" as const },
   { path: "/acces/", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/journal/cafe-et-dents/", priority: 0.7, changeFrequency: "yearly" as const },
@@ -17,7 +20,7 @@ const routes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date("2026-08-30T00:00:00+02:00");
+  const lastModified = new Date("2026-09-28T00:00:00+02:00");
   return routes.map((route) => ({
     url: `${SITE_URL}${route.path}`,
     lastModified,
