@@ -37,36 +37,42 @@ const services = [
     title: "Maintenance & hygiène",
     text: "Prévenir, surveiller et intervenir tôt pour conserver vos dents le plus longtemps possible.",
     tag: "Préserver",
+    href: "#rendez-vous",
   },
   {
     number: "02",
     title: "Esthétique du sourire",
     text: "Blanchiment, facettes et restaurations pensées pour rester naturelles, jamais standardisées.",
     tag: "Harmoniser",
+    href: "/esthetique-dentaire/",
   },
   {
     number: "03",
     title: "Endodontie",
     text: "Des traitements précis pour soulager la douleur et donner une nouvelle chance à la dent.",
     tag: "Sauver",
+    href: "/endodontie/",
   },
   {
     number: "04",
     title: "Orthodontie",
     text: "Aligner les dents à tout âge en conciliant esthétique, confort et stabilité du résultat.",
     tag: "Aligner",
+    href: "#rendez-vous",
   },
   {
     number: "05",
     title: "Implantologie",
     text: "Remplacer une ou plusieurs dents avec une planification numérique rigoureuse et lisible.",
     tag: "Reconstruire",
+    href: "#rendez-vous",
   },
   {
     number: "06",
     title: "Soins complets",
     text: "Diagnostic, restaurations, chirurgie et suivi coordonnés au même endroit par une équipe dédiée.",
     tag: "Accompagner",
+    href: "/traitement-global/",
   },
 ];
 
@@ -283,7 +289,7 @@ export default function Home() {
         action={<AppointmentDialog compact />}
         homeHref="#accueil"
         secondaryLinks={[
-          { href: "#histoire", label: "18 ans d’existence" },
+          { href: "#expertises", label: "Nos 3 expertises" },
           { href: "#approche", label: "Notre approche" },
           { href: "#technologie", label: "Technologie 3D" },
           { href: "#equipe", label: "L’équipe" },
@@ -295,7 +301,7 @@ export default function Home() {
           <p className="eyebrow"><span>Fondée en 2008</span> · 18 ans d’existence</p>
           <h1 id="hero-title">Votre sourire mérite une <em>vision à long terme.</em></h1>
           <p className="hero-lead">
-            Une clinique solidement installée à Neuchâtel depuis 18 ans, portée par des praticiens qui disposent d’au moins 25 ans d’expérience et par des protocoles affinés dans la durée.
+            Une clinique solidement installée à Neuchâtel depuis 18 ans, avec trois axes forts&nbsp;: traitement global, esthétique du sourire et endodontie spécialisée — soutenus par des praticiens expérimentés et des protocoles affinés dans la durée.
           </p>
           <div className="hero-actions">
             <AppointmentDialog />
@@ -303,7 +309,7 @@ export default function Home() {
           </div>
           <div className="hero-proof" aria-label="Points forts">
             <span><Check aria-hidden="true" /> 18 ans d’existence à Neuchâtel</span>
-            <span><Check aria-hidden="true" /> Organisation et protocoles éprouvés</span>
+            <span><Check aria-hidden="true" /> Traitement global · Esthétique · Endodontie</span>
           </div>
         </div>
         <div className="hero-visual" role="img" aria-label="Patiente souriante dans une clinique dentaire lumineuse">
@@ -319,12 +325,47 @@ export default function Home() {
       </section>
 
       <div className="expertise-ribbon" aria-label="Expertises">
-        <span>Maintenance</span><i />
-        <span>Esthétique</span><i />
-        <span>Endodontie</span><i />
+        <a href="/traitement-global/">Traitement global</a><i />
+        <a href="/esthetique-dentaire/">Esthétique</a><i />
+        <a href="/endodontie/">Endodontie</a><i />
         <span>Orthodontie</span><i />
-        <span>Implantologie</span><i />
+        <span>Implantologie</span>
       </div>
+
+      <section className="approach section-shell" id="expertises">
+        <div className="section-intro">
+          <p className="eyebrow">Trois portes d’entrée</p>
+          <h2>Le bon traitement commence par<br /><em>la bonne question.</em></h2>
+        </div>
+        <div className="approach-copy">
+          <p className="large-copy">
+            Certaines situations demandent une vision d’ensemble. D’autres un projet esthétique précis ou une expertise endodontique ciblée. Ces trois activités ont désormais leur propre parcours chez SourirePlus.
+          </p>
+        </div>
+        <div className="journey-grid">
+          <article>
+            <span className="step-number">01</span>
+            <Activity aria-hidden="true" />
+            <h3>Traitement global</h3>
+            <p>Quand plusieurs problèmes se croisent, organiser les priorités et construire un plan cohérent avant d’additionner les soins.</p>
+            <a className="inline-link" href="/traitement-global/">Découvrir <ArrowRight aria-hidden="true" /></a>
+          </article>
+          <article>
+            <span className="step-number">02</span>
+            <Sparkles aria-hidden="true" />
+            <h3>Traitement esthétique</h3>
+            <p>Améliorer couleur, formes et proportions en recherchant un résultat naturel et le traitement le plus conservateur possible.</p>
+            <a className="inline-link" href="/esthetique-dentaire/">Découvrir <ArrowRight aria-hidden="true" /></a>
+          </article>
+          <article>
+            <span className="step-number">03</span>
+            <HeartPulse aria-hidden="true" />
+            <h3>Endodontie spécialisée</h3>
+            <p>Diagnostiquer une douleur, traiter ou retraiter l’intérieur de la dent et la conserver lorsque son pronostic le permet.</p>
+            <a className="inline-link" href="/endodontie/">Découvrir <ArrowRight aria-hidden="true" /></a>
+          </article>
+        </div>
+      </section>
 
       <section className="legacy section-shell" id="histoire">
         <div className="legacy-number" aria-hidden="true">
@@ -410,7 +451,7 @@ export default function Home() {
                 <div><span>{service.number}</span><small>{service.tag}</small></div>
                 <h3>{service.title}</h3>
                 <p>{service.text}</p>
-                <a href="#rendez-vous" aria-label={"En savoir plus sur " + service.title}><ArrowRight aria-hidden="true" /></a>
+                <a href={service.href} aria-label={"En savoir plus sur " + service.title}><ArrowRight aria-hidden="true" /></a>
               </article>
             ))}
           </div>
@@ -454,7 +495,7 @@ export default function Home() {
               <img className="team-portrait-raphael" src="/images/raphael-lacoste-medical-2026.webp?v=20260902-1426" alt="Portrait du Dr Raphaël Lacoste" loading="lazy" decoding="async" />
             </div>
             <h3>Dr Raphaël Lacoste</h3>
-            <p>Endodontie · Esthétique</p>
+            <p>Traitements globaux · Esthétique · Endodontie</p>
           </article>
           <article>
             <div className="portrait-placeholder team-portrait-frame">
