@@ -143,7 +143,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    <html lang="fr-CH">
       <body>
         <style>{`
           .team-list .portrait-placeholder.team-portrait-frame {
