@@ -16,9 +16,9 @@ import {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
+  title: "Dentiste à Neuchâtel | Clinique Dentaire SourirePlus",
   description:
-    "Clinique dentaire à Neuchâtel organisée autour de 6 pôles : traitement global, esthétique, endodontie, hygiène & suivi, parodontologie-implantologie et orthodontie enfants/adultes.",
+    "Dentiste à Neuchâtel, SourirePlus réunit 6 pôles coordonnés : prévention, traitement global, esthétique, endodontie, parodontologie-implantologie et orthodontie.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -45,14 +45,17 @@ export const metadata: Metadata = {
     locale: "fr_CH",
     url: "/",
     siteName: SITE_NAME,
-    title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
+    title: "Dentiste à Neuchâtel | Clinique Dentaire SourirePlus",
     description:
-      "À deux minutes de la gare de Neuchâtel, SourirePlus réunit 6 pôles coordonnés, de l’hygiène et la prévention aux traitements spécialisés.",
+      "Clinique dentaire à deux minutes de la gare de Neuchâtel : 6 pôles coordonnés, de la prévention aux traitements spécialisés.",
+  },
+    images: [{ url: "/images/hero-premium.webp", width: 1200, height: 630, alt: "Clinique Dentaire SourirePlus à Neuchâtel" }],
   },
   twitter: {
-    card: "summary",
-    title: "Clinique Dentaire SourirePlus | Neuchâtel",
+    card: "summary_large_image",
+    title: "Dentiste à Neuchâtel | SourirePlus",
     description: "6 pôles coordonnés à Neuchâtel : prévention, traitement global, esthétique, endodontie, parodontologie-implantologie et orthodontie.",
+    images: ["/images/hero-premium.webp"],
   },
   robots: {
     index: true,
@@ -114,6 +117,14 @@ const structuredData = [
       "Implant dentistry",
       "Aesthetic dentistry",
       "Preventive dentistry",
+    ],
+    department: [
+      { "@type": "Dentist", name: "SourirePlus — Traitement global", url: `${SITE_URL}/traitement-global/`, parentOrganization: { "@id": `${SITE_URL}/#clinic` } },
+      { "@type": "Dentist", name: "SourirePlus — Esthétique dentaire", url: `${SITE_URL}/esthetique-dentaire/`, parentOrganization: { "@id": `${SITE_URL}/#clinic` } },
+      { "@type": "Dentist", name: "SourirePlus — Endodontie", url: `${SITE_URL}/endodontie/`, parentOrganization: { "@id": `${SITE_URL}/#clinic` } },
+      { "@type": "Dentist", name: "SourirePlus — Hygiène et suivi", url: `${SITE_URL}/hygiene-suivi/`, parentOrganization: { "@id": `${SITE_URL}/#clinic` } },
+      { "@type": "Dentist", name: "SourirePlus — Parodontologie et implantologie", url: `${SITE_URL}/parodontologie-implantologie/`, parentOrganization: { "@id": `${SITE_URL}/#clinic` } },
+      { "@type": "Dentist", name: "SourirePlus — Orthodontie enfants et adultes", url: `${SITE_URL}/orthodontie/`, parentOrganization: { "@id": `${SITE_URL}/#clinic` } },
     ],
   },
   {
