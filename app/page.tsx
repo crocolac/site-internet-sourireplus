@@ -305,7 +305,7 @@ export default function Home() {
 
       <section className="hero section-shell" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow"><span>Fondée en 2008</span> · 18 ans d’existence</p>
+          <p className="eyebrow"><span>Clinique dentaire à Neuchâtel</span> · Fondée en 2008</p>
           <h1 id="hero-title">Votre sourire mérite une <em>vision à long terme.</em></h1>
           <p className="hero-lead">
             Une clinique solidement installée à Neuchâtel depuis 18 ans, organisée autour de six pôles&nbsp;: traitement global, esthétique, endodontie, hygiène &amp; suivi, parodontologie–implantologie et orthodontie enfants/adultes.
