@@ -259,9 +259,9 @@ main section[id], main div[id] { scroll-margin-top: 160px; }
 .service-card > div small { border: 1px solid rgba(255,255,255,.16); border-radius: 999px; color: rgba(255,255,255,.5); font-size: 12px; letter-spacing: .12em; padding: 6px 10px; text-transform: uppercase; }
 .service-card h3 { font-family: Georgia, serif; font-size: 23px; font-weight: 400; margin-top: 44px; }
 .service-card p { color: rgba(255,255,255,.58); font-size: 15px; line-height: 1.7; margin-top: 16px; max-width: 285px; }
-.service-card > a { align-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; bottom: 28px; display: flex; height: 34px; justify-content: center; position: absolute; right: 30px; transition: background .2s ease; width: 34px; }
+.service-card > a { align-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; bottom: 24px; display: inline-flex; font-size: 12px; font-weight: 700; gap: 8px; justify-content: center; left: 32px; letter-spacing: .02em; max-width: calc(100% - 64px); padding: 9px 13px; position: absolute; transition: background .2s ease; }
 .service-card > a:hover { background: var(--gold); }
-.service-card > a svg { height: 13px; width: 13px; }
+.service-card > a svg { flex: 0 0 auto; height: 13px; width: 13px; }
 
 .technology { align-items: center; display: grid; gap: clamp(55px, 8vw, 105px); grid-template-columns: 1.05fr .95fr; padding-block: 130px; }
 .technology-visual { min-height: 600px; position: relative; }
