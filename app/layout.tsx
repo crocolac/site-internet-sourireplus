@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
   description:
-    "Clinique dentaire à Neuchâtel organisée autour de 6 pôles : traitement global, esthétique, endodontie, hygiène & suivi, parodontologie-implantologie et orthodontie enfants/adultes."
+    "Clinique dentaire à Neuchâtel organisée autour de 6 pôles : traitement global, esthétique, endodontie, hygiène & suivi, parodontologie-implantologie et orthodontie enfants/adultes.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -47,12 +47,12 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
     description:
-      "À deux minutes de la gare de Neuchâtel, SourirePlus réunit 6 pôles coordonnés, de l’hygiène et la prévention aux traitements spécialisés."
+      "À deux minutes de la gare de Neuchâtel, SourirePlus réunit 6 pôles coordonnés, de l’hygiène et la prévention aux traitements spécialisés.",
   },
   twitter: {
     card: "summary",
     title: "Clinique Dentaire SourirePlus | Neuchâtel",
-    description: "6 pôles coordonnés à Neuchâtel : prévention, traitement global, esthétique, endodontie, parodontologie-implantologie et orthodontie."
+    description: "6 pôles coordonnés à Neuchâtel : prévention, traitement global, esthétique, endodontie, parodontologie-implantologie et orthodontie.",
   },
   robots: {
     index: true,
