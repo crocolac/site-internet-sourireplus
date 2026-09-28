@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 export default function TraitementGlobalPage() {
   return (
     <TreatmentPage
+      serviceName="Traitement global et réhabilitation dentaire"
+      servicePath="/traitement-global/"
       eyebrow="Traitement global · Neuchâtel"
       title="Traiter toute la bouche avec"
       accent="une seule logique."
