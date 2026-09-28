@@ -7,6 +7,7 @@ const routes = [
   { path: "/", priority: 1, changeFrequency: "weekly" as const },
   { path: "/methode/", priority: 0.9, changeFrequency: "monthly" as const },
   { path: "/jumeau-numerique/", priority: 0.9, changeFrequency: "monthly" as const },
+  { path: "/soins-dentaires-neuchatel/", priority: 0.95, changeFrequency: "monthly" as const },
   { path: "/traitement-global/", priority: 0.95, changeFrequency: "monthly" as const },
   { path: "/esthetique-dentaire/", priority: 0.95, changeFrequency: "monthly" as const },
   { path: "/endodontie/", priority: 0.95, changeFrequency: "monthly" as const },
