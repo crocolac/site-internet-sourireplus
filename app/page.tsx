@@ -69,9 +69,9 @@ const services = [
   },
   {
     number: "06",
-    title: "Soins complets",
-    text: "Diagnostic, restaurations, chirurgie et suivi coordonnés au même endroit par une équipe dédiée.",
-    tag: "Accompagner",
+    title: "Traitement global",
+    text: "Diagnostic, priorités et traitements coordonnés pour construire une trajectoire cohérente dans le temps.",
+    tag: "Coordonner",
     href: "/traitement-global/",
   },
 ];
