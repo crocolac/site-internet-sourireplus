@@ -150,7 +150,7 @@ export default function ProprietairesPage() {
           <div className="owner-profile-copy">
             <p className="eyebrow light">Le mouvement dans le temps</p>
             <h2>Dr Guillaume Guilbert</h2>
-            <p className="owner-role">Orthodontiste</p>
+            <p className="owner-role">Orthodontie enfants &amp; adultes</p>
             <p className="owner-intro">
               L’orthodontie ne consiste pas seulement à aligner des dents. Elle accompagne une croissance, un équilibre et une évolution qui se poursuivent bien après la fin d’un traitement.
             </p>

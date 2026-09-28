@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
   description:
-    "Clinique dentaire à Neuchâtel : traitement global, esthétique du sourire, endodontie spécialisée et méthode SourirePlus fondée sur une vision à long terme.",
+    "Clinique dentaire à Neuchâtel organisée autour de 6 pôles : traitement global, esthétique, endodontie, hygiène & suivi, parodontologie-implantologie et orthodontie enfants/adultes.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -31,6 +31,9 @@ export const metadata: Metadata = {
     "urgence dentaire Neuchâtel",
     "traitement global dentaire Neuchâtel",
     "réhabilitation orale Neuchâtel",
+    "hygiéniste dentaire Neuchâtel",
+    "prophylaxie dentaire enfant Neuchâtel",
+    "parodontologie Neuchâtel",
     "implantologie Neuchâtel",
     "orthodontie Neuchâtel",
     "endodontie Neuchâtel",
@@ -44,12 +47,12 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
     description:
-      "À deux minutes de la gare de Neuchâtel, SourirePlus développe trois axes forts : traitement global, esthétique du sourire et endodontie spécialisée.",
+      "À deux minutes de la gare de Neuchâtel, SourirePlus réunit 6 pôles coordonnés, de l’hygiène et la prévention aux traitements spécialisés.",
   },
   twitter: {
     card: "summary",
     title: "Clinique Dentaire SourirePlus | Neuchâtel",
-    description: "Traitement global, esthétique du sourire, endodontie spécialisée et vision à long terme à Neuchâtel.",
+    description: "6 pôles coordonnés à Neuchâtel : prévention, traitement global, esthétique, endodontie, parodontologie-implantologie et orthodontie.",
   },
   robots: {
     index: true,
@@ -107,8 +110,10 @@ const structuredData = [
       "Dentistry",
       "Orthodontics",
       "Endodontics",
+      "Periodontics",
       "Implant dentistry",
       "Aesthetic dentistry",
+      "Preventive dentistry",
     ],
   },
   {

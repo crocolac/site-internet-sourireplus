@@ -40,6 +40,9 @@ const expertiseLinks = [
   { href: "/traitement-global/", label: "Traitement global" },
   { href: "/esthetique-dentaire/", label: "Esthétique" },
   { href: "/endodontie/", label: "Endodontie" },
+  { href: "/hygiene-suivi/", label: "Hygiène & suivi" },
+  { href: "/parodontologie-implantologie/", label: "Parodontologie & implants" },
+  { href: "/orthodontie/", label: "Orthodontie" },
 ] as const;
 
 export function TreatmentPage({

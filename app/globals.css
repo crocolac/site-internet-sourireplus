@@ -239,7 +239,9 @@ main section[id], main div[id] { scroll-margin-top: 160px; }
 .journey-grid { border-top: 1px solid var(--line); display: grid; gap: 0; grid-column: 1 / -1; grid-template-columns: repeat(3,1fr); margin-top: 46px; }
 .journey-grid article { border-right: 1px solid var(--line); padding: 40px 42px 10px 0; position: relative; }
 .journey-grid article + article { padding-left: 42px; }
-.journey-grid article:last-child { border-right: 0; }
+.journey-grid article:nth-child(3n) { border-right: 0; }
+.journey-grid article:nth-child(n+4) { border-top: 1px solid var(--line); }
+.journey-grid article:nth-child(3n+1):not(:first-child) { padding-left: 0; }
 .journey-grid svg { color: var(--gold); height: 29px; width: 29px; }
 .journey-grid h3 { color: var(--navy); font-family: Georgia, serif; font-size: 22px; font-weight: 400; margin-top: 24px; }
 .journey-grid p { color: var(--muted); font-size: 15px; line-height: 1.75; margin-top: 13px; max-width: 285px; }
