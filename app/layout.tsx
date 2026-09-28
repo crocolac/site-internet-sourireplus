@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
   description:
-    "Fondée en 2008, SourirePlus célèbre 18 ans d’existence à Neuchâtel avec des praticiens ayant au moins 25 ans d’expérience et une méthode fondée sur six courbes.",
+    "Clinique dentaire à Neuchâtel : traitement global, esthétique du sourire, endodontie spécialisée et méthode SourirePlus fondée sur une vision à long terme.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -29,6 +29,8 @@ export const metadata: Metadata = {
     "clinique dentaire Neuchâtel",
     "dentiste gare Neuchâtel",
     "urgence dentaire Neuchâtel",
+    "traitement global dentaire Neuchâtel",
+    "réhabilitation orale Neuchâtel",
     "implantologie Neuchâtel",
     "orthodontie Neuchâtel",
     "endodontie Neuchâtel",
@@ -42,12 +44,12 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: "Clinique Dentaire SourirePlus | Dentiste à Neuchâtel",
     description:
-      "À deux minutes de la gare de Neuchâtel, SourirePlus associe 18 ans d’existence, praticiens expérimentés et méthode fondée sur six courbes.",
+      "À deux minutes de la gare de Neuchâtel, SourirePlus développe trois axes forts : traitement global, esthétique du sourire et endodontie spécialisée.",
   },
   twitter: {
     card: "summary",
     title: "Clinique Dentaire SourirePlus | Neuchâtel",
-    description: "18 ans d’existence, une équipe expérimentée et une vision à long terme du sourire.",
+    description: "Traitement global, esthétique du sourire, endodontie spécialisée et vision à long terme à Neuchâtel.",
   },
   robots: {
     index: true,
