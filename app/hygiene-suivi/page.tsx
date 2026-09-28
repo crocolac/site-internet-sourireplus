@@ -15,7 +15,9 @@ export const metadata: Metadata = {
 export default function HygieneSuiviPage() {
   return (
     <TreatmentPage
-      eyebrow="Hygiène & suivi · Enfants et adultes"
+      serviceName="Hygiène dentaire, prévention et suivi"
+      servicePath="/hygiene-suivi/"
+      eyebrow="Hygiène dentaire & suivi · Neuchâtel · Enfants et adultes"
       title="Prévenir aujourd’hui pour"
       accent="conserver demain."
       lead="Notre pôle hygiène et suivi réunit 3 hygiénistes et 2 assistantes en prophylaxie. Enfants comme adultes bénéficient d’un suivi adapté à leur âge, à leur risque et à leur histoire dentaire."
