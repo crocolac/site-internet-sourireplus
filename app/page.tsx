@@ -206,7 +206,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
           <p className="eyebrow">Votre rendez-vous</p>
           <DialogTitle>Comment pouvons-nous vous aider&nbsp;?</DialogTitle>
           <DialogDescription>
-            Renseignez vos informations puis choisissez immédiatement votre créneau. Un lien personnel vous sera aussi envoyé par SMS.
+            Renseignez vos informations puis choisissez immédiatement votre créneau. Un SMS vous permettra ensuite de valider le rendez-vous et deviendra votre lien personnel.
           </DialogDescription>
         </DialogHeader>
 
@@ -265,7 +265,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
                 </label>
               </RadioGroup>
             </fieldset>
-            <p className="form-note">Après validation, vous serez directement dirigé vers les créneaux disponibles. Le SMS vous permettra de retrouver ou modifier votre rendez-vous plus tard.</p>
+            <p className="form-note">Après cette étape, vous choisirez directement votre créneau. Un seul SMS sera ensuite envoyé pour valider le rendez-vous ; ce même lien permettra de le retrouver ou le modifier plus tard.</p>
             {error && <p className="form-error" role="alert">{error}</p>}
             <div className="dialog-actions">
               <button className="text-button" type="button" onClick={() => { setMode("choice"); setError(""); }}>Retour</button>
