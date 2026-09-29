@@ -173,9 +173,17 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
             }
           : { action: "manage_link", phone, code: code.trim() }),
       });
-      const result = await response.json() as { ok?: boolean; message?: string; error?: string };
+      const result = await response.json() as { ok?: boolean; message?: string; error?: string; booking_url?: string | null };
       if (!response.ok || result.ok !== true) {
         throw new Error(result.error || "Le service est momentanément indisponible.");
+      }
+      if (
+        isRequest &&
+        typeof result.booking_url === "string" &&
+        result.booking_url.startsWith("https://mydentalpass.ch/borne/mobile.php#s=")
+      ) {
+        window.location.assign(result.booking_url);
+        return;
       }
       setSuccessMessage(result.message || "Le lien a été envoyé par SMS.");
       setMode("success");
@@ -198,7 +206,7 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
           <p className="eyebrow">Votre rendez-vous</p>
           <DialogTitle>Comment pouvons-nous vous aider&nbsp;?</DialogTitle>
           <DialogDescription>
-            Une demande simple, puis votre lien personnel directement par SMS.
+            Renseignez vos informations puis choisissez immédiatement votre créneau. Un lien personnel vous sera aussi envoyé par SMS.
           </DialogDescription>
         </DialogHeader>
 
@@ -257,13 +265,13 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
                 </label>
               </RadioGroup>
             </fieldset>
-            <p className="form-note">Notre système de prise de RDV va vous permettre de choisir votre rendez-vous via votre téléphone.</p>
+            <p className="form-note">Après validation, vous serez directement dirigé vers les créneaux disponibles. Le SMS vous permettra de retrouver ou modifier votre rendez-vous plus tard.</p>
             {error && <p className="form-error" role="alert">{error}</p>}
             <div className="dialog-actions">
               <button className="text-button" type="button" onClick={() => { setMode("choice"); setError(""); }}>Retour</button>
               <Button className="primary-cta" type="submit" disabled={pending}>
                 {pending ? <Loader2 className="spin" aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
-                Prendre mon RDV
+                Choisir mon RDV
               </Button>
             </div>
           </form>
