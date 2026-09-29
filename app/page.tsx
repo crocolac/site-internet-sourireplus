@@ -123,6 +123,8 @@ const APPOINTMENT_API = "https://mydentalpass.ch/borne/site-api.php";
 
 function AppointmentDialog({ compact = false }: { compact?: boolean }) {
   const [mode, setMode] = useState<"choice" | "request" | "manage" | "success">("choice");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [existingPatient, setExistingPatient] = useState("yes");
   const [need, setNeed] = useState("bilan");
@@ -134,6 +136,8 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
 
   const reset = () => {
     setMode("choice");
+    setFirstName("");
+    setLastName("");
     setPhone("");
     setExistingPatient("yes");
     setNeed("bilan");
@@ -160,6 +164,8 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
           ? {
               action: "create_request",
               request_id: requestId.current,
+              first_name: firstName,
+              last_name: lastName,
               phone,
               need,
               existing_patient: existingPatient === "yes",
@@ -219,6 +225,14 @@ function AppointmentDialog({ compact = false }: { compact?: boolean }) {
           </div>
         ) : mode === "request" ? (
           <form className="appointment-form" onSubmit={submit}>
+            <label>
+              Prénom
+              <Input value={firstName} onChange={(event) => setFirstName(event.target.value)} required maxLength={80} autoComplete="given-name" placeholder="Votre prénom" />
+            </label>
+            <label>
+              Nom
+              <Input value={lastName} onChange={(event) => setLastName(event.target.value)} required maxLength={80} autoComplete="family-name" placeholder="Votre nom" />
+            </label>
             <label>
               Votre numéro de téléphone
               <Input value={phone} onChange={(event) => setPhone(event.target.value)} required inputMode="tel" autoComplete="tel" placeholder="+41 79 123 45 67" />
