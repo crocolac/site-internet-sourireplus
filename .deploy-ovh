@@ -42,3 +42,4 @@ Deploy PR #46 — six coordinated poles: hygiene and follow-up, periodontology-i
 Deploy PR #47 — local SEO hub, descriptive internal linking, structured data and fr-CH metadata on 2026-09-28 Europe/Zurich.
 Deploy PR #48 — add required first name and last name to the online appointment form and send them securely to the appointment kiosk backend on 2026-09-29 Europe/Zurich.
 Deploy PR #49 — redirect new online appointment requests directly to the one-time secure booking handoff, while retaining the permanent SMS link, on 2026-09-29 Europe/Zurich.
+Deploy PR #50 — publish the one-SMS appointment validation wording coordinated with backend PR #62 on 2026-09-29 Europe/Zurich.
