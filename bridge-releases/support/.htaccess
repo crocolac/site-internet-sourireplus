@@ -1,0 +1,12 @@
+Options -Indexes
+AddType application/json .json
+AddType application/octet-stream .exe
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  <Files "manifest.json">
+    Header set Cache-Control "no-store, max-age=0"
+  </Files>
+</IfModule>
+<FilesMatch "^\.bridge-stage-">
+  Require all denied
+</FilesMatch>
