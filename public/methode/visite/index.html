@@ -35,6 +35,7 @@
 @media print{.print-summary .evolution-print{break-inside:auto}.evolution-cards{break-inside:avoid}.mean-card{padding:9px}.mean-card h3{margin-bottom:8px}.mean-number{font-size:33px}.stage-mean{padding:5px}.stage-mean strong{font-size:22px}.print-summary .panel-head{margin-bottom:8px}.print-summary .evolution-print h2{margin-top:12px}.score-trajectories{margin-top:15px}.trajectory-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.score-trajectory{padding:8px 6px 1px;border-top-width:2px}.score-trajectory h3{font-size:11px;margin-bottom:1px}.score-trajectories>p{font-size:9px!important;margin-bottom:8px!important}.score-trajectories>h2{font-size:14px}.report-plans{break-before:page}.print-summary .report-plans{break-inside:auto}.stage-mean{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 
 @media print{.print-summary .mean-card{padding:6px}.print-summary .stage-mean{padding:4px;gap:1px;line-height:1.15}.print-summary .stage-mean strong{font-size:19px}.print-summary .mean-card h3{margin:0 0 6px}.print-summary .score-trajectories{margin-top:10px}.print-summary .score-trajectory h3{line-height:1.3}.print-summary .evolution-caption{margin-top:8px!important}}
+.objective-zero{display:block;margin-top:4px;padding:6px 1px;border-radius:5px;background:var(--criterion-color);color:#fff;font-size:10px;text-align:center}
 </style>
 </head>
 <body>
@@ -89,12 +90,12 @@ function inheritedScores(stage){
 }
 function objectiveGrid(stage,title){
   const inherited=inheritedScores(stage),included=Boolean(planDraft?.[stage]?.trim());
-  let html='<div class="objective-grid" data-objective-grid="'+stage+'" data-included="'+included+'"><h4>Objectifs sur 10 <span>facultatifs</span></h4><p class="objective-help">10 en haut, 1 en bas. Sans sélection, la note précédente est conservée. Recliquez pour effacer.</p><p class="objective-excluded">Renseignez le cadre pour retenir ce devis et choisir ses objectifs.</p><div class="objective-columns">';
+  let html='<div class="objective-grid" data-objective-grid="'+stage+'" data-included="'+included+'"><h4>Objectifs sur 10 <span>facultatifs</span></h4><p class="objective-help">La note précédente est déjà sélectionnée. Changez-la si besoin ; recliquez sur votre objectif pour revenir à la note reprise.</p><p class="objective-excluded">Renseignez le cadre pour retenir ce devis et choisir ses objectifs.</p><div class="objective-columns">';
   for(const c of criteria()){
-    const chosen=planDraft?.objectives?.[stage]?.[c.id]??null;
+    const chosen=planDraft?.objectives?.[stage]?.[c.id]??null,effective=chosen??inherited[c.id];
     html+='<div class="objective-row" data-objective-criterion="'+c.id+'" style="--criterion-color:'+criterionColors[c.id]+'"><div class="objective-label"><strong>'+esc(c.label)+'</strong><span>'+ (chosen===null?'Repris : '+inherited[c.id]:inherited[c.id]+' → '+chosen)+'/10</span></div><div class="objective-options" role="group" aria-label="'+title+' · objectif '+esc(c.label)+'">';
-    for(let n=10;n>=1;n--)html+='<button type="button" id="objective-'+stage+'-'+c.id+'-'+n+'" class="objective-button'+(chosen===n?' selected':'')+'" data-action="objective" data-stage="'+stage+'" data-criterion="'+c.id+'" data-score="'+n+'" aria-pressed="'+(chosen===n)+'" aria-label="'+title+' · '+esc(c.label)+' : objectif '+n+' sur 10"'+disabled(!included)+'>'+n+'</button>';
-    html+='</div></div>';
+    for(let n=10;n>=1;n--)html+='<button type="button" id="objective-'+stage+'-'+c.id+'-'+n+'" class="objective-button'+(effective===n?' selected':'')+'" data-action="objective" data-stage="'+stage+'" data-criterion="'+c.id+'" data-score="'+n+'" aria-pressed="'+(effective===n)+'" aria-label="'+title+' · '+esc(c.label)+' : objectif '+n+' sur 10"'+disabled(!included)+'>'+n+'</button>';
+    html+='</div><span class="objective-zero"'+(effective===0?'':' hidden')+'>0 · repris</span></div>';
   }
   return html+'</div></div>';
 }
@@ -136,6 +137,9 @@ function markPlanDirty(){
     for(const row of grid.querySelectorAll('[data-objective-criterion]')){
       const id=row.dataset.objectiveCriterion,chosen=planDraft.objectives?.[stage]?.[id]??null;
       row.querySelector('.objective-label span').textContent=(chosen===null?'Repris : '+inherited[id]:inherited[id]+' → '+chosen)+'/10';
+      const effective=chosen??inherited[id];
+      for(const b of row.querySelectorAll('.objective-button')){const selected=Number(b.dataset.score)===effective;b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',String(selected))}
+      row.querySelector('.objective-zero').hidden=effective!==0;
     }
   }
 }
@@ -239,7 +243,7 @@ async function downloadReport(){if(busy||!online)return;busy=true;connectionStat
 async function prepareSummary(){if(busy||!online||!summaryReady())return;busy=true;summaryApproved=false;mutationEpoch++;render();let ready=false;try{const response=await request('/api/summary',{method:'POST',body:{}});acceptState(await response.json());ready=summaryReady();summaryApproved=ready;if(!ready)errorMessage='Complétez et enregistrez au moins un devis avant de préparer la synthèse.'}catch(error){if(!error.status)online=false;errorMessage=error.status?error.message:'La synthèse n’a pas pu être vérifiée. Vérifiez la connexion avant de réessayer.'}finally{busy=false;render()}if(ready){for(const reportLogo of app.querySelectorAll('.print-summary img'))try{await reportLogo.decode()}catch{}window.print()}}
 app.addEventListener('click',event=>{const button=event.target.closest('button[data-action]');if(!button||button.disabled)return;const action=button.dataset.action;
   if(action==='close-session'){closeSession();return}if(action==='retry'){errorMessage='';stateFingerprint='';refresh();return}if(action==='open-presentation'){openView('presentation');return}if(action==='copy-presentation'){navigator.clipboard.writeText(state.links.presentation).then(()=>toast('Lien de présentation copié.')).catch(()=>window.prompt('Lien de présentation',state.links.presentation));return}if(action==='report'){downloadReport();return}if(action==='print-plan'){prepareSummary();return}
-  if(action==='objective'){if(!planDraft)return;const stage=button.dataset.stage,id=button.dataset.criterion,n=Number(button.dataset.score);planDraft.objectives??={};planDraft.objectives[stage]??={};planDraft.objectives[stage][id]=planDraft.objectives[stage][id]===n?null:n;markPlanDirty();render();return}
+  if(action==='objective'){if(!planDraft)return;const stage=button.dataset.stage,id=button.dataset.criterion,n=Number(button.dataset.score);if(planDraft.objectives?.[stage]?.[id]==null&&n===inheritedScores(stage)[id])return;planDraft.objectives??={};planDraft.objectives[stage]??={};planDraft.objectives[stage][id]=planDraft.objectives[stage][id]===n?null:n;markPlanDirty();render();return}
   if(action==='score'){mutate('/api/score',{side:button.dataset.side,criterion:button.dataset.criterion,score:Number(button.dataset.score)});return}
   if(action==='lock'){mutate('/api/lock',{side:button.dataset.side},'Les six cartes sont verrouillées.');return}
   if(action==='reveal'){mutate('/api/reveal',{criterion:button.dataset.criterion});return}
@@ -253,6 +257,6 @@ window.addEventListener('afterprint',()=>{summaryApproved=false;app.querySelecto
 if(token&&sessionId){refresh();refreshing=setInterval(()=>{if(!document.hidden)refresh()},1200)}
 })();
 </script>
-<script src="team.js"></script>
+<script src="team.js?v=0.4.3"></script>
 </body>
 </html>

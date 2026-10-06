@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 // SOURIREPLUS_TWO_SCREEN_V1 — encrypted sessions; private directory denied by Apache.
-const SP_VERSION = '0.4.2';
+const SP_VERSION = '0.4.3';
 const SP_CRITERIA = ['caries'=>'Caries','restaurations'=>'Restaurations','gencives'=>'Gencives','alignement'=>'Alignement','fonction'=>'Fonction','esthetique'=>'Esthétique'];
 const SP_BASE = 'https://sourireplus.ch/methode/visite/';
 
