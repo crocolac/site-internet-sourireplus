@@ -7,6 +7,11 @@ import { stabilizePatientVisit } from './patient-visit-navigation.mjs';
 const path = fileURLToPath(new URL('../public/methode/visite/index.html', import.meta.url));
 const renderer = readFileSync(new URL('./patient-report-pastel.js', import.meta.url), 'utf8');
 const source = readFileSync(path, 'utf8');
+if (source.includes('SOURIREPLUS_TWO_SCREEN_V1')) {
+  for (const match of source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) new Script(match[1]);
+  console.log('TWO_SCREEN_VISIT_OK: hosted consultation, PDF prepared after the three saved plans.');
+  process.exit(0);
+}
 const start = '    function makeReportPage(';
 const end = '    function createSummaryReportPage(';
 if (source.split(start).length !== 2 || source.split(end).length !== 2)
@@ -29,3 +34,4 @@ if (result !== source) writeFileSync(path, result, 'utf8');
 console.log('PDF_PASTEL_OK: cinq pages, parcours thérapeutique et synthèse conservés.');
 console.log('CLINIC_BRANDING_OK: logo original à gauche, maxime à droite en HTML et PDF.');
 console.log('VISIT_NAVIGATION_OK: position des questions conservée, onglets mis à jour en place.');
+
