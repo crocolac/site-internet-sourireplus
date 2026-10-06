@@ -263,7 +263,7 @@ async function prepareSummary(kind='medical'){
     const response=await request('/api/summary',{method:'POST',body:{}});acceptState(await response.json());
     if(!summaryReady())throw new Error('Enregistrez les devis avant de préparer la synthèse.');
     if(kind==='medical'){
-      summaryApproved=true;render();for(const logo of app.querySelectorAll('.print-summary img'))try{await logo.decode()}catch{}
+      summaryApproved=true;render();for(const reportLogo of app.querySelectorAll('.print-summary img'))try{await reportLogo.decode()}catch{}
       window.print();
     }else{
       let bytes=await window.SourirePlusPDF.createPatient(reportModel());
