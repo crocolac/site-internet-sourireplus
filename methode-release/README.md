@@ -1,7 +1,7 @@
-# Publication Méthode SourirePlus 0.4.0
+# Publication Méthode SourirePlus web 0.4.1 / passerelle Windows 0.4.0
 
-Source de référence : crocolac/methode-sourireplus, commit ddf8869a6f5d369b7523fdcfb052405303c92969 (intégré à main). L’instantané source.zip.b64 ne contient aucun secret ni dossier réel.
+Source : crocolac/methode-sourireplus, commit a9e4779180125bf12b8e4bc5ff3bc2c4deb912af.
 
-SHA-256 : 3d03cbb5c9cac6be7c912a1bd86e90b0d07e7c955d768ee04f65c4d76f069900
+Courbes de référence et objectifs cumulatifs facultatifs. Le code de la passerelle et son kit signé sont inchangés.
 
-Le dépôt d’hébergement est public. La livraison contenant les accès est chiffrée avec la clé publique destinataire avant tout chargement comme artefact. La clé privée reste chez le responsable de la livraison.
+SHA-256 source.zip.b64 : 03f50688eb649bda8199b6d22a1f1c6b870c9734cd3bbeb72302dd4f22470f8f
