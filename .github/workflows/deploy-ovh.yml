@@ -108,8 +108,13 @@ jobs:
           php -l out/social-hub/api.php
           php -l out/social-hub/lib.php
           php -l out/config/social-hub.php
-          grep -q 'function patientReportGap' out/methode/visite/index.html
-          grep -q 'function patientReportEffect' out/methode/visite/index.html
+          if grep -q 'SOURIREPLUS_TWO_SCREEN_V1' out/methode/visite/index.html; then
+            php -l out/methode/visite/api.php
+            php -l out/methode/visite/lib.php
+          else
+            grep -q 'function patientReportGap' out/methode/visite/index.html
+            grep -q 'function patientReportEffect' out/methode/visite/index.html
+          fi
       - name: Install SFTP client
         run: sudo apt-get update && sudo apt-get install -y lftp
       - name: Publish without deleting the legacy backup
@@ -179,3 +184,4 @@ jobs:
           done
           echo "The live Google rating endpoint did not return valid data" >&2
           exit 1
+
