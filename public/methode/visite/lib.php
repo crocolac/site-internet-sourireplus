@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 // SOURIREPLUS_TWO_SCREEN_V1 — encrypted sessions; private directory denied by Apache.
-const SP_VERSION = '0.4.3';
+const SP_VERSION = '0.4.4';
 const SP_CRITERIA = ['caries'=>'Caries','restaurations'=>'Restaurations','gencives'=>'Gencives','alignement'=>'Alignement','fonction'=>'Fonction','esthetique'=>'Esthétique'];
 const SP_BASE = 'https://sourireplus.ch/methode/visite/';
 
@@ -136,7 +136,7 @@ function sp_state(array $s,string $role): array {
         'criteria'=>array_map(fn($id,$label)=>['id'=>$id,'label'=>$label],array_keys(SP_CRITERIA),array_values(SP_CRITERIA)),
         'scores'=>$visible,'filled'=>$filled,'locked'=>$s['locked'],'revealed'=>$s['revealed'],
         'phase'=>!$s['locked']['patient']?'patient':(!$s['locked']['clinical']?'clinical':(count($s['revealed'])<6?'reveal':'plan')),
-        'summary_ready'=>sp_ready($s),'report_available'=>false,'closed'=>$s['closed']];
+        'target_age'=>(int)($s['plan']['horizon']??70),'summary_ready'=>sp_ready($s),'report_available'=>false,'closed'=>$s['closed']];
     if($s['patient']['birth_date']!=='') {
         $born=new DateTimeImmutable($s['patient']['birth_date']);
         $visit=(new DateTimeImmutable($s['created_at']))->setTimezone(new DateTimeZone('Europe/Zurich'));

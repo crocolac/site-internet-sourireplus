@@ -2,7 +2,7 @@
   "version": "0.4.0",
   "build_run_id": 37491005250,
   "build_head_sha": "907295461e499be998dc4abe8500d09a03270316",
-  "source_sha256": "bbdf728871c67b69fc4480003911793280c7a70e497defb4d65107c81eb8f5a7",
-  "publication_attempt": 6,
-  "web_version": "0.4.3"
+  "source_sha256": "5f3523bc479044dd4e961ace831292acc4b3bf3f672d2cb6d8556272e3b60f1b",
+  "publication_attempt": 7,
+  "web_version": "0.4.4"
 }

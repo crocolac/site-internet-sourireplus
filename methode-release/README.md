@@ -1,7 +1,7 @@
-# Publication Méthode SourirePlus web 0.4.3 / passerelle Windows 0.4.0
+# Publication Méthode SourirePlus web 0.4.4 / passerelle Windows 0.4.0
 
-Source : crocolac/methode-sourireplus, commit 447b9a1c509278ce92379ab7d7ea4c745e4e7250.
+Source : crocolac/methode-sourireplus, commit 2b9ab9776cd4432e571188da7842e3338977d7a7.
 
-Notes héritées présélectionnées et accès à la même séance depuis plusieurs ordinateurs sans renouveler les liens. Le code de la passerelle et son kit signé sont inchangés.
+Graphique commun des six critères, synthèses médicale et patient distinctes, âge cible mis en valeur, fusion locale du PDF DX Plus et purge de séance confirmée. Le code de la passerelle et son kit signé sont inchangés.
 
-SHA-256 source.zip.b64 : bbdf728871c67b69fc4480003911793280c7a70e497defb4d65107c81eb8f5a7
+SHA-256 source.zip.b64 : 5f3523bc479044dd4e961ace831292acc4b3bf3f672d2cb6d8556272e3b60f1b
