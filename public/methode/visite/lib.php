@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-// SOURIREPLUS_TWO_SCREEN_V1 — no clinical data or credentials in the web tree.
+// SOURIREPLUS_TWO_SCREEN_V1 — encrypted sessions; private directory denied by Apache.
 const SP_VERSION = '0.4.0';
 const SP_CRITERIA = ['alignement'=>'Alignement','caries'=>'Caries','gencives'=>'Gencives','restaurations'=>'Restaurations','fonction'=>'Fonction','esthetique'=>'Esthétique'];
 const SP_BASE = 'https://sourireplus.ch/methode/visite/';
@@ -10,13 +10,16 @@ final class SpError extends RuntimeException {
     public function __construct(int $status, string $message) { parent::__construct($message); $this->status=$status; }
 }
 function sp_assert(bool $ok, int $status, string $message): void { if (!$ok) throw new SpError($status,$message); }
-function sp_dir(): string { return getenv('SOURIREPLUS_METHOD_PRIVATE') ?: dirname(__DIR__,3).'/.sourireplus-methode'; }
+function sp_dir(): string { return getenv('SOURIREPLUS_METHOD_PRIVATE') ?: dirname(__DIR__,2).'/.sourireplus-methode'; }
 function sp_config(): array {
     static $config=null;
     if ($config!==null) return $config;
-    $path=sp_dir().'/config.json';
+    $path=sp_dir().'/config.php';
     sp_assert(is_file($path),503,'Le service de séances est en cours de configuration.');
-    $config=json_decode(file_get_contents($path),true,32,JSON_THROW_ON_ERROR);
+    $guard="<?php http_response_code(404); exit; __halt_compiler();\n";
+    $raw=file_get_contents($path);
+    sp_assert(str_starts_with($raw,$guard),503,'Configuration protégée indisponible.');
+    $config=json_decode(substr($raw,strlen($guard)),true,32,JSON_THROW_ON_ERROR);
     sp_assert(isset($config['key'],$config['access_hash']) && strlen(base64_decode($config['key'],true) ?: '')===32,503,'Configuration du service indisponible.');
     return $config;
 }

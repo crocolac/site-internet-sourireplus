@@ -26,6 +26,7 @@ import publish_bridge_updates as updates
 
 BASE="https://sourireplus.ch/methode/visite/"
 FILES=(".htaccess","lib.php","api.php","team.js","index.html")
+GUARD=b"<?php http_response_code(404); exit; __halt_compiler();\n"
 
 
 def put(sftp,path,raw,mode=0o600):
@@ -49,7 +50,7 @@ def directory(sftp,path,mode):
 
 def configuration(sftp,private):
     directory(sftp,private,0o700)
-    config_path=private+"/config.json";access_path=private+"/installation-access.json"
+    config_path=private+"/config.php";access_path=private+"/installation-access.php"
     raw=updates.remote_read(sftp,config_path,4096)
     access_raw=updates.remote_read(sftp,access_path,4096)
     if raw is None:
@@ -58,15 +59,34 @@ def configuration(sftp,private):
         config={"key":base64.b64encode(os.urandom(32)).decode(),
                 "access_hash":hashlib.sha256(access["staff_key"].encode()).hexdigest(),
                 "bridge_hash":hashlib.sha256(access["bridge_key"].encode()).hexdigest()}
-        put(sftp,access_path,json.dumps(access).encode())
-        put(sftp,config_path,json.dumps(config).encode())
+        put(sftp,access_path,GUARD+json.dumps(access).encode())
+        put(sftp,config_path,GUARD+json.dumps(config).encode())
     else:
         updates.require(access_raw is not None,"Private installation access missing. Do not replace an existing encryption key.")
-        config=json.loads(raw);access=json.loads(access_raw)
+        updates.require(raw.startswith(GUARD) and access_raw.startswith(GUARD),"Private configuration guard missing.")
+        config=json.loads(raw[len(GUARD):]);access=json.loads(access_raw[len(GUARD):])
         updates.require(len(base64.b64decode(config["key"]))==32,"Invalid stored encryption key.")
         for value,field in [("staff_key","access_hash"),("bridge_key","bridge_hash")]:
             updates.require(hashlib.sha256(access[value].encode()).hexdigest()==config[field],"Private access configuration differs.")
     return access
+
+
+def protect_private_directory(sftp,private):
+    # Shared OVH credentials can write the site but cannot create a sibling.
+    # Deny HTTP access before creating any secret; PHP wrappers add a second barrier.
+    directory(sftp,private,0o700)
+    put(sftp,private+"/.htaccess",b"Options -Indexes\nRequire all denied\n",0o644)
+    probe="access-check-"+uuid.uuid4().hex+".txt"
+    put(sftp,private+"/"+probe,b"non-sensitive deployment probe\n",0o644)
+    try:
+        opener=urllib.request.build_opener(updates.NoRedirect())
+        for name in (probe,"config.php","installation-access.php"):
+            request=urllib.request.Request("https://sourireplus.ch/.sourireplus-methode/"+name,headers={"Cache-Control":"no-cache"})
+            try:response=opener.open(request,timeout=25)
+            except urllib.error.HTTPError as exc:response=exc
+            with response:updates.require(response.status==403,"Private directory must deny all HTTP requests before credentials are stored.")
+    finally:sftp.remove(private+"/"+probe)
+    print("PRIVATE_DIRECTORY_HTTP_DENIED")
 
 
 def delivery(kit,access,public_key,output):
@@ -167,20 +187,22 @@ def main():
     if not args.publish:print("METHOD_RELEASE_VALID");return
     client,sftp=updates.connect_sftp();previous={};written=[]
     try:
-        root=sftp.normalize(".");updates.require(root!="/","SFTP root must expose the hosting parent for private storage.")
-        private=posixpath.dirname(root)+"/.sourireplus-methode"
+        root=sftp.normalize(".")
+        private=posixpath.join(root,".sourireplus-methode")
+        protect_private_directory(sftp,private)
         access=configuration(sftp,private)
         encrypted_delivery(args.kit,access,public_bytes)
         directory(sftp,private+"/backups",0o700)
         directory(sftp,"methode",0o755);directory(sftp,"methode/visite",0o755)
-        for name in FILES:
-            target="methode/visite/"+name
-            previous[name]=updates.remote_read(sftp,target,1024*1024)
-            if previous[name] is not None:
-                backup=private+"/backups/"+name.replace('.','_')+"-"+hashlib.sha256(previous[name]).hexdigest()
-                if updates.remote_stat(sftp,backup) is None:put(sftp,backup,previous[name])
-            put(sftp,target,(Path("public/methode/visite")/name).read_bytes(),0o644);written.append(name)
-        try:smoke(sftp,private,access)
+        try:
+            for name in FILES:
+                target="methode/visite/"+name
+                previous[name]=updates.remote_read(sftp,target,1024*1024)
+                if previous[name] is not None:
+                    backup=private+"/backups/"+name.replace('.','_')+"-"+hashlib.sha256(previous[name]).hexdigest()
+                    if updates.remote_stat(sftp,backup) is None:put(sftp,backup,previous[name])
+                put(sftp,target,(Path("public/methode/visite")/name).read_bytes(),0o644);written.append(name)
+            smoke(sftp,private,access)
         except Exception:
             for name in reversed(written):
                 target="methode/visite/"+name
