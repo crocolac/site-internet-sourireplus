@@ -1,6 +1,6 @@
 # Publication Méthode SourirePlus 0.4.0
 
-Source de référence : crocolac/methode-sourireplus, branche codex/methode-ovh-two-screens. L’instantané source.zip.b64 ne contient aucun secret ni dossier réel.
+Source de référence : crocolac/methode-sourireplus, commit ddf8869a6f5d369b7523fdcfb052405303c92969 (intégré à main). L’instantané source.zip.b64 ne contient aucun secret ni dossier réel.
 
 SHA-256 : 3d03cbb5c9cac6be7c912a1bd86e90b0d07e7c955d768ee04f65c4d76f069900
 
