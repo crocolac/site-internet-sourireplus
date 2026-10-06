@@ -16,6 +16,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  hosting-check:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install cryptography==50.0.2 paramiko==4.0.0
+      - name: Check hosting private-directory reachability without writes
+        env:
+          SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
+          SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_PORT: ${{ secrets.SFTP_PORT }}
+        run: |
+          python - <<'PYCODE'
+          import sys,posixpath,stat
+          sys.path.insert(0,'scripts')
+          import publish_bridge_updates as u
+          client,sftp=u.connect_sftp()
+          try:
+              root=sftp.normalize('.')
+              print('SFTP_ROOT_IS_CHROOT='+str(root=='/'))
+              print('PARENT_IS_SAME='+str(sftp.normalize('..')==root))
+              for label,path in [('current','.'),('parent','..')]:
+                  detail=sftp.stat(path)
+                  print(label+'_mode='+oct(stat.S_IMODE(detail.st_mode)))
+              if root!='/':
+                  private=posixpath.dirname(root)+'/.sourireplus-methode'
+                  for name in ['','/config.json','/installation-access.json']:
+                      detail=u.remote_stat(sftp,private+name)
+                      print('PRIVATE'+name.replace('/','_')+'_EXISTS='+str(detail is not None))
+          finally:sftp.close();client.close()
+          PYCODE
   hosted-tests:
     runs-on: ubuntu-24.04
     steps:

@@ -13,6 +13,7 @@ import shutil
 import stat
 import sys
 import tempfile
+import traceback
 import urllib.error
 import urllib.request
 import uuid
@@ -194,7 +195,8 @@ def main():
 
 if __name__=="__main__":
     try:main()
-    except Exception:
-        # Never include access keys, patient content, hosting paths or raw HTTP responses.
-        print("Method publication failed. Inspect the validation step and restore status before retrying.",file=sys.stderr)
+    except Exception as exc:
+        # Report code locations only: no credentials, server paths, responses or exception text.
+        frames=[f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}" for frame in traceback.extract_tb(exc.__traceback__) if Path(frame.filename).name in {"publish_methode.py","publish_bridge_updates.py"}]
+        print("Method publication failed:",type(exc).__name__,"errno="+str(getattr(exc,"errno",None))," > ".join(frames),file=sys.stderr)
         sys.exit(1)
