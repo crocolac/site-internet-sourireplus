@@ -155,7 +155,7 @@ def api(action,data=None,key=None,session=None):
 
 def smoke(sftp,private,access):
     from urllib.parse import urlsplit,parse_qs
-    code,status=api("status");updates.require(code==200 and status.get("version")=="0.4.0","Live service version differs.")
+    code,status=api("status");updates.require(code==200 and status.get("version")==json.loads(Path("methode-release/release.json").read_text()).get("web_version","0.4.0"),"Live service version differs.")
     updates.require(api("sessions")[0]==401,"Sessions must require authentication.")
     for name in FILES:
         if name in ("lib.php",".htaccess"):continue
@@ -212,7 +212,7 @@ def main():
         updates.publish_release(sftp,Path("bridge-releases/support"),public,envelope,payload,exe)
     finally:sftp.close();client.close()
     updates.verify_live(envelope,payload)
-    print("METHOD_AND_WINDOWS_LIVE_OK version=0.4.0")
+    print("METHOD_AND_WINDOWS_LIVE_OK web="+release.get("web_version","0.4.0")+" bridge="+release["version"])
 
 
 if __name__=="__main__":

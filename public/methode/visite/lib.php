@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 // SOURIREPLUS_TWO_SCREEN_V1 — encrypted sessions; private directory denied by Apache.
-const SP_VERSION = '0.4.0';
+const SP_VERSION = '0.4.1';
 const SP_CRITERIA = ['alignement'=>'Alignement','caries'=>'Caries','gencives'=>'Gencives','restaurations'=>'Restaurations','fonction'=>'Fonction','esthetique'=>'Esthétique'];
 const SP_BASE = 'https://sourireplus.ch/methode/visite/';
 
@@ -95,6 +95,30 @@ function sp_links(array $s): array {
     return $out;
 }
 function sp_ready(array $s): bool { return count($s['revealed'])===6 && trim($s['plan']['essential'])!=='' && trim($s['plan']['needs'])!=='' && trim($s['plan']['strategy'])!==''; }
+function sp_objectives($input): array {
+    sp_assert(is_array($input),400,'Objectifs invalides.');
+    sp_assert(!array_diff(array_keys($input),['essential','needs','strategy']),400,'Devis inconnu.');
+    $out=[];
+    foreach(['essential','needs','strategy'] as $stage) {
+        $row=$input[$stage]??[];
+        sp_assert(is_array($row)&&!array_diff(array_keys($row),array_keys(SP_CRITERIA)),400,'Critère d’objectif invalide.');
+        foreach(SP_CRITERIA as $id=>$label) {
+            $value=$row[$id]??null;
+            sp_assert($value===null||(is_int($value)&&$value>=1&&$value<=10),400,'Un objectif doit être une note entière de 1 à 10, ou rester vide.');
+            $out[$stage][$id]=$value;
+        }
+    }
+    return $out;
+}
+function sp_evolution(array $s): array {
+    $objectives=$s['plan']['objectives']??[];
+    $values=$s['scores']['clinical']; $stages=[];
+    foreach(['essential','needs','strategy'] as $stage) {
+        foreach(SP_CRITERIA as $id=>$label) if(isset($objectives[$stage][$id]))$values[$id]=$objectives[$stage][$id];
+        $stages[$stage]=['scores'=>$values,'mean'=>array_sum($values)/6];
+    }
+    return ['patient_mean'=>array_sum($s['scores']['patient'])/6,'clinical_mean'=>array_sum($s['scores']['clinical'])/6,'stages'=>$stages];
+}
 function sp_state(array $s,string $role): array {
     $visible=[]; $filled=[];
     foreach($s['scores'] as $side=>$scores) foreach($scores as $id=>$value) {
@@ -110,7 +134,13 @@ function sp_state(array $s,string $role): array {
         'scores'=>$visible,'filled'=>$filled,'locked'=>$s['locked'],'revealed'=>$s['revealed'],
         'phase'=>!$s['locked']['patient']?'patient':(!$s['locked']['clinical']?'clinical':(count($s['revealed'])<6?'reveal':'plan')),
         'summary_ready'=>sp_ready($s),'report_available'=>false,'closed'=>$s['closed']];
-    if($role==='practitioner') { $out['plan']=$s['plan']; $out['links']=['presentation'=>sp_links($s)['presentation']]; $out['plan_revision']=$s['plan_revision']; }
+    if($s['patient']['birth_date']!=='') {
+        $born=new DateTimeImmutable($s['patient']['birth_date']);
+        $visit=(new DateTimeImmutable($s['created_at']))->setTimezone(new DateTimeZone('Europe/Zurich'));
+        $out['patient_age']=$born->diff($visit)->y;
+    }
+    if(sp_ready($s)) $out['evolution']=sp_evolution($s);
+    if($role==='practitioner') { $out['plan']=$s['plan']; $out['plan']['objectives']=$s['plan']['objectives']??sp_objectives([]); $out['links']=['presentation'=>sp_links($s)['presentation']]; $out['plan_revision']=$s['plan_revision']; }
     return $out;
 }
 function sp_patient(array $data): array {
@@ -167,6 +197,8 @@ function sp_mutate(array &$s,string $role,string $action,array $data): array {
         sp_assert(($data['plan_revision']??null)===$s['plan_revision'],409,'Les orientations ont changé sur un autre écran. Rechargez la séance avant d’enregistrer.');
         $plan=[]; foreach(['essential','needs','strategy'] as $key)$plan[$key]=sp_text($data[$key]??'',20000,false);
         $h=$data['horizon']??null; sp_assert(is_int($h)&&$h>=55&&$h<=100,400,'Âge repère invalide.'); $plan['horizon']=$h;
+        // Older open clients may omit this field: preserve already saved objectives.
+        $plan['objectives']=array_key_exists('objectives',$data)?sp_objectives($data['objectives']):($s['plan']['objectives']??sp_objectives([]));
         $s['plan']=$plan; $s['plan_revision']++;
     } elseif($action==='summary') { sp_assert($role==='practitioner',403,'Accès praticien requis.'); sp_assert(sp_ready($s),409,'Complétez et enregistrez les trois cadres.'); }
     elseif($action==='close') { sp_assert($role==='practitioner',403,'Accès praticien requis.'); $s['closed']=true; }
