@@ -1,7 +1,7 @@
 # Publication Méthode SourirePlus 0.4.0
 
-La source de référence est crocolac/methode-sourireplus. source.zip.b64 est un instantané sans données patient ni secrets, utilisé pour les tests PHP et la compilation Windows. Les fichiers web doivent lui être identiques.
+Source de référence : crocolac/methode-sourireplus, branche codex/methode-ovh-two-screens. L’instantané source.zip.b64 ne contient aucun secret ni dossier réel.
 
-SHA-256 de l’instantané encodé : dd1f69a6da28c996a36b33a928aafd97682cce95c84e22d646aee1c43141efa1
+SHA-256 : 92036ffa3653cf655337e69a1b3f99ab2f4b743e5e36e11f199a8153e1907d07
 
-Le manifeste signé et release.json identifient le binaire exact validé avant publication. Le dossier privé de la clinique est créé hors du site ; ses accès sont livrés comme artefact privé, jamais dans le dépôt.
+Le dépôt d’hébergement est public. La livraison contenant les accès est chiffrée avec la clé publique destinataire avant tout chargement comme artefact. La clé privée reste chez le responsable de la livraison.

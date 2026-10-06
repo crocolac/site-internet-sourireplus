@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,9 @@ import urllib.error
 import urllib.request
 import uuid
 import zipfile
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 import publish_bridge_updates as updates
 
@@ -99,6 +103,23 @@ def delivery(kit,access,public_key,output):
     shutil.rmtree(staged)
 
 
+def encrypted_delivery(kit,access,public_key):
+    # The hosting repository is public. Never upload clear-text credentials or
+    # a configured private kit as a GitHub Actions artifact.
+    with tempfile.TemporaryDirectory(prefix="sp-private-delivery-") as temp:
+        directory=Path(temp);delivery(kit,access,public_key,directory)
+        data=io.BytesIO()
+        with zipfile.ZipFile(data,"w",zipfile.ZIP_STORED) as archive:
+            for file in sorted(directory.iterdir()):archive.write(file,file.name)
+        key=AESGCM.generate_key(bit_length=256);nonce=os.urandom(12)
+        recipient=serialization.load_pem_public_key(Path("methode-release/delivery-public-key.pem").read_bytes())
+        wrapped=recipient.encrypt(key,padding.OAEP(mgf=padding.MGF1(hashes.SHA256()),algorithm=hashes.SHA256(),label=None))
+        header=json.dumps({"schema":1,"wrapped_key":base64.b64encode(wrapped).decode(),"nonce":base64.b64encode(nonce).decode()},separators=(',',':')).encode()
+        sealed=AESGCM(key).encrypt(nonce,data.getvalue(),header)
+        Path("delivery-encrypted").mkdir(exist_ok=True)
+        Path("delivery-encrypted/methode-delivery.enc").write_bytes(b"SPDELIVERY1\n"+header+b"\n"+sealed)
+
+
 def api(action,data=None,key=None,session=None):
     headers={"Accept":"application/json"}
     if data is not None:headers["Content-Type"]="application/json"
@@ -148,7 +169,7 @@ def main():
         root=sftp.normalize(".");updates.require(root!="/","SFTP root must expose the hosting parent for private storage.")
         private=posixpath.dirname(root)+"/.sourireplus-methode"
         access=configuration(sftp,private)
-        delivery(args.kit,access,public_bytes,Path("delivery-private"))
+        encrypted_delivery(args.kit,access,public_bytes)
         directory(sftp,private+"/backups",0o700)
         directory(sftp,"methode",0o755);directory(sftp,"methode/visite",0o755)
         for name in FILES:

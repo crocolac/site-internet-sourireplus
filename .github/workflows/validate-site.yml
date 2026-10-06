@@ -40,11 +40,18 @@ jobs:
           test -s out/methode/visite/index.html
           grep -q 'id="visitClinicLogo"' out/methode/visite/index.html
           grep -q 'await reportLogo.decode()' out/methode/visite/index.html
-          grep -q 'function patientReportGap' out/methode/visite/index.html
-          grep -q 'function patientReportEffect' out/methode/visite/index.html
+          if grep -q 'SOURIREPLUS_TWO_SCREEN_V1' out/methode/visite/index.html; then
+            test -s out/methode/visite/api.php
+            test -s out/methode/visite/lib.php
+            test -s out/methode/visite/team.js
+          else
+            grep -q 'function patientReportGap' out/methode/visite/index.html
+            grep -q 'function patientReportEffect' out/methode/visite/index.html
+          fi
       - name: Save the standalone visit for visual and PDF checks
         uses: actions/upload-artifact@v4
         with:
           name: patient-visit-preview
           path: out/methode/visite/index.html
           retention-days: 3
+
