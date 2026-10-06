@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 // SOURIREPLUS_TWO_SCREEN_V1 — encrypted sessions; private directory denied by Apache.
-const SP_VERSION = '0.4.1';
-const SP_CRITERIA = ['alignement'=>'Alignement','caries'=>'Caries','gencives'=>'Gencives','restaurations'=>'Restaurations','fonction'=>'Fonction','esthetique'=>'Esthétique'];
+const SP_VERSION = '0.4.2';
+const SP_CRITERIA = ['caries'=>'Caries','restaurations'=>'Restaurations','gencives'=>'Gencives','alignement'=>'Alignement','fonction'=>'Fonction','esthetique'=>'Esthétique'];
 const SP_BASE = 'https://sourireplus.ch/methode/visite/';
 
 final class SpError extends RuntimeException {
@@ -94,7 +94,8 @@ function sp_links(array $s): array {
     foreach($s['tokens'] as $role=>$token) $out[$role]=$base.'#'.http_build_query(['session'=>$s['id'],'role'=>$role,'token'=>$token]);
     return $out;
 }
-function sp_ready(array $s): bool { return count($s['revealed'])===6 && trim($s['plan']['essential'])!=='' && trim($s['plan']['needs'])!=='' && trim($s['plan']['strategy'])!==''; }
+function sp_active_stages(array $plan): array { return array_values(array_filter(['essential','needs','strategy'],fn($key)=>trim($plan[$key]??'')!=='')); }
+function sp_ready(array $s): bool { return count($s['revealed'])===6 && count(sp_active_stages($s['plan']))>0; }
 function sp_objectives($input): array {
     sp_assert(is_array($input),400,'Objectifs invalides.');
     sp_assert(!array_diff(array_keys($input),['essential','needs','strategy']),400,'Devis inconnu.');
@@ -112,12 +113,14 @@ function sp_objectives($input): array {
 }
 function sp_evolution(array $s): array {
     $objectives=$s['plan']['objectives']??[];
-    $values=$s['scores']['clinical']; $stages=[];
+    $values=$s['scores']['clinical']; $stages=[]; $active=sp_active_stages($s['plan']);
     foreach(['essential','needs','strategy'] as $stage) {
-        foreach(SP_CRITERIA as $id=>$label) if(isset($objectives[$stage][$id]))$values[$id]=$objectives[$stage][$id];
-        $stages[$stage]=['scores'=>$values,'mean'=>array_sum($values)/6];
+        $included=in_array($stage,$active,true);
+        if($included) foreach(SP_CRITERIA as $id=>$label) if(isset($objectives[$stage][$id]))$values[$id]=$objectives[$stage][$id];
+        // Keep stage keys for clients opened before 0.4.2; new clients render active_stages only.
+        $stages[$stage]=['scores'=>$values,'mean'=>array_sum($values)/6,'active'=>$included];
     }
-    return ['patient_mean'=>array_sum($s['scores']['patient'])/6,'clinical_mean'=>array_sum($s['scores']['clinical'])/6,'stages'=>$stages];
+    return ['patient_mean'=>array_sum($s['scores']['patient'])/6,'clinical_mean'=>array_sum($s['scores']['clinical'])/6,'stages'=>$stages,'active_stages'=>$active];
 }
 function sp_state(array $s,string $role): array {
     $visible=[]; $filled=[];
@@ -199,8 +202,9 @@ function sp_mutate(array &$s,string $role,string $action,array $data): array {
         $h=$data['horizon']??null; sp_assert(is_int($h)&&$h>=55&&$h<=100,400,'Âge repère invalide.'); $plan['horizon']=$h;
         // Older open clients may omit this field: preserve already saved objectives.
         $plan['objectives']=array_key_exists('objectives',$data)?sp_objectives($data['objectives']):($s['plan']['objectives']??sp_objectives([]));
+        foreach(['essential','needs','strategy'] as $stage) if($plan[$stage]==='')$plan['objectives'][$stage]=array_fill_keys(array_keys(SP_CRITERIA),null);
         $s['plan']=$plan; $s['plan_revision']++;
-    } elseif($action==='summary') { sp_assert($role==='practitioner',403,'Accès praticien requis.'); sp_assert(sp_ready($s),409,'Complétez et enregistrez les trois cadres.'); }
+    } elseif($action==='summary') { sp_assert($role==='practitioner',403,'Accès praticien requis.'); sp_assert(sp_ready($s),409,'Complétez et enregistrez au moins un devis.'); }
     elseif($action==='close') { sp_assert($role==='practitioner',403,'Accès praticien requis.'); $s['closed']=true; }
     else throw new SpError(404,'Action introuvable.');
     $s['revision']++; $s['updated_at']=gmdate('c');
