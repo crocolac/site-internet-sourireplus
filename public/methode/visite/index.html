@@ -36,6 +36,10 @@
 
 @media print{.print-summary .mean-card{padding:6px}.print-summary .stage-mean{padding:4px;gap:1px;line-height:1.15}.print-summary .stage-mean strong{font-size:19px}.print-summary .mean-card h3{margin:0 0 6px}.print-summary .score-trajectories{margin-top:10px}.print-summary .score-trajectory h3{line-height:1.3}.print-summary .evolution-caption{margin-top:8px!important}}
 .objective-zero{display:block;margin-top:4px;padding:6px 1px;border-radius:5px;background:var(--criterion-color);color:#fff;font-size:10px;text-align:center}
+
+.target-age{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:20px 0;padding:18px 25px;background:#edf3ec;border:1px solid #cbdcc9;border-left:5px solid #4b7764;border-radius:12px}.target-age span{text-transform:uppercase;letter-spacing:1.6px;font-size:12px;font-weight:750;color:#315e50}.target-age p{margin:5px 0 0!important;font-size:13px!important}.target-age strong{font:600 42px Georgia,serif;color:#315e50;white-space:nowrap}.target-age small{font:15px system-ui}.combined-trajectory{margin:0;border:1px solid var(--line);border-radius:16px;background:white;padding:15px}.combined-trajectory>svg{display:block;width:100%;max-height:470px}.combined-trajectory .axis-label,.combined-trajectory .stage-label{font:13px system-ui;fill:#53666a}.combined-trajectory .point-value{font:700 15px system-ui;paint-order:stroke;stroke:white;stroke-width:4px}.trajectory-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.trajectory-key{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:#fbfcfa;border:1px solid #e3e8e1;border-radius:8px;padding:10px;color:var(--criterion-color);min-width:0}.trajectory-key[aria-pressed="true"]{border-color:var(--criterion-color);background:#f0f4ed}.trajectory-key>span{display:flex;align-items:center;gap:8px;font-size:12px}.trajectory-key svg{width:32px;height:8px}.trajectory-key small{font-size:11px;color:#52655b}.trajectory-help{font-size:11px!important;margin-top:10px!important}.project-horizon{background:#edf3ec;border:1px solid #cbdcc9;border-radius:12px;padding:18px 22px}.project-horizon label{font-size:16px;font-weight:650}.project-horizon p{font-size:12px;margin:0}.dx-merge{border-top:1px solid var(--line);padding-top:20px;margin-top:15px}.dx-merge p{font-size:13px;margin:10px 0}.dx-merge .button,.dx-merge>span{margin:6px 10px 6px 0}.dx-merge .button:has(input:disabled){opacity:.45;cursor:default}
+@media(max-width:560px){.trajectory-legend{grid-template-columns:repeat(2,minmax(0,1fr))}.trajectory-key{padding:8px}.trajectory-key>span{font-size:10px;gap:4px}.trajectory-key svg{width:20px}.combined-trajectory{padding:8px}.target-age{padding:15px;gap:10px}.target-age strong{font-size:34px}}
+@media print{.print-summary .target-age{margin:10px 0;padding:10px 15px;print-color-adjust:exact}.print-summary .target-age strong{font-size:34px}.print-summary .target-age p{font-size:10px!important}.print-summary .combined-trajectory{padding:7px}.print-summary .combined-trajectory>svg{max-height:285px}.print-summary .trajectory-legend{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:3px;gap:6px}.print-summary .trajectory-key{padding:6px;print-color-adjust:exact}.print-summary .trajectory-key>span{font-size:10px}.print-summary .trajectory-key small{font-size:9px}.print-summary .trajectory-help{font-size:9px!important}.report-heading strong{overflow-wrap:anywhere}}
 </style>
 </head>
 <body>
@@ -47,7 +51,7 @@
 const params=new URLSearchParams(location.hash.slice(1)),token=params.get('token'),sessionId=params.get('session');
 const app=document.getElementById('app'),connection=document.getElementById('connection'),roleName=document.getElementById('roleName');
 const lockIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 14v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
-let state=null,stateFingerprint='',busy=false,online=true,errorMessage='',pollPending=false,planDraft=null,planDirty=false,toastTimer=null,closed=false,refreshing=null,mutationEpoch=0,pendingPlanScroll=false,pendingBoardScroll=false,pendingEvolutionScroll=false,summaryApproved=false,planDraftRevision=0;
+let state=null,stateFingerprint='',busy=false,online=true,errorMessage='',pollPending=false,planDraft=null,planDirty=false,toastTimer=null,closed=false,refreshing=null,mutationEpoch=0,pendingPlanScroll=false,pendingBoardScroll=false,pendingEvolutionScroll=false,summaryApproved=false,planDraftRevision=0,focusedCriterion=null,dxAttachment=null;
 const animatedReveals=new Set();
 
 const referenceSeries = [
@@ -100,20 +104,32 @@ function objectiveGrid(stage,title){
   return html+'</div></div>';
 }
 const activeStages=()=>planStages.filter(([key])=>(state.evolution?.active_stages||planStages.map(([k])=>k)).includes(key));
+const criterionDashes=['','10 4','3 4','12 4 2 4','8 4 2 4 2 4','1 4'];
+function reportModel(){
+  const stages=[['patient','Ressenti'],['clinical','Bilan'],...activeStages()];
+  return {name:state.patient?.name||'',dossier:state.dossier||'',age:state.target_age??state.plan?.horizon??70,
+    patientMean:state.evolution.patient_mean,clinicalMean:state.evolution.clinical_mean,
+    goals:activeStages().map(([key,title])=>({key,title,mean:state.evolution.stages[key].mean})),stages,
+    series:criteria().map((c,i)=>({id:c.id,label:c.label,color:criterionColors[c.id],dash:criterionDashes[i],values:stages.map(([key])=>key==='patient'||key==='clinical'?score(key,c.id):state.evolution.stages[key].scores[c.id])})),
+    logo:document.getElementById('visitClinicLogo').src};
+}
+function targetAge(){return '<aside class="target-age"><div><span>Votre âge cible</span><p>Préserver votre sourire dans la durée</p></div><strong>'+esc(state.target_age??state.plan?.horizon??70)+' <small>ans</small></strong></aside>'}
 function scoreTrajectories(print=false){
   if(!state.evolution||!allRevealed())return '';
-  const stages=[['patient','Ressenti'],['clinical','Bilan'],...activeStages()];
-  let html='<section class="score-trajectories"><h2>Vos six critères, étape par étape</h2><p>Du ressenti aux objectifs des devis retenus · notes sur 10.</p><div class="trajectory-grid">';
-  for(const c of criteria()){
-    const values=stages.map(([key])=>key==='patient'||key==='clinical'?score(key,c.id):state.evolution.stages[key].scores[c.id]);
-    const x=i=>34+i*278/(stages.length-1),y=n=>(print?106:137)-n*(print?8:11.1),color=criterionColors[c.id];
-    let svg='<svg viewBox="0 0 340 '+(print?148:184)+'" role="img" aria-label="'+esc(c.label+': '+stages.map(([,title],i)=>title+' '+values[i]+' sur 10').join(', '))+'">';
-    for(const n of [0,5,10])svg+='<line x1="34" y1="'+y(n)+'" x2="312" y2="'+y(n)+'" stroke="#e0e5df"/><text x="25" y="'+(y(n)+4)+'" text-anchor="end" class="axis-label">'+n+'</text>';
-    svg+='<polyline points="'+values.map((n,i)=>x(i)+','+y(n)).join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2.6" stroke-linejoin="round"/>';
-    for(let i=0;i<values.length;i++)svg+='<circle data-score-stage="'+stages[i][0]+'" data-score-value="'+values[i]+'" cx="'+x(i)+'" cy="'+y(values[i])+'" r="4" fill="white" stroke="'+color+'" stroke-width="2"/><text class="point-value" x="'+x(i)+'" y="'+(y(values[i])-10)+'" text-anchor="middle" fill="'+color+'">'+values[i]+'</text><text class="stage-label" x="'+x(i)+'" y="'+(print?128:160)+'" text-anchor="middle">'+esc(stages[i][1])+'</text>';
-    html+='<figure class="score-trajectory" data-trajectory="'+c.id+'" style="--criterion-color:'+color+'"><h3>'+esc(c.label)+'</h3>'+svg+'</svg></figure>';
+  const model=reportModel(),focus=print?null:focusedCriterion;
+  const x=i=>66+i*656/(model.stages.length-1),y=n=>274-n*23;
+  let html='<section class="score-trajectories"><h2>Vos six critères, étape par étape</h2><p>Une même échelle pour comparer les évolutions · notes sur 10.</p><figure class="combined-trajectory"><svg viewBox="0 0 790 325" role="img" aria-label="Évolution comparée des six critères du ressenti aux devis retenus">';
+  for(let n=0;n<=10;n++)html+='<line x1="66" y1="'+y(n)+'" x2="722" y2="'+y(n)+'" stroke="#e0e5df"/><text x="49" y="'+(y(n)+4)+'" text-anchor="end" class="axis-label">'+n+'</text>';
+  for(let i=0;i<model.stages.length;i++)html+='<text x="'+x(i)+'" y="305" text-anchor="middle" class="stage-label">'+esc(model.stages[i][1])+'</text>';
+  for(const c of model.series){
+    html+='<g data-trajectory="'+c.id+'" opacity="'+(focus&&focus!==c.id?'.12':'1')+'"><polyline points="'+c.values.map((n,i)=>x(i)+','+y(n)).join(' ')+'" fill="none" stroke="'+c.color+'" stroke-width="3" stroke-dasharray="'+c.dash+'" stroke-linejoin="round"/>';
+    for(let i=0;i<c.values.length;i++)html+='<circle data-score-stage="'+model.stages[i][0]+'" data-score-value="'+c.values[i]+'" cx="'+x(i)+'" cy="'+y(c.values[i])+'" r="4" fill="white" stroke="'+c.color+'" stroke-width="2"><title>'+esc(c.label+' · '+model.stages[i][1]+' : '+c.values[i]+'/10')+'</title></circle>'+(focus===c.id?'<text x="'+x(i)+'" y="'+(y(c.values[i])-11)+'" text-anchor="middle" fill="'+c.color+'" class="point-value">'+c.values[i]+'</text>':'');
+    html+='</g>';
   }
-  return html+'</div></section>';
+  html+='</svg><figcaption class="trajectory-legend">';
+  for(const c of model.series)html+=(print?'<div':'<button type="button" data-action="focus-criterion" data-criterion="'+c.id+'" aria-pressed="'+(focus===c.id)+'"')+' class="trajectory-key" style="--criterion-color:'+c.color+'"><span><svg viewBox="0 0 32 8" aria-hidden="true"><line x1="0" y1="4" x2="32" y2="4" stroke="'+c.color+'" stroke-width="2.5" stroke-dasharray="'+c.dash+'"/></svg><b>'+esc(c.label)+'</b></span><small>'+c.values.join(' → ')+'</small>'+(print?'</div>':'</button>');
+  html+='</figcaption></figure><p class="trajectory-help">'+(print?'Les valeurs de la légende suivent l’ordre des étapes.':'Touchez un critère de la légende pour le mettre en évidence. Les valeurs suivent l’ordre des étapes.')+'</p></section>';
+  return html;
 }
 function evolutionCards(print=false){
   const e=state.evolution;if(!e||!allRevealed())return '';
@@ -122,13 +138,13 @@ function evolutionCards(print=false){
   html+='<article class="mean-card mean-clinical"><h3>Le bilan clinique</h3><strong class="mean-number" data-mean="clinical">'+formatMean(e.clinical_mean)+'</strong><span>sur 10</span></article>';
   html+='<article class="mean-card mean-objectives"><h3>Les objectifs du parcours</h3><div class="objective-means" data-count="'+activeStages().length+'">';
   for(const [key,title] of activeStages())html+='<div class="stage-mean stage-'+key+'"><span>'+title+'</span><strong data-mean="'+key+'">'+formatMean(e.stages[key].mean)+'</strong><small>sur 10</small></div>';
-  return html+'</div></article></div><p class="evolution-caption">Chaque devis reprend les notes du précédent et les objectifs que vous avez définis ensemble. Sans nouvel objectif, la note est conservée.</p>'+scoreTrajectories(print)+'</section>';
+  return html+'</div></article></div><p class="evolution-caption">Chaque devis reprend les notes du précédent et les objectifs que vous avez définis ensemble. Sans nouvel objectif, la note est conservée.</p>'+targetAge()+scoreTrajectories(print)+'</section>';
 }
 function markPlanDirty(){
   planDirty=true;summaryApproved=false;
   const status=document.getElementById('plan-save-status');if(status)status.textContent=planStatus();
   const counter=document.getElementById('plan-count');if(counter)counter.textContent=draftCount()+' / 3 devis retenus';
-  const button=document.getElementById('prepare-summary');if(button){button.disabled=true;button.hidden=true}
+  for(const button of app.querySelectorAll('[data-summary-action]')){button.disabled=true;button.hidden=true}
   app.querySelector('.print-summary')?.remove();
   for(const grid of app.querySelectorAll('[data-objective-grid]')){
     const stage=grid.dataset.objectiveGrid,included=Boolean(planDraft?.[stage]?.trim()),inherited=inheritedScores(stage);
@@ -211,17 +227,16 @@ function planPanel(){if(state.role!=='practitioner'||!allRevealed())return '';co
   let out='<section class="panel" id="deborah-plan" aria-labelledby="deborah-title"><div class="panel-head"><div><p class="eyebrow">04 · Avec Déborah</p><h2 id="deborah-title" tabindex="-1">Les devis de votre parcours</h2><p>Renseignez uniquement les devis retenus : un, deux ou trois. Un cadre laissé vide ne figure pas dans la synthèse.</p></div><span class="counter" id="plan-count">'+draftCount()+' / 3 devis retenus</span></div><div class="plan-grid">';
   for(let i=0;i<categories.length;i++){const [key,title,subtitle,prompt]=categories[i];out+='<article class="plan-card"><div class="plan-index">0'+(i+1)+' · '+esc(subtitle)+'</div><h3>'+title+'</h3><p class="prompt">'+prompt+'</p><label class="sr-only" for="plan-'+key+'">'+title+' — orientations pour Déborah</label><textarea id="plan-'+key+'" data-plan="'+key+'" maxlength="5000" placeholder="'+(key==='essential'?'Priorités et ordre des soins à proposer…':key==='needs'?'Attentes retenues avec le patient…':'Fonctions à préserver, entretien, options futures…')+'"'+disabled(false)+'>'+esc(plan?.[key]||'')+'</textarea>';
     out+=objectiveGrid(key,title);
-    if(key==='strategy')out+='<div class="horizon"><label for="plan-horizon">Âge repère du projet</label><input id="plan-horizon" type="number" data-plan="horizon" min="55" max="100" step="1" value="'+esc(plan?.horizon??70)+'"'+disabled(false)+'><span>ans</span></div><p class="subtle" style="margin-top:11px">Un horizon de discussion personnalisable, pas une norme ni une promesse de résultat.</p>';
     out+='</article>';
   }
-  return out+'</div><div class="panel-foot"><p id="plan-save-status" class="plan-status" aria-live="polite">'+planStatus()+'</p><div class="plan-footer-actions"><button id="save-plan" class="button primary" data-action="save-plan"'+disabled(false)+'>Enregistrer les devis</button><button id="prepare-summary" class="button gold" data-action="print-plan"'+(summaryReady()?'':' hidden')+disabled(!summaryReady())+'>Préparer la synthèse PDF</button></div></div><p class="subtle plan-complete">Ces orientations servent à préparer les devis. La synthèse peut être enregistrée en PDF depuis la fenêtre d’impression.</p></section>';
+  return out+'</div><div class="horizon project-horizon"><label for="plan-horizon">Âge cible du projet</label><input id="plan-horizon" type="number" data-plan="horizon" min="55" max="100" step="1" value="'+esc(plan?.horizon??70)+'"'+disabled(false)+'><span>ans</span><p>Un cap choisi ensemble pour préserver le sourire dans la durée.</p></div><div class="panel-foot"><p id="plan-save-status" class="plan-status" aria-live="polite">'+planStatus()+'</p><div class="plan-footer-actions"><button id="save-plan" class="button primary" data-action="save-plan"'+disabled(false)+'>Enregistrer les devis</button><button id="prepare-summary" data-summary-action class="button gold" data-action="print-plan"'+(summaryReady()?'':' hidden')+disabled(!summaryReady())+'>PDF dossier médical</button><button id="patient-summary" data-summary-action class="button gold" data-action="patient-pdf"'+(summaryReady()?'':' hidden')+disabled(!summaryReady())+'>PDF patient · 1 page</button></div></div><div class="dx-merge"><h3>Le document à remettre au patient</h3><p>Ajoutez le rapport PDF DX Plus de ce patient pour le réunir à sa page de synthèse.</p><label class="button" for="dx-file">Choisir le PDF DX Plus<input id="dx-file" type="file" accept="application/pdf,.pdf" class="sr-only"'+disabled(!summaryReady())+'></label><span class="subtle" id="dx-filename">'+(dxAttachment?esc(dxAttachment.name)+' · '+dxAttachment.pages+' page(s)':'Aucun rapport sélectionné')+'</span><button id="merge-patient" data-summary-action class="button primary" data-action="merge-patient"'+(summaryReady()?'':' hidden')+disabled(!summaryReady()||!dxAttachment)+'>PDF patient + DX Plus</button><p class="subtle">La fusion est réalisée sur cet ordinateur. Le rapport sélectionné reste dans ce navigateur.</p></div></section>';
 }
 function printSummary(){
   if(!summaryReady()||!summaryApproved)return '';
-  let out='<section class="print-summary" data-ready="true"><div class="report-heading"><img alt="Clinique SourirePlus" src="'+document.getElementById('visitClinicLogo').src+'"><div><p class="eyebrow">Méthode SourirePlus · synthèse de séance</p><h1>Votre bilan et vos objectifs</h1><p><strong>'+esc(state.patient?.name)+'</strong> · Dossier '+esc(state.dossier)+'</p></div></div>'+evolutionCards(true);
+  let out='<section class="print-summary" data-ready="true"><div class="report-heading"><img alt="Clinique SourirePlus" src="'+document.getElementById('visitClinicLogo').src+'"><div><p class="eyebrow">Méthode SourirePlus · dossier médical</p><h1>Votre bilan et vos objectifs</h1><p><strong>'+esc(state.patient?.name)+'</strong> · Dossier '+esc(state.dossier)+'</p></div></div>'+evolutionCards(true);
   out+='<section class="report-plans"><h2>Les devis retenus</h2>';
   for(const [key,title] of activeStages())out+='<section class="report-plan report-plan-'+key+'"><h2>'+title+'</h2><div class="print-plan">'+esc(state.plan[key])+'</div></section>';
-  if(activeStages().some(([key])=>key==='strategy'))out+='<p>Âge repère du projet : <strong>'+esc(state.plan.horizon)+' ans</strong>. Horizon personnalisable, sans valeur de norme ni de promesse.</p>';
+
   return out+'<p>Orientations à discuter et à chiffrer dans ZaWin. Cette synthèse ne constitue pas un devis.</p></section></section>';
 }
 function performPendingScroll(){const targetId=pendingEvolutionScroll?'score-evolution':pendingPlanScroll?'deborah-plan':pendingBoardScroll?'card-board':null;if(!targetId)return;pendingPlanScroll=false;pendingBoardScroll=false;pendingEvolutionScroll=false;requestAnimationFrame(()=>{const target=document.getElementById(targetId);if(!target)return;target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});target.querySelector('h2')?.focus({preventScroll:true})})}
@@ -240,14 +255,41 @@ async function mutate(path,body,message){if(busy||!online)return false;const act
 async function closeSession(){if(!window.confirm('Terminer la séance ? Les notes et les orientations enregistrées seront conservées. Les modifications de texte non enregistrées seront perdues.'))return;try{await request('/api/close',{method:'POST',body:{}});closed=true;clearInterval(refreshing);state=null;planDraft=null;planDirty=false;summaryApproved=false;roleName.textContent='';connection.innerHTML='<span>Séance terminée</span>';app.innerHTML='<div class="loading"><h1>La séance est enregistrée et terminée.</h1><p>Vous pouvez fermer cet onglet. La séance reste accessible depuis l’espace équipe.</p></div>'}catch(error){toast(error.status?error.message:'La fermeture n’a pas pu être confirmée. Vérifiez la connexion réseau.')}}
 function openView(role){const raw=state.links?.[role];if(!raw)return;try{const url=new URL(raw,location.href);if(url.origin!==location.origin)return;window.open(url.href,'_blank','popup=yes,width=1280,height=900,noopener,noreferrer')}catch{toast('Le lien de cet écran n’est pas disponible.')}}
 async function downloadReport(){if(busy||!online)return;busy=true;connectionStatus();try{const response=await request('/api/report'),blob=await response.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Rapport_DX_demonstration.pdf';a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);toast('Le rapport fourni a été téléchargé.')}catch(error){toast(error.status?error.message:'Le document n’a pas pu être téléchargé.')}finally{busy=false;connectionStatus()}}
-async function prepareSummary(){if(busy||!online||!summaryReady())return;busy=true;summaryApproved=false;mutationEpoch++;render();let ready=false;try{const response=await request('/api/summary',{method:'POST',body:{}});acceptState(await response.json());ready=summaryReady();summaryApproved=ready;if(!ready)errorMessage='Complétez et enregistrez au moins un devis avant de préparer la synthèse.'}catch(error){if(!error.status)online=false;errorMessage=error.status?error.message:'La synthèse n’a pas pu être vérifiée. Vérifiez la connexion avant de réessayer.'}finally{busy=false;render()}if(ready){for(const reportLogo of app.querySelectorAll('.print-summary img'))try{await reportLogo.decode()}catch{}window.print()}}
+function savePdfDownload(bytes,name){const url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000)}
+async function prepareSummary(kind='medical'){
+  if(busy||!online||!summaryReady()||(kind==='merge'&&!dxAttachment))return;
+  busy=true;summaryApproved=false;mutationEpoch++;render();
+  try{
+    const response=await request('/api/summary',{method:'POST',body:{}});acceptState(await response.json());
+    if(!summaryReady())throw new Error('Enregistrez les devis avant de préparer la synthèse.');
+    if(kind==='medical'){
+      summaryApproved=true;render();for(const reportLogo of app.querySelectorAll('.print-summary img'))try{await reportLogo.decode()}catch{}
+      window.print();
+    }else{
+      let bytes=await window.SourirePlusPDF.createPatient(reportModel());
+      if(kind==='merge')bytes=await window.SourirePlusPDF.merge(bytes,dxAttachment.bytes);
+      const id=String(state.dossier).replace(/[^a-zA-Z0-9_-]/g,'_').slice(0,80)||'patient';
+      savePdfDownload(bytes,'SourirePlus_'+id+(kind==='merge'?'_patient_DXPlus.pdf':'_patient.pdf'));
+      toast(kind==='merge'?'La synthèse patient et le rapport DX Plus sont réunis.':'La synthèse patient est téléchargée.');
+    }
+  }catch(error){if(error.status===401)online=false;errorMessage=error.message||'Le PDF n’a pas pu être préparé.'}
+  finally{busy=false;render()}
+}
+app.addEventListener('change',async event=>{
+  if(event.target.id!=='dx-file')return;
+  const file=event.target.files?.[0];if(!file)return;dxAttachment=null;
+  if(file.size>30*1024*1024){toast('Choisissez un PDF de moins de 30 Mo.');render();return}
+  busy=true;render();
+  try{const bytes=new Uint8Array(await file.arrayBuffer()),doc=await PDFLib.PDFDocument.load(bytes);if(!doc.getPageCount())throw new Error();dxAttachment={name:file.name,bytes,pages:doc.getPageCount()};toast('Rapport DX Plus prêt pour la fusion.')}catch{errorMessage='Ce PDF est protégé ou illisible. Sélectionnez un PDF DX Plus accessible.'}
+  finally{busy=false;render()}
+});
 app.addEventListener('click',event=>{const button=event.target.closest('button[data-action]');if(!button||button.disabled)return;const action=button.dataset.action;
-  if(action==='close-session'){closeSession();return}if(action==='retry'){errorMessage='';stateFingerprint='';refresh();return}if(action==='open-presentation'){openView('presentation');return}if(action==='copy-presentation'){navigator.clipboard.writeText(state.links.presentation).then(()=>toast('Lien de présentation copié.')).catch(()=>window.prompt('Lien de présentation',state.links.presentation));return}if(action==='report'){downloadReport();return}if(action==='print-plan'){prepareSummary();return}
+  if(action==='close-session'){closeSession();return}if(action==='retry'){errorMessage='';stateFingerprint='';refresh();return}if(action==='open-presentation'){openView('presentation');return}if(action==='copy-presentation'){navigator.clipboard.writeText(state.links.presentation).then(()=>toast('Lien de présentation copié.')).catch(()=>window.prompt('Lien de présentation',state.links.presentation));return}if(action==='report'){downloadReport();return}if(action==='print-plan'){prepareSummary('medical');return}if(action==='patient-pdf'){prepareSummary('patient');return}if(action==='merge-patient'){prepareSummary('merge');return}if(action==='focus-criterion'){focusedCriterion=focusedCriterion===button.dataset.criterion?null:button.dataset.criterion;render();return}
   if(action==='objective'){if(!planDraft)return;const stage=button.dataset.stage,id=button.dataset.criterion,n=Number(button.dataset.score);if(planDraft.objectives?.[stage]?.[id]==null&&n===inheritedScores(stage)[id])return;planDraft.objectives??={};planDraft.objectives[stage]??={};planDraft.objectives[stage][id]=planDraft.objectives[stage][id]===n?null:n;markPlanDirty();render();return}
   if(action==='score'){mutate('/api/score',{side:button.dataset.side,criterion:button.dataset.criterion,score:Number(button.dataset.score)});return}
   if(action==='lock'){mutate('/api/lock',{side:button.dataset.side},'Les six cartes sont verrouillées.');return}
   if(action==='reveal'){mutate('/api/reveal',{criterion:button.dataset.criterion});return}
-  if(action==='save-plan'){const horizon=Number(planDraft.horizon);if(!Number.isInteger(horizon)||horizon<55||horizon>100){toast('Choisissez un âge repère entre 55 et 100 ans.');document.getElementById('plan-horizon').focus();return}const submitted={...planDraft,horizon,plan_revision:planDraftRevision};mutate('/api/plan',submitted,'Les devis sont enregistrés.').then(success=>{if(success){planDirty=false;planDraft=clonePlan(state.plan);planDraftRevision=state.plan_revision;render()}})}
+  if(action==='save-plan'){const horizon=Number(planDraft.horizon);if(!Number.isInteger(horizon)||horizon<55||horizon>100){toast('Choisissez un âge cible entre 55 et 100 ans.');document.getElementById('plan-horizon').focus();return}const submitted={...planDraft,horizon,plan_revision:planDraftRevision};mutate('/api/plan',submitted,'Les devis sont enregistrés.').then(success=>{if(success){planDirty=false;planDraft=clonePlan(state.plan);planDraftRevision=state.plan_revision;render()}})}
 });
 app.addEventListener('input',event=>{const key=event.target.dataset.plan;if(!key||!planDraft)return;planDraft[key]=event.target.value;markPlanDirty()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
@@ -257,6 +299,8 @@ window.addEventListener('afterprint',()=>{summaryApproved=false;app.querySelecto
 if(token&&sessionId){refresh();refreshing=setInterval(()=>{if(!document.hidden)refresh()},1200)}
 })();
 </script>
-<script src="team.js?v=0.4.3"></script>
+<script src="pdf-lib.1.17.1.min.js"></script>
+<script src="report-pdf.js?v=0.4.4"></script>
+<script src="team.js?v=0.4.4"></script>
 </body>
 </html>

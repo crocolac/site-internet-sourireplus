@@ -25,7 +25,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import publish_bridge_updates as updates
 
 BASE="https://sourireplus.ch/methode/visite/"
-FILES=(".htaccess","lib.php","api.php","team.js","index.html")
+FILES=(".htaccess","lib.php","api.php","team.js","pdf-lib.1.17.1.min.js","pdf-lib.LICENSE.txt","report-pdf.js","index.html")
 GUARD=b"<?php http_response_code(404); exit; __halt_compiler();\n"
 
 

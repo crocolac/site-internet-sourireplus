@@ -41,10 +41,23 @@ try {
         sp_assert($method==='POST',405,'POST requis.');
         setcookie('sp_method_staff','',['expires'=>1,'path'=>'/methode/visite/','secure'=>!getenv('SOURIREPLUS_METHOD_TEST_ORIGIN'),'httponly'=>true,'samesite'=>'Strict']); sp_reply(['ok'=>true]);
     }
-    if(in_array($action,['staff','sessions','create','join','reopen'],true)) {
+    if(in_array($action,['staff','sessions','create','join','reopen','purge'],true)) {
         if($action==='create')sp_create_access();else sp_staff();
         if($action==='staff')sp_reply(['ok'=>true]);
         if($action==='create') { sp_assert($method==='POST',405,'POST requis.'); sp_reply(sp_create($data),201); }
+        if($action==='purge') {
+            sp_assert($method==='POST',405,'POST requis.');
+            $id=sp_text($data['session_id']??'',32);
+            sp_assert(($data['confirm_session_id']??null)===$id,400,'Confirmez la séance à purger.');
+            sp_assert(preg_match('/\A[a-f0-9]{32}\z/',$id)===1,400,'Identifiant de séance invalide.');
+            sp_locked($id,function()use($id) {
+                $path=sp_dir().'/'.$id.'.enc';
+                sp_assert(is_file($path),404,'Séance introuvable.');
+                sp_assert(unlink($path),500,'Suppression impossible.');
+                // Keep the lock inode so a waiting request cannot race a new lock.
+            });
+            sp_reply(['ok'=>true,'purged'=>$id]);
+        }
         if($action==='join') {
             sp_assert($method==='POST',405,'POST requis.');
             sp_reply(sp_session(sp_text($data['session_id']??'',32),function(&$s) {
@@ -61,7 +74,10 @@ try {
             }));
         }
         $items=[]; $files=glob(sp_dir().'/*.enc'); usort($files,fn($a,$b)=>filemtime($b)<=>filemtime($a));
-        foreach(array_slice($files,0,200)as$file)$items[]=sp_session(basename($file,'.enc'),fn(&$s)=>['session_id'=>$s['id'],'name'=>$s['patient']['name'],'dossier'=>$s['patient']['display_id']?:$s['patient']['patient_id'],'date'=>$s['created_at'],'updated_at'=>$s['updated_at'],'closed'=>$s['closed'],'joinable'=>!$s['closed']&&$s['access_until']>=time(),'complete'=>sp_ready($s)]);
+        foreach(array_slice($files,0,200)as$file) {
+            try { $items[]=sp_session(basename($file,'.enc'),fn(&$s)=>['session_id'=>$s['id'],'name'=>$s['patient']['name'],'dossier'=>$s['patient']['display_id']?:$s['patient']['patient_id'],'date'=>$s['created_at'],'updated_at'=>$s['updated_at'],'closed'=>$s['closed'],'joinable'=>!$s['closed']&&$s['access_until']>=time(),'complete'=>sp_ready($s)]); }
+            catch(SpError $e) { if($e->status!==404)throw $e; }
+        }
         sp_reply(['sessions'=>$items]);
     }
     $id=sp_text($_SERVER['HTTP_X_SOURIREPLUS_SESSION']??'',32);
