@@ -2,8 +2,8 @@
   "version": "0.6.0",
   "web_version": "0.6.0",
   "source_sha256": "e327be10f55e7b7b3097c63061ee60c087ff3e181be851dbb5bcda40e3643846",
-  "build_run_id": 0,
-  "build_head_sha": "PENDING_VALIDATED_BUILD",
+  "build_run_id": 37602899163,
+  "build_head_sha": "80fee59e5dd47322cf2dc2edc211724e625345c8",
   "source_commit": "260641f99035b03a627b8644aac85b9a53b36abe",
   "publication_attempt": 1
 }
