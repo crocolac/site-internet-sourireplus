@@ -26,6 +26,26 @@ import publish_bridge_updates as updates
 
 BASE="https://sourireplus.ch/methode/visite/"
 FILES=(".htaccess","lib.php","api.php","team.js","pdf-lib.1.17.1.min.js","pdf-lib.LICENSE.txt","report-pdf.js","index.html")
+
+def release_files(release):
+    version=release.get("web_version", "0.4.0")
+    updates.require(isinstance(version,str) and updates.VERSION.fullmatch(version), "Invalid web version.")
+    parts=tuple(map(int,version.split('.')))
+    paths=["visite/"+name for name in FILES]
+    if parts >= (0,5,0):
+        paths += ["visite/3shape.php", "api/3shape/oauth/.htaccess", "api/3shape/oauth/callback.php"]
+    if parts >= (0,6,0):
+        paths += ["visite/3shape-bridge.php", "visite/3shape-ui.js"]
+    return tuple(paths)
+
+
+def validate_web_snapshot(root,source,release):
+    for name in release_files(release):
+        deployed=root/name; original=source/name
+        updates.require(deployed.is_file() and original.is_file() and deployed.read_bytes()==original.read_bytes(),
+                        "Published Method file missing or different from the source snapshot.")
+
+
 GUARD=b"<?php http_response_code(404); exit; __halt_compiler();\n"
 
 
@@ -99,19 +119,20 @@ def delivery(kit,access,public_key,output):
     install["public_key"]=public_key.decode().strip()
     (staged/"bridge-install.json").write_text(json.dumps(install,indent=2))
     (staged/"COMMENCER-ICI.txt").write_text(
-        "METHODE SOURIREPLUS 0.4.0 - KIT PRIVE DU TECHNICIEN\n\n"
+        f"METHODE SOURIREPLUS {install['seed']['version']} - KIT PRIVE DU TECHNICIEN\n\n"
         "Lire docs/INSTALLATION-METHODE-WEB.md.\n"
         "Installer sur le veritable hote d'execution ZaWin.\n"
         "Le programme VDDS est SourirePlusLauncher.exe.\n"
         "La configuration web et les mises a jour sont preconfigurees.\n"
         "La cle de liaison est privee : ne pas publier ce kit.\n"
-        "3Shape/Dx Plus et retour PDF ZaWin ne sont pas encore actifs.\n")
+        "Lire les criteres de recette avant activation clinique.\n"
+        "Appairer 3Shape et verifier Unite si cette version inclut la liaison.\n")
     sums=[]
     for file in sorted(staged.rglob("*")):
         if file.is_file() and file.name!="SHA256SUMS.txt":
             sums.append(hashlib.sha256(file.read_bytes()).hexdigest()+"  "+file.relative_to(staged).as_posix())
     (staged/"SHA256SUMS.txt").write_text("\n".join(sums)+"\n")
-    with zipfile.ZipFile(output/"SourirePlus-Methode-OVH-Windows-0.4.0.zip","w",zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(output/f"SourirePlus-Methode-OVH-Windows-{install['seed']['version']}.zip","w",zipfile.ZIP_DEFLATED) as archive:
         for file in sorted(staged.rglob("*")):
             if file.is_file():archive.write(file,file.relative_to(staged).as_posix())
     (output/"Acces-equipe-Methode-SourirePlus.txt").write_text(
@@ -157,10 +178,20 @@ def smoke(sftp,private,access):
     from urllib.parse import urlsplit,parse_qs
     code,status=api("status");updates.require(code==200 and status.get("version")==json.loads(Path("methode-release/release.json").read_text()).get("web_version","0.4.0"),"Live service version differs.")
     updates.require(api("sessions")[0]==401,"Sessions must require authentication.")
-    for name in FILES:
-        if name in ("lib.php",".htaccess"):continue
-        if name=="api.php":continue
-        updates.require(updates.fetch_https(BASE+name,1024*1024)==(Path("public/methode/visite")/name).read_bytes(),"Live page differs from release.")
+    release=json.loads(Path("methode-release/release.json").read_text())
+    paths=release_files(release)
+    for name in paths:
+        if name.endswith((".php", ".htaccess")):continue
+        updates.require(updates.fetch_https("https://sourireplus.ch/methode/"+name,1024*1024)==(Path("public/methode")/name).read_bytes(),"Live page differs from release.")
+    opener=urllib.request.build_opener(updates.NoRedirect())
+    checks=[("visite/lib.php",403)]
+    if "visite/3shape.php" in paths:
+        checks += [("visite/3shape.php",403),("api/3shape/oauth/callback",400)]
+    if "visite/3shape-bridge.php" in paths:checks.append(("visite/3shape-bridge.php",403))
+    for name,expected in checks:
+        try:response=opener.open("https://sourireplus.ch/methode/"+name,timeout=25)
+        except urllib.error.HTTPError as exc:response=exc
+        with response:updates.require(response.status==expected,"Method route protection or OAuth callback differs.")
     patient={"patient_id":"INSTALLATION-"+uuid.uuid4().hex,"display_id":"TEST INSTALLATION","first_name":"Validation","last_name":"Technique","birth_date":"2000-01-01","source_pvs":"TEST_INSTALLATION","practice_number":"TEST"}
     code,result=api("create",{"patient":patient,"resume_today":False},access["bridge_key"])
     updates.require(code==201,"Hosted identity reception failed.")
@@ -184,6 +215,8 @@ def main():
     public=updates.load_public_key(public_bytes);payload=updates.verify_manifest(envelope,public)
     exe=(args.kit/"seed/SourirePlusBridge.exe").read_bytes();updates.check_executable(exe,payload)
     updates.require(hashlib.sha256(Path("methode-release/source.zip.b64").read_bytes()).hexdigest()==release["source_sha256"],"Source bundle differs from the validated build.")
+    files=release_files(release)
+    for name in files:updates.require((Path("public/methode")/name).is_file(),"Method release file missing.")
     if not args.publish:print("METHOD_RELEASE_VALID");return
     client,sftp=updates.connect_sftp();previous={};written=[]
     try:
@@ -195,17 +228,20 @@ def main():
         directory(sftp,private+"/backups",0o700)
         directory(sftp,"methode",0o755);directory(sftp,"methode/visite",0o755)
         try:
-            for name in FILES:
-                target="methode/visite/"+name
+            for name in files:
+                target="methode/"+name
+                parent="methode"
+                for part in name.split('/')[:-1]:
+                    parent+="/"+part;directory(sftp,parent,0o755)
                 previous[name]=updates.remote_read(sftp,target,1024*1024)
                 if previous[name] is not None:
-                    backup=private+"/backups/"+name.replace('.','_')+"-"+hashlib.sha256(previous[name]).hexdigest()
+                    backup=private+"/backups/"+name.replace('/','_').replace('.','_')+"-"+hashlib.sha256(previous[name]).hexdigest()
                     if updates.remote_stat(sftp,backup) is None:put(sftp,backup,previous[name])
-                put(sftp,target,(Path("public/methode/visite")/name).read_bytes(),0o644);written.append(name)
+                put(sftp,target,(Path("public/methode")/name).read_bytes(),0o644);written.append(name)
             smoke(sftp,private,access)
         except Exception:
             for name in reversed(written):
-                target="methode/visite/"+name
+                target="methode/"+name
                 if previous[name] is None:sftp.remove(target)
                 else:put(sftp,target,previous[name],0o644)
             raise
@@ -222,3 +258,4 @@ if __name__=="__main__":
         frames=[f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}" for frame in traceback.extract_tb(exc.__traceback__) if Path(frame.filename).name in {"publish_methode.py","publish_bridge_updates.py"}]
         print("Method publication failed:",type(exc).__name__,"errno="+str(getattr(exc,"errno",None))," > ".join(frames),file=sys.stderr)
         sys.exit(1)
+
