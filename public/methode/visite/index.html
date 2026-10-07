@@ -275,6 +275,10 @@ async function prepareSummary(kind='medical'){
   }catch(error){if(error.status===401)online=false;errorMessage=error.message||'Le PDF n’a pas pu être préparé.'}
   finally{busy=false;render()}
 }
+window.addEventListener('sourireplus-3shape-pdf',async event=>{
+  if(!state||state.role!=='practitioner'||closed||event.detail?.session!==sessionId)return;
+  try{const bytes=event.detail.bytes;if(!(bytes instanceof Uint8Array)||bytes.length>15*1024*1024)throw new Error();const doc=await PDFLib.PDFDocument.load(bytes);if(!doc.getPageCount())throw new Error();dxAttachment={name:event.detail.name,bytes,pages:doc.getPageCount()};toast('Rapport 3Shape prêt pour la fusion.');render();}catch{toast('Ce PDF 3Shape est protégé ou illisible.');}
+});
 app.addEventListener('change',async event=>{
   if(event.target.id!=='dx-file')return;
   const file=event.target.files?.[0];if(!file)return;dxAttachment=null;
@@ -301,6 +305,7 @@ if(token&&sessionId){refresh();refreshing=setInterval(()=>{if(!document.hidden)r
 </script>
 <script src="pdf-lib.1.17.1.min.js"></script>
 <script src="report-pdf.js?v=0.4.4"></script>
-<script src="team.js?v=0.4.4"></script>
+<script src="team.js?v=0.6.0"></script>
+<script src="3shape-ui.js?v=0.6.0"></script>
 </body>
 </html>
