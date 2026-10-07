@@ -7,6 +7,6 @@ DirectoryIndex index.html
   Header always set X-Frame-Options "DENY"
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
 </IfModule>
-<FilesMatch "^(lib\.php|.*\.(json|enc|lock|tmp|zip|ini))$">
+<FilesMatch "^(lib\.php|3shape(?:-bridge)?\.php|.*\.(json|enc|lock|tmp|zip|ini))$">
   Require all denied
 </FilesMatch>

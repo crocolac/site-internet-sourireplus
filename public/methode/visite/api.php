@@ -12,6 +12,14 @@ try {
     sp_assert($origin==='' || $origin===rtrim(getenv('SOURIREPLUS_METHOD_TEST_ORIGIN')?:'https://sourireplus.ch','/'),403,'Origine non autorisée.');
     sp_assert(($_SERVER['HTTP_SEC_FETCH_SITE']??'')!=='cross-site',403,'Origine non autorisée.');
     if($action==='status') { sp_config(); sp_reply(['ok'=>true,'service'=>'SourirePlus Method','version'=>SP_VERSION]); }
+    if($action==='3shape-upload') {
+        sp_assert($method==='POST',405,'POST requis.');require_once __DIR__.'/3shape-bridge.php';
+        sp3_device_auth(sp3_bridge_state());
+        sp_assert(strtolower(explode(';',$_SERVER['CONTENT_TYPE']??'')[0])==='application/pdf',415,'PDF requis.');
+        sp_assert((int)($_SERVER['CONTENT_LENGTH']??0)<=SP3_PDF_LIMIT,413,'PDF trop volumineux.');
+        $raw=file_get_contents('php://input',false,null,0,SP3_PDF_LIMIT+1);
+        sp_reply(sp3_store_pdf(['job_id'=>$_SERVER['HTTP_X_SOURIREPLUS_JOB']??'','claim'=>$_SERVER['HTTP_X_SOURIREPLUS_CLAIM']??''],$raw));
+    }
     $data=[];
     if($method==='POST') {
         sp_assert(str_starts_with(strtolower($_SERVER['CONTENT_TYPE']??''),'application/json'),415,'Format JSON requis.');
@@ -41,6 +49,32 @@ try {
         sp_assert($method==='POST',405,'POST requis.');
         setcookie('sp_method_staff','',['expires'=>1,'path'=>'/methode/visite/','secure'=>!getenv('SOURIREPLUS_METHOD_TEST_ORIGIN'),'httponly'=>true,'samesite'=>'Strict']); sp_reply(['ok'=>true]);
     }
+    if(in_array($action,['3shape-device-create','3shape-device-revoke','3shape-devices','3shape-poll','3shape-finish','3shape-view','3shape-enqueue','3shape-cancel','3shape-pdf'],true)) {
+        require_once __DIR__.'/3shape-bridge.php';
+        if($action==='3shape-devices'){sp_staff();sp_assert($method==='GET',405,'GET requis.');sp_reply(['devices'=>sp3_devices(sp3_bridge_state())]);}
+        if($action==='3shape-view'){sp_assert($method==='GET',405,'GET requis.');sp_reply(sp3_view(sp_text($_SERVER['HTTP_X_SOURIREPLUS_SESSION']??'',32)));}
+        if($action==='3shape-pdf'){
+            sp_assert($method==='GET',405,'GET requis.');$pdf=sp3_get_pdf(sp_text($_SERVER['HTTP_X_SOURIREPLUS_SESSION']??'',32),sp_text($_GET['job_id']??'',32));
+            header('Content-Type: application/pdf');header('Content-Disposition: attachment; filename="rapport-3shape.pdf"');header('Content-Length: '.strlen($pdf));echo $pdf;exit;
+        }
+        sp_assert($method==='POST',405,'POST requis.');
+        if($action==='3shape-device-create')sp_reply(sp3_device_create($data),201);
+        if($action==='3shape-device-revoke')sp_reply(sp3_device_revoke($data));
+        if($action==='3shape-poll')sp_reply(sp3_poll());
+        if($action==='3shape-finish')sp_reply(sp3_finish_job($data));
+        $session=sp_text($_SERVER['HTTP_X_SOURIREPLUS_SESSION']??'',32);
+        if($action==='3shape-enqueue')sp_reply(sp3_enqueue($session,$data),202);
+        sp_reply(sp3_cancel_job($session,$data));
+    }
+    if(in_array($action,['3shape-status','3shape-start','3shape-disconnect'],true)) {
+        sp_staff(); require __DIR__.'/3shape.php';
+        if($action==='3shape-status'){sp_assert($method==='GET',405,'GET requis.');sp_reply(sp3_status());}
+        sp_assert($method==='POST',405,'POST requis.');
+        if($action==='3shape-disconnect'){sp3_disconnect();sp_reply(['ok'=>true]);}
+        $flow=sp3_start();
+        setcookie('sp_3shape_binding',$flow['binding'],['expires'=>time()+600,'path'=>'/methode/','secure'=>!getenv('SOURIREPLUS_METHOD_TEST_ORIGIN'),'httponly'=>true,'samesite'=>'Lax']);
+        sp_reply(['authorization_url'=>$flow['authorization_url']]);
+    }
     if(in_array($action,['staff','sessions','create','join','reopen','purge'],true)) {
         if($action==='create')sp_create_access();else sp_staff();
         if($action==='staff')sp_reply(['ok'=>true]);
@@ -56,6 +90,7 @@ try {
                 sp_assert(unlink($path),500,'Suppression impossible.');
                 // Keep the lock inode so a waiting request cannot race a new lock.
             });
+            require_once __DIR__.'/3shape-bridge.php';sp3_purge_session($id);
             sp_reply(['ok'=>true,'purged'=>$id]);
         }
         if($action==='join') {
