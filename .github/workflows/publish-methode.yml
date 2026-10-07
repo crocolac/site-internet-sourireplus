@@ -2,7 +2,7 @@ name: Method two-screen application and Windows kit
 
 on:
   pull_request:
-    paths: ['methode-release/**', 'public/methode/visite/**', 'scripts/publish_methode.py', '.github/workflows/publish-methode.yml']
+    paths: ['methode-release/**', 'public/methode/visite/**', 'public/methode/api/**', 'scripts/publish_methode.py', 'tests/test_methode_publisher.py', '.github/workflows/publish-methode.yml']
   push:
     branches: [main]
     paths: ['methode-release/release.json']
@@ -30,19 +30,33 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: python -m pip install cryptography==50.0.2 paramiko==4.0.0
+      - run: python -m unittest discover -s tests -p test_methode_publisher.py -v
       - name: Extract the versioned source snapshot
         run: |
           python - <<'PY'
-          import base64,io,zipfile
+          import base64,io,zipfile,json,sys
           from pathlib import Path
           zipfile.ZipFile(io.BytesIO(base64.b64decode(Path('methode-release/source.zip.b64').read_bytes()))).extractall('method-source')
-          for file in Path('public/methode/visite').iterdir():
-              if file.name in ['index.html','team.js','api.php','lib.php','.htaccess']:
-                  assert file.read_bytes()==(Path('method-source/web/visite')/file.name).read_bytes(), file.name
+          sys.path.insert(0,'scripts')
+          from publish_methode import validate_web_snapshot
+          validate_web_snapshot(Path('public/methode'),Path('method-source/web'),json.loads(Path('methode-release/release.json').read_text()))
           PY
       - name: Private sessions, persistence and authorization
         working-directory: method-source
         run: python web/tests/test_hosted.py -v
+      - name: Versioned OAuth and Unite bridge checks
+        working-directory: method-source
+        run: |
+          python - <<'PYTEST'
+          import json,subprocess,sys
+          from pathlib import Path
+          version=tuple(map(int,json.loads(Path('../methode-release/release.json').read_text()).get('web_version','0.4.0').split('.')))
+          if version >= (0,5,0):subprocess.run([sys.executable,'web/tests/test_3shape.py','-v'],check=True)
+          if version >= (0,6,0):
+              subprocess.run([sys.executable,'-m','pip','install','-r','bridge/requirements-test.txt'],check=True)
+              subprocess.run([sys.executable,'web/tests/test_3shape_flow.py','-v'],check=True)
+          PYTEST
       - name: Install browser verification
         working-directory: method-source
         run: |
@@ -139,3 +153,4 @@ jobs:
           path: delivery-encrypted/*
           retention-days: 7
           if-no-files-found: warn
+
