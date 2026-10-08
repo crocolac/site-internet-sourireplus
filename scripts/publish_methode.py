@@ -11,6 +11,7 @@ import posixpath
 import secrets
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import traceback
@@ -88,7 +89,27 @@ def configuration(sftp,private):
         updates.require(len(base64.b64decode(config["key"]))==32,"Invalid stored encryption key.")
         for value,field in [("staff_key","access_hash"),("bridge_key","bridge_hash")]:
             updates.require(hashlib.sha256(access[value].encode()).hexdigest()==config[field],"Private access configuration differs.")
+    access["_staff_password_managed"] = "staff_password_hash" in config
     return access
+
+
+def apply_staff_password(sftp,private,access):
+    password=os.environ.get("METHOD_STAFF_PASSWORD", "")
+    if not password:return
+    updates.require(10 <= len(password.encode()) <= 72 and password==password.strip(), "Invalid team password length or whitespace.")
+    path=private+"/config.php"
+    raw=updates.remote_read(sftp,path,4096)
+    updates.require(raw is not None and raw.startswith(GUARD),"Private configuration missing.")
+    config=json.loads(raw[len(GUARD):])
+    # PHP receives the password through stdin, never a command-line argument.
+    # Keep the same hash when re-publishing the same password (preserves cookies).
+    program='$v=json_decode(stream_get_contents(STDIN),true); echo isset($v["hash"]) && password_verify($v["password"],$v["hash"]) ? $v["hash"] : password_hash($v["password"],PASSWORD_BCRYPT,["cost"=>12]);'
+    hashed=subprocess.run(["php","-r",program],input=json.dumps({"password":password,"hash":config.get("staff_password_hash")}),text=True,capture_output=True,check=True).stdout.strip()
+    updates.require(hashed.startswith("$2y$12$") and len(hashed)==60,"Password hashing failed.")
+    config["staff_password_hash"]=hashed
+    updated=GUARD+json.dumps(config).encode()
+    if updated!=raw:put(sftp,path,updated)
+    access["_staff_password_managed"]=True
 
 
 def protect_private_directory(sftp,private):
@@ -137,7 +158,7 @@ def delivery(kit,access,public_key,output):
             if file.is_file():archive.write(file,file.relative_to(staged).as_posix())
     (output/"Acces-equipe-Methode-SourirePlus.txt").write_text(
         "ACCES PRIVE DE L'EQUIPE - METHODE SOURIREPLUS\n\n"+BASE+"\n\nCode de la clinique :\n"+
-        access["staff_key"]+"\n\nConserver ce fichier avec les acces internes. Ne pas publier ni partager avec les patients.\n"
+        ("Mot de passe choisi par la clinique (secret METHOD_STAFF_PASSWORD)." if access.get("_staff_password_managed") else access["staff_key"])+"\n\nConserver ce fichier avec les acces internes. Ne pas publier ni partager avec les patients.\n"
         "Le technicien recoit uniquement le ZIP Windows, qui contient une cle de liaison distincte.\n"
         "Depuis l'espace equipe : creer ou reprendre la seance, ouvrir les deux ecrans.\n"
         "Le lien de presentation peut etre copie sur l'ordinateur tactile. Les liens expirent apres 12 heures.\n"
@@ -224,7 +245,7 @@ def main():
         private=posixpath.join(root,".sourireplus-methode")
         protect_private_directory(sftp,private)
         access=configuration(sftp,private)
-        encrypted_delivery(args.kit,access,public_bytes)
+        previous_config=updates.remote_read(sftp,private+"/config.php",4096)
         directory(sftp,private+"/backups",0o700)
         directory(sftp,"methode",0o755);directory(sftp,"methode/visite",0o755)
         try:
@@ -238,8 +259,15 @@ def main():
                     backup=private+"/backups/"+name.replace('/','_').replace('.','_')+"-"+hashlib.sha256(previous[name]).hexdigest()
                     if updates.remote_stat(sftp,backup) is None:put(sftp,backup,previous[name])
                 put(sftp,target,(Path("public/methode")/name).read_bytes(),0o644);written.append(name)
+            apply_staff_password(sftp,private,access)
             smoke(sftp,private,access)
+            if os.environ.get("METHOD_STAFF_PASSWORD"):
+                updates.require(api("login",{"key":os.environ["METHOD_STAFF_PASSWORD"]})[0]==200,"New team password login failed.")
+                updates.require(api("staff",key=access["staff_key"])[0]==401,"Old team key is still accepted.")
+                print("TEAM_PASSWORD_LOGIN_VERIFIED_OLD_KEY_REJECTED")
+            encrypted_delivery(args.kit,access,public_bytes)
         except Exception:
+            put(sftp,private+"/config.php",previous_config)
             for name in reversed(written):
                 target="methode/"+name
                 if previous[name] is None:sftp.remove(target)
@@ -258,4 +286,5 @@ if __name__=="__main__":
         frames=[f"{Path(frame.filename).name}:{frame.lineno}:{frame.name}" for frame in traceback.extract_tb(exc.__traceback__) if Path(frame.filename).name in {"publish_methode.py","publish_bridge_updates.py"}]
         print("Method publication failed:",type(exc).__name__,"errno="+str(getattr(exc,"errno",None))," > ".join(frames),file=sys.stderr)
         sys.exit(1)
+
 
