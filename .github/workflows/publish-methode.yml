@@ -44,7 +44,9 @@ jobs:
           PY
       - name: Private sessions, persistence and authorization
         working-directory: method-source
-        run: python web/tests/test_hosted.py -v
+        run: |
+          python web/tests/test_hosted.py -v
+          python web/tests/test_password.py -v
       - name: Versioned OAuth and Unite bridge checks
         working-directory: method-source
         run: |
@@ -118,6 +120,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
       - name: Resolve the exact approved Windows build
         id: release
         env:
@@ -141,6 +147,7 @@ jobs:
       - run: python scripts/publish_methode.py --kit approved-kit
       - name: Publish only Method files and signed receiver
         env:
+          METHOD_STAFF_PASSWORD: ${{ secrets.METHOD_STAFF_PASSWORD }}
           SFTP_SERVER: ${{ secrets.SFTP_SERVER }}
           SFTP_USERNAME: ${{ secrets.SFTP_USERNAME }}
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
@@ -153,4 +160,5 @@ jobs:
           path: delivery-encrypted/*
           retention-days: 7
           if-no-files-found: warn
+
 

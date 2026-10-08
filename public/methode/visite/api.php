@@ -36,12 +36,12 @@ try {
             if(time()-$limit['since']>900)$limit=['since'=>time(),'count'=>0];
             sp_assert($limit['count']<20,429,'Trop de tentatives. Réessayez dans quinze minutes.');
             $key=$data['key']??'';
-            if(!is_string($key)||strlen($key)!==43||!hash_equals(sp_config()['access_hash'],hash('sha256',$key))) {
+            if(!sp_password_valid($key)) {
                 $limit['count']++; sp_atomic($path,json_encode($limit)); throw new SpError(401,'Code d’accès incorrect.');
             }
             if(is_file($path))unlink($path);
         });
-        $cookie=(time()+43200).'.'.bin2hex(random_bytes(12)); $cookie.='.'.hash_hmac('sha256',$cookie,sp_key());
+        $cookie=(time()+43200).'.'.bin2hex(random_bytes(12)); $cookie.='.'.hash_hmac('sha256',$cookie,sp_staff_cookie_key());
         setcookie('sp_method_staff',$cookie,['expires'=>time()+43200,'path'=>'/methode/visite/','secure'=>!getenv('SOURIREPLUS_METHOD_TEST_ORIGIN'),'httponly'=>true,'samesite'=>'Strict']);
         sp_reply(['ok'=>true]);
     }

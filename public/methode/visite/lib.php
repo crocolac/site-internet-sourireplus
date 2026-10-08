@@ -69,13 +69,23 @@ function sp_session(string $id,callable $action) {
     });
 }
 function sp_header_token(): string { return $_SERVER['HTTP_X_SOURIREPLUS_TOKEN'] ?? ''; }
+function sp_password_valid($candidate): bool {
+    if(!is_string($candidate) || strlen($candidate)<1 || strlen($candidate)>256) return false;
+    $config=sp_config();
+    if(isset($config['staff_password_hash'])) return password_verify($candidate,$config['staff_password_hash']);
+    return strlen($candidate)===43 && hash_equals($config['access_hash'],hash('sha256',$candidate));
+}
+function sp_staff_cookie_key(): string {
+    $hash=sp_config()['staff_password_hash']??null;
+    return $hash===null ? sp_key() : hash_hmac('sha256','staff-cookie:'.$hash,sp_key(),true);
+}
 function sp_is_staff(): bool {
     $token=sp_header_token();
-    if(strlen($token)===43 && hash_equals(sp_config()['access_hash'],hash('sha256',$token))) return true;
+    if(!isset(sp_config()['staff_password_hash']) && strlen($token)===43 && hash_equals(sp_config()['access_hash'],hash('sha256',$token))) return true;
     $cookie=$_COOKIE['sp_method_staff'] ?? '';
     if(!is_string($cookie) || strlen($cookie)>300) return false;
     $parts=explode('.',$cookie); if(count($parts)!==3 || !ctype_digit($parts[0])) return false;
-    return (int)$parts[0]>=time() && hash_equals(hash_hmac('sha256',$parts[0].'.'.$parts[1],sp_key()),$parts[2]);
+    return (int)$parts[0]>=time() && hash_equals(hash_hmac('sha256',$parts[0].'.'.$parts[1],sp_staff_cookie_key()),$parts[2]);
 }
 function sp_staff(): void { sp_assert(sp_is_staff(),401,'Accès équipe requis.'); }
 function sp_create_access(): void {
