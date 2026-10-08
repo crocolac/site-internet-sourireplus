@@ -27,8 +27,8 @@ try {
     if ($LASTEXITCODE -ne 0 -or $After.selected_version -ne '0.6.1' -or $After.selected_release -ne 7 -or $After.payload_source -eq 'seed') { throw 'Updated payload not selected.' }
     $Again = (& $Launcher --check-updates-now | Out-String) | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0 -or $Again.update_status -ne 'up_to_date') { throw 'Repeated check failed.' }
-    $Simulation = (& $Launcher --self-test | Out-String) | ConvertFrom-Json
-    if ($LASTEXITCODE -ne 0 -or $Simulation.status -ne 'PASS') { throw 'Updated payload failed.' }
+    $Preflight = (& $Launcher --preflight | Out-String) | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0 -or $Preflight.clinical_ready -ne $false) { throw 'Updated maintenance delegation failed.' }
     'PASS: live signed upgrade 0.6.0 to 0.6.1, standard Windows user' | Set-Content -LiteralPath $Output
     exit 0
 } catch {
@@ -39,8 +39,9 @@ try {
     Start-Service seclogon
     $Credential = New-Object Management.Automation.PSCredential(($env:COMPUTERNAME + '\' + $Name), $Password)
     $Output = Join-Path $Root 'result.txt'
-    $Process = Start-Process powershell.exe -Credential $Credential -LoadUserProfile -Wait -PassThru `
+    $Process = Start-Process powershell.exe -Credential $Credential -LoadUserProfile -PassThru `
         -ArgumentList ('-NoProfile -ExecutionPolicy Bypass -File "' + (Join-Path $Root 'verify.ps1') + '" -Launcher "' + $Launcher + '" -Output "' + $Output + '"')
+    if (-not $Process.WaitForExit(180000)) { $Process.Kill(); throw 'Standard-user test timed out.' }
     if (Test-Path -LiteralPath $Output) { Get-Content -LiteralPath $Output }
     if ($Process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $Output)) { throw 'Standard-user compiled check failed.' }
 } finally {
