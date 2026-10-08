@@ -98,3 +98,33 @@ jobs:
           SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
           SFTP_PORT: ${{ secrets.SFTP_PORT }}
         run: python scripts/publish_bridge_updates.py --release-dir agent-staged --publish
+  verify-upgrade:
+    if: github.event_name == 'push'
+    needs: publish
+    runs-on: windows-2022
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: methode-windows-kit
+          path: production-seed
+          run-id: 37602899163
+          github-token: ${{ github.token }}
+      - name: Install the existing 0.6.0 seed in disposable Windows
+        shell: powershell
+        run: |
+          $ErrorActionPreference='Stop'
+          & './production-seed/scripts/Install-Bridge.ps1'
+          if($LASTEXITCODE -ne 0){throw 'Seed installation failed.'}
+          $Root=Join-Path $env:ProgramFiles 'SourirePlus\Bridge'
+          if((Get-FileHash "$Root/SourirePlusLauncher.exe").Hash -ne '3059A91B8A4C273A733D4EBEC0EFBECAD637C7ACDEFF546709115B8777FDABEE'){throw 'Wrong production launcher.'}
+          if((Get-FileHash "$Root/seed/SourirePlusBridge.exe").Hash -ne 'F259A5246FBEC00698E848BDCD3B675CD103EE41DFCF5256C7C6765D87BF6EEB'){throw 'Wrong production seed.'}
+          $Path=Join-Path $Root 'bridge-install.json'
+          $Config=Get-Content $Path -Raw|ConvertFrom-Json
+          $Config.manifest_url='https://sourireplus.ch/updates/bridge/manifest.json'
+          $Config.public_key='OmSCTcXPz4tlexDQEW9uoWtgjuz8MjtNNIkAUpOKc6Q='
+          $Config|ConvertTo-Json -Depth 5|Set-Content $Path -Encoding UTF8
+      - name: Adopt signed update under a standard Windows account
+        shell: powershell
+        run: ./agent-release/test-live-upgrade.ps1
