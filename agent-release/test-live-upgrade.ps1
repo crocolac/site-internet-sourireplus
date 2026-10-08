@@ -25,10 +25,10 @@ try {
     if ($LASTEXITCODE -ne 0 -or $Update.update_status -ne 'updated') { throw 'Signed update failed.' }
     $After = (& $Launcher --launcher-diagnose | Out-String) | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0 -or $After.selected_version -ne '0.6.1' -or $After.selected_release -ne 7 -or $After.payload_source -eq 'seed') { throw 'Updated payload not selected.' }
-    $Simulation = (& $Launcher --self-test | Out-String) | ConvertFrom-Json
-    if ($LASTEXITCODE -ne 0 -or $Simulation.status -ne 'PASS') { throw 'Updated payload failed.' }
     $Again = (& $Launcher --check-updates-now | Out-String) | ConvertFrom-Json
     if ($LASTEXITCODE -ne 0 -or $Again.update_status -ne 'up_to_date') { throw 'Repeated check failed.' }
+    $Simulation = (& $Launcher --self-test | Out-String) | ConvertFrom-Json
+    if ($LASTEXITCODE -ne 0 -or $Simulation.status -ne 'PASS') { throw 'Updated payload failed.' }
     'PASS: live signed upgrade 0.6.0 to 0.6.1, standard Windows user' | Set-Content -LiteralPath $Output
     exit 0
 } catch {
