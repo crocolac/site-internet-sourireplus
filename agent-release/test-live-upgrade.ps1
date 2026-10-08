@@ -41,9 +41,12 @@ try {
     $Output = Join-Path $Root 'result.txt'
     $Process = Start-Process powershell.exe -Credential $Credential -LoadUserProfile -PassThru `
         -ArgumentList ('-NoProfile -ExecutionPolicy Bypass -File "' + (Join-Path $Root 'verify.ps1') + '" -Launcher "' + $Launcher + '" -Output "' + $Output + '"')
+    $ProcessHandle = $Process.Handle # Retain the handle so Windows PowerShell preserves ExitCode.
     if (-not $Process.WaitForExit(180000)) { $Process.Kill(); throw 'Standard-user test timed out.' }
     if (Test-Path -LiteralPath $Output) { Get-Content -LiteralPath $Output }
-    if ($Process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $Output)) { throw 'Standard-user compiled check failed.' }
+    if (-not (Test-Path -LiteralPath $Output)) { throw 'Standard-user result missing.' }
+    if ((Get-Content -LiteralPath $Output -Raw).Trim() -ne 'PASS: live signed upgrade 0.6.0 to 0.6.1, standard Windows user') { throw 'Standard-user upgrade failed.' }
+    if ($null -ne $Process.ExitCode -and $Process.ExitCode -ne 0) { throw 'Standard-user process failed.' }
 } finally {
     if ($null -ne $User) { Remove-LocalUser -Name $Name -ErrorAction SilentlyContinue }
     if (Test-Path -LiteralPath $Root) { Remove-Item -LiteralPath $Root -Recurse -Force }
