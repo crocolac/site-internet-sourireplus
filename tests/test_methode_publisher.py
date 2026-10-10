@@ -1,6 +1,7 @@
 import sys
 import tempfile
 import unittest
+from unittest.mock import Mock, patch
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
@@ -8,6 +9,24 @@ import publish_methode as publisher
 
 
 class MethodPublicationTests(unittest.TestCase):
+    def test_web_only_publication_never_writes_or_verifies_an_old_windows_release(self):
+        with patch.object(publisher.updates,'publish_release') as publish, patch.object(publisher.updates,'verify_live') as verify:
+            publisher.finish_windows_publication(Mock(),Mock(),b'older-envelope',{},b'exe',False)
+            publish.assert_not_called()
+            verify.assert_not_called()
+
+    def test_windows_publication_keeps_its_progression_and_live_checks(self):
+        sftp,public=Mock(),Mock()
+        with patch.object(publisher.updates,'publish_release') as publish, patch.object(publisher.updates,'verify_live') as verify:
+            publisher.finish_windows_publication(sftp,public,b'envelope',{'release':2},b'exe',True)
+            publish.assert_called_once_with(sftp,Path('bridge-releases/support'),public,b'envelope',{'release':2},b'exe')
+            verify.assert_called_once_with(b'envelope',{'release':2})
+
+    def test_publication_flag_requires_a_boolean(self):
+        for value in ('false',0,None):
+            with self.assertRaises(publisher.updates.PublishError):
+                publisher.finish_windows_publication(Mock(),Mock(),b'envelope',{},b'exe',value)
+
     def test_snapshot_requires_every_oauth_and_bridge_file(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)/'public';source=Path(folder)/'source'

@@ -230,9 +230,18 @@ def smoke(sftp,private,access):
             if updates.remote_stat(sftp,path) is not None:sftp.remove(path)
 
 
+def finish_windows_publication(sftp,public,envelope,payload,exe,enabled):
+    updates.require(type(enabled) is bool,"Invalid Windows publication flag.")
+    if not enabled:return
+    updates.publish_release(sftp,Path("bridge-releases/support"),public,envelope,payload,exe)
+    updates.verify_live(envelope,payload)
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument("--kit",type=Path,required=True);parser.add_argument("--publish",action="store_true");args=parser.parse_args()
     release=json.loads(Path("methode-release/release.json").read_text())
+    publish_windows=release.get("publish_windows",True)
+    updates.require(type(publish_windows) is bool,"Invalid Windows publication flag.")
     envelope=Path("methode-release/manifest.json").read_bytes()
     public_bytes=Path("bridge-releases/current/public-key.txt").read_bytes()
     public=updates.load_public_key(public_bytes);payload=updates.verify_manifest(envelope,public)
@@ -267,7 +276,7 @@ def main():
                 updates.require(api("login",{"key":os.environ["METHOD_STAFF_PASSWORD"]})[0]==200,"New team password login failed.")
                 updates.require(api("staff",key=access["staff_key"])[0]==401,"Old team key is still accepted.")
                 print("TEAM_PASSWORD_LOGIN_VERIFIED_OLD_KEY_REJECTED")
-            encrypted_delivery(args.kit,access,public_bytes)
+            if publish_windows:encrypted_delivery(args.kit,access,public_bytes)
         except Exception:
             put(sftp,private+"/config.php",previous_config)
             for name in reversed(written):
@@ -275,10 +284,10 @@ def main():
                 if previous[name] is None:sftp.remove(target)
                 else:put(sftp,target,previous[name],0o644)
             raise
-        updates.publish_release(sftp,Path("bridge-releases/support"),public,envelope,payload,exe)
+        finish_windows_publication(sftp,public,envelope,payload,exe,publish_windows)
     finally:sftp.close();client.close()
-    updates.verify_live(envelope,payload)
-    print("METHOD_AND_WINDOWS_LIVE_OK web="+release.get("web_version","0.4.0")+" bridge="+release["version"])
+    if publish_windows:print("METHOD_AND_WINDOWS_LIVE_OK web="+release.get("web_version","0.4.0")+" bridge="+release["version"])
+    else:print("METHOD_WEB_LIVE_OK web="+release.get("web_version","0.4.0")+" WINDOWS_RELEASE_UNCHANGED")
 
 
 if __name__=="__main__":
