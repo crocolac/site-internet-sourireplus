@@ -5,7 +5,8 @@
   "build_run_id": 37602899163,
   "build_head_sha": "80fee59e5dd47322cf2dc2edc211724e625345c8",
   "source_commit": "260641f99035b03a627b8644aac85b9a53b36abe",
-  "publication_attempt": 3,
+  "publication_attempt": 4,
+  "publish_windows": false,
   "auth_source_commit": "2ebe523035362ef3fc05e3b9ac9651fc4ae2c4c6",
   "reference_source_commit": "17c0e0e6658a9a02ef8ef8cf5c0b0ffaa2f0dc2e"
 }
