@@ -1,0 +1,24 @@
+name: OVH - verifier les connexions
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  site:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: python3 -m pip install paramiko==5.0.0
+      - name: Verifier sans modifier OVH
+        env:
+          CONNECTION_ROOT: "."
+          CONNECTION_MARKERS: "index.html,google-rating.php"
+          CONNECTION_HOST: "${{ secrets.SFTP_SERVER }}"
+          CONNECTION_USERNAME: "${{ secrets.SFTP_USERNAME }}"
+          CONNECTION_PASSWORD: "${{ secrets.SFTP_PASSWORD }}"
+          CONNECTION_PORT: "${{ secrets.SFTP_PORT }}"
+        run: python3 connections/audit.py
