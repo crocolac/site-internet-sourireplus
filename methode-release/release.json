@@ -1,10 +1,11 @@
 {
   "version": "0.6.0",
   "web_version": "0.6.0",
-  "source_sha256": "eaa455ecfd3fcba9ddca4a10acd7d5930d4acbecd8224e98eacb1dac9ef1c955",
+  "source_sha256": "1bb06a822fe7ae76573161f358e024d60e6dcc99207fc48a1b147e75356d9272",
   "build_run_id": 37602899163,
   "build_head_sha": "80fee59e5dd47322cf2dc2edc211724e625345c8",
   "source_commit": "260641f99035b03a627b8644aac85b9a53b36abe",
-  "publication_attempt": 2,
-  "auth_source_commit": "2ebe523035362ef3fc05e3b9ac9651fc4ae2c4c6"
+  "publication_attempt": 3,
+  "auth_source_commit": "2ebe523035362ef3fc05e3b9ac9651fc4ae2c4c6",
+  "reference_source_commit": "17c0e0e6658a9a02ef8ef8cf5c0b0ffaa2f0dc2e"
 }
