@@ -116,6 +116,24 @@ try {
         sp_reply(['sessions'=>$items]);
     }
     $id=sp_text($_SERVER['HTTP_X_SOURIREPLUS_SESSION']??'',32);
+    if($action==='reference') {
+        sp_assert($method==='GET',405,'GET requis.');
+        // Release the session lock before reading the public reference file.
+        sp_session($id,fn(&$s)=>sp_role($s));
+        $context=stream_context_create([
+            'http'=>['timeout'=>5,'follow_location'=>0,'header'=>"Accept: application/json\r\nCache-Control: no-cache\r\n"],
+            'ssl'=>['verify_peer'=>true,'verify_peer_name'=>true]
+        ]);
+        $stream=@fopen('https://mydentalpass.ch/courbes/fond-trajectoire.json','rb',false,$context);
+        sp_assert($stream!==false,503,'Les repères de vie sont momentanément indisponibles.');
+        try { $raw=stream_get_contents($stream,262145); $meta=stream_get_meta_data($stream); }
+        finally { fclose($stream); }
+        sp_assert(is_string($raw)&&strlen($raw)<=262144&&!($meta['timed_out']??false)&&preg_match('/^HTTP\/\S+ 200(?: |$)/',$meta['wrapper_data'][0]??'')===1,503,'Les repères de vie sont momentanément indisponibles.');
+        try { $reference=json_decode($raw,true,32,JSON_THROW_ON_ERROR); }
+        catch(JsonException $e) { throw new SpError(503,'Les repères de vie sont momentanément indisponibles.'); }
+        sp_assert(is_array($reference)&&($reference['schema']??null)==='sourire-plus-fond-trajectoire'&&is_array($reference['series']??null)&&count($reference['series'])===6,503,'Les repères de vie sont momentanément indisponibles.');
+        sp_reply($reference);
+    }
     $result=sp_session($id,function(&$s)use($action,$data,$method) {
         $role=sp_role($s);
         if($action==='state') { sp_assert($method==='GET',405,'GET requis.'); return sp_state($s,$role); }

@@ -221,6 +221,8 @@ def smoke(sftp,private,access):
         token=parse_qs(urlsplit(result["links"]["presentation"]).fragment)["token"][0]
         code,state=api("state",key=token,session=sid)
         updates.require(code==200 and state.get("dossier")=="TEST INSTALLATION" and "links" not in state and "plan" not in state,"Private role filtering failed.")
+        code,reference=api("reference",key=token,session=sid)
+        updates.require(code==200 and reference.get("schema")=="sourire-plus-fond-trajectoire" and len(reference.get("series",[]))==6,"Live reference curves are unavailable.")
     finally:
         # Only the exact synthetic session created by this deployment is removed.
         for suffix in (".enc",".lock"):
